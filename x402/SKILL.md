@@ -153,10 +153,36 @@ Verified working services from the bazaar:
 |---------|-----|-------|-------|
 | Current weather (any city) | `https://xx402.vercel.app/weather?location=<city>` | $0.001 | GET, returns temp + conditions |
 
-**Example:**
+**Example — weather in Bali:**
 ```
 x402_discover_payment_requirements(baseURL="https://xx402.vercel.app", path="/weather", method="GET")
 make_http_request_with_x402(baseURL="https://xx402.vercel.app", path="/weather", method="GET", queryParams={"location": "Bali"})
+```
+
+**Example — fund Base wallet from NEAR (USDC → USDC, 0.5 USDC out):**
+```
+# 1. Get token asset IDs
+GET https://1click.chaindefuser.com/v0/tokens
+# originAsset:      nep141:17208628f84f5d6ad33f0da3bbbeb27ffcb398eac501a31bd6ad2011e36133a1  (USDC on NEAR)
+# destinationAsset: nep141:base-0x833589fcd6edb6e08f4c7c32d4f71b54bda02913.omft.near       (USDC on Base)
+
+# 2. Dry quote
+POST https://1click.chaindefuser.com/v0/quote
+{
+  "dry": true, "swapType": "EXACT_OUTPUT",
+  "originAsset": "nep141:17208628f84f5d6ad33f0da3bbbeb27ffcb398eac501a31bd6ad2011e36133a1",
+  "destinationAsset": "nep141:base-0x833589fcd6edb6e08f4c7c32d4f71b54bda02913.omft.near",
+  "amount": "500000", "recipient": "0xB29...<baseWallet>",
+  "refundTo": "shade-agent.near",
+  "depositType": "ORIGIN_CHAIN", "recipientType": "DESTINATION_CHAIN",
+  "refundType": "ORIGIN_CHAIN", "deadline": "<10min from now>",
+  "slippageTolerance": 100
+}
+# → quote.amountInFormatted: "0.508494" USDC to send
+
+# 3. Commit (dry: false) → quote.depositAddress: "5af01c8c..."
+# 4. Send ft_transfer_call on NEAR: contract 17208628..., amount 508494, msg = depositAddress
+# Result: 0.5 USDC lands on Base in ~22 seconds
 ```
 
 ---
