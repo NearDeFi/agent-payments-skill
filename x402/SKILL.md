@@ -1,11 +1,12 @@
 ---
 name: x402
-version: "3.0"
+version: "3.1"
 description: >
   Use this skill when the user wants to call a paid API, access an x402-protected resource,
-  check the price of an endpoint, browse or search for x402 services, or manage their crypto
-  wallet. Triggers: "x402", "HTTP 402", "pay for API", "paid endpoint", "find x402 services",
-  "bazaar", or a request returns a 402 response.
+  check the price of an endpoint, browse or search for x402 services, manage their crypto
+  wallet, or fund their wallet from another chain. Triggers: "x402", "HTTP 402", "pay for API",
+  "paid endpoint", "find x402 services", "bazaar", "fund my wallet", "deposit", "top up",
+  or a request returns a 402 response.
 ---
 
 # x402 — HTTP-Native Payments via Coinbase payments-mcp
@@ -169,6 +170,90 @@ make_http_request_with_x402(baseURL="https://xx402.vercel.app", path="/weather",
 | Receipt header (server → you) | `PAYMENT-RESPONSE` (base64 JSON) |
 | USDC decimals | 6 — divide `amount` by `1,000,000` for USD |
 | Default chain | Base mainnet — `eip155:8453` |
+
+---
+
+## Funding Your Wallet from Another Chain (NEAR Intents)
+
+Swap any supported asset on any chain into USDC on Base using the NEAR Intents 1-click API.
+**API base:** `https://1click.chaindefuser.com`
+
+### Step 1: Gather inputs
+
+```
+get_wallet_address(chain="base")
+```
+
+Ask the user:
+- How much USDC do you want on Base?
+- What asset and chain are you sending from? (e.g. ETH on Ethereum, SOL on Solana)
+- What is your sending wallet address? (used as refund address — if unknown, Base wallet is used)
+
+### Step 2: Look up asset IDs
+
+```
+GET https://1click.chaindefuser.com/v0/tokens
+```
+
+Find both:
+- `destinationAsset`: USDC on `base`
+- `originAsset`: the user's chosen symbol + blockchain
+
+**Never construct asset IDs manually — always look them up from this endpoint.**
+
+### Step 3: Dry quote (preview, no charge)
+
+Use `EXACT_OUTPUT` — user wants a specific USDC amount, the input is variable.
+Convert the desired USDC amount to atomic units (multiply by 10^decimals).
+
+```json
+POST https://1click.chaindefuser.com/v0/quote
+{
+  "dry": true,
+  "swapType": "EXACT_OUTPUT",
+  "originAsset": "<originAssetId>",
+  "destinationAsset": "<usdcBaseAssetId>",
+  "amount": "<desiredUsdcInAtomicUnits>",
+  "recipient": "<baseWalletAddress>",
+  "refundTo": "<see refund logic below>",
+  "depositType": "ORIGIN_CHAIN",
+  "recipientType": "DESTINATION_CHAIN",
+  "refundType": "ORIGIN_CHAIN",
+  "deadline": "<ISO8601 timestamp ~10 min from now>",
+  "slippageTolerance": 100
+}
+```
+
+**Note:** `depositType`, `recipientType`, `refundType`, and `deadline` are all required — the API returns 400 without them.
+
+Show the user:
+- Must send: `quote.minAmountIn` – `quote.maxAmountIn` of origin asset (`amountInFormatted` for display)
+- Will receive: `quote.amountOutFormatted` USDC on Base
+- Deadline: `quote.deadline`
+
+### Step 4: Committed quote (get deposit address)
+
+Once user confirms, repeat with `dry: false` to get the real deposit address (valid ~10 min):
+
+```json
+{ "dry": false, ...same fields, with a fresh deadline... }
+```
+
+Return to the user:
+- **Send**: `quote.amountInFormatted` of origin asset
+- **To address**: `quote.depositAddress`
+- **Chain**: origin chain name
+- **Asset contract**: origin token `contractAddress` (from tokens response)
+- **By**: `quote.deadline`
+- If `quote.depositMemo` is non-null — user must include it in the transaction (required for Stellar, otherwise funds are lost)
+
+### Refund address logic
+
+| Situation | What to set |
+|-----------|-------------|
+| User provides their origin wallet address | `refundTo`: that address |
+| Origin is EVM, address unknown | `refundTo`: Base wallet address |
+| Origin is non-EVM, address unknown | `refundType`: `"VIRTUAL_CHAIN"`, `virtualChainRefundRecipient`: Base wallet address — omit `refundTo` |
 
 ---
 
