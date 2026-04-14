@@ -114,3 +114,37 @@ Then include any chain-specific instructions from the table below.
 | **Solana (SPL tokens)** | The recipient's Associated Token Account (ATA) may not exist yet — wallet software handles this, but warn the user if they're doing it manually |
 | **TON (Jetton tokens)** | Send to the user's own Jetton wallet address for that token, **not** the token contract address — these are different |
 
+---
+
+## Step 5: Monitor swap status
+
+Poll until a terminal status is reached:
+
+```
+GET https://1click.chaindefuser.com/v0/status?depositAddress=<quote.depositAddress>
+```
+
+If the quote included a `depositMemo`, append `&depositMemo=<memo>` to the request.
+
+| Status | Meaning |
+|--------|---------|
+| `PENDING_DEPOSIT` | Waiting for the deposit transaction to be detected |
+| `KNOWN_DEPOSIT_TX` | Deposit transaction detected, awaiting confirmation |
+| `INCOMPLETE_DEPOSIT` | Amount sent was less than required — may need a top-up |
+| `PROCESSING` | Swap is actively executing |
+| `SUCCESS` | Swap complete — USDC should be on Base |
+| `REFUNDED` | Swap failed, assets returned to refund address |
+| `FAILED` | Swap failed, assets not returned — check `swapDetails` |
+
+Once `SUCCESS` is confirmed, proceed to verify the balance landed.
+
+---
+
+## Step 6: Verify balance
+
+```
+get_wallet_balance(chain="base")
+```
+
+Confirm the USDC balance has increased by the expected `quote.amountOutFormatted`. If it hasn't arrived yet, wait and re-poll the status endpoint — settlement typically takes under a minute but can vary by origin chain.
+

@@ -69,7 +69,7 @@ get_wallet_balance(chain="base")
 USDC uses 6 decimals — divide by 1,000,000 for USD. Default chain: Base mainnet (`eip155:8453`).
 
 - **Balance ≥ service price** → proceed to Step 4
-- **Balance < service price** → read `references/near-intents-funding.md` for the complete cross-chain funding flow
+- **Balance < service price** → read `references/near-intents-funding.md` for the complete cross-chain funding flow, including swap status monitoring and balance verification
 
 **Gas:** No ETH needed — Coinbase Paymaster sponsors gas for USDC payments on Base.
 
