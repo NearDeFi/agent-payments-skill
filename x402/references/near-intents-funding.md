@@ -1,7 +1,13 @@
 # Funding Your Wallet from Another Chain (NEAR Intents)
 
-Swap any supported asset on any supported chain into USDC on Base using the NEAR Intents 1-click API.
+Swap any supported asset into USDC on Base using the NEAR Intents 1-click API.
 **API base:** `https://1click.chaindefuser.com`
+
+## Supported origin chains
+
+Only use this flow for the following chains. Do not attempt it for any other chain — deposit handling requirements vary per chain and unlisted chains are not verified to work correctly.
+
+`near` `eth` `base` `sol` `arb` `op` `pol` `bsc` `avax` `gnosis` `scroll` `starknet` `bera` `ton` `tron` `stellar` `btc` `doge` `ltc` `bch` `zec` `dash` `xrp` `cardano` `sui` `aptos` `xlayer` `monad` `plasma` `adi` `aleo`
 
 ## How much to deposit
 
