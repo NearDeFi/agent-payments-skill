@@ -6,15 +6,16 @@ description: >
   wallet, fund their wallet from another chain or pay for x402 services from any chain. Triggers: "x402", "HTTP 402", "pay for API",
   "paid endpoint", "find x402 services", "bazaar", "fund my wallet", "deposit", "top up",
   or a request returns a 402 response.
-compatibility: Requires payments-mcp MCP server (npx @coinbase/payments-mcp --client claude-code --auto-config) and internet access
+compatibility: Recommended — payments-mcp MCP server (npx @coinbase/payments-mcp --client claude-code --auto-config). Can also run without it using a raw private key — see references/wallet-setup.md. Requires internet access.
 metadata:
   version: "1.0"
 ---
 
-# x402 — HTTP-Native Payments via Coinbase payments-mcp
+# x402 — HTTP-Native Payments
 
 x402 gates API resources behind USDC micropayments using HTTP `402 Payment Required`.
-All operations go through the `payments-mcp` MCP tools — no code, no installs.
+
+> **Wallet:** If `make_http_request_with_x402` is available in your tools (payments-mcp), use the flow below. Otherwise, read `references/wallet-setup.md` before continuing — it will detect your wallet setup and explain the manual payment flow.
 
 ---
 
@@ -39,6 +40,14 @@ bazaar_list()
 Results are saved to a file automatically (13k+ services exceed token limits).
 To search the saved file: `node scripts/search-bazaar.js <saved-file> <keyword>`
 
+**Without payments-mcp** — query the bazaar API directly (no auth required):
+```
+GET https://api.cdp.coinbase.com/platform/v2/x402/discovery/resources?limit=100&network=eip155:8453
+```
+To search: `node scripts/search-bazaar.js --url https://api.cdp.coinbase.com/platform/v2/x402/discovery/resources <keyword>`
+
+Each result includes a `network` field showing which chain(s) the service accepts payment on. A service may be Base-only, Solana-only, or support both. **Currently only Base (and Polygon) payments are supported by payments-mcp** — Solana payment signing is not yet implemented.
+
 **Get full details for a specific service** (schemas, parameters, examples):
 ```
 bazaar_get_resource_details(resource="<resource URL or name>")
@@ -46,11 +55,11 @@ bazaar_get_resource_details(resource="<resource URL or name>")
 
 **For a non-bazaar endpoint** (URL you already have):
 ```
-x402_discover_payment_requirements(url="<URL>")
+x402_discover_payment_requirements(baseURL="<base URL>", path="<path>", method="GET")
 ```
-Returns the price in USDC atomic units without charging anything.
+Returns the price and accepted payment networks without charging anything. The response includes an `accepts` array — each entry specifies a network (e.g. `eip155:8453` for Base, `solana:...` for Solana).
 
-### Example working serivce 
+### Example working service
 
 **Example — weather in Bali:**
 ```
@@ -60,7 +69,7 @@ make_http_request_with_x402(baseURL="https://xx402.vercel.app", path="/weather",
 
 ---
 
-## Step 3: Check Balance 
+## Step 3: Check Balance
 
 ```
 get_wallet_balance(chain="base")
@@ -82,17 +91,18 @@ USDC uses 6 decimals — divide by 1,000,000 for USD. Default chain: Base mainne
 **For bazaar resources** — get details first, then pay:
 ```
 bazaar_get_resource_details(resource="<resource>")
-make_http_request_with_x402(url="<url>", method="<GET|POST>", body={...})
+make_http_request_with_x402(baseURL="<base URL>", path="<path>", method="<GET|POST>", body={...})
 ```
 
 **For non-bazaar endpoints:**
 ```
-x402_discover_payment_requirements(url="<URL>")
-make_http_request_with_x402(url="<url>", method="<GET|POST>")
+x402_discover_payment_requirements(baseURL="<base URL>", path="<path>", method="GET")
+make_http_request_with_x402(baseURL="<base URL>", path="<path>", method="<GET|POST>")
 ```
 
 `make_http_request_with_x402` handles the 402 → sign → retry flow automatically.
-Use `preferredNetwork="solana"` to pay via Solana instead of EVM.
+
+**Note:** Solana payment signing is not yet supported by payments-mcp — only Base and Polygon payments work currently. Do not use `preferredNetwork="solana"`.
 
 ---
 

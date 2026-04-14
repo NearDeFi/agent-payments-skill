@@ -96,7 +96,7 @@ If falling back to `INTENTS`, warn the user: if the transaction fails, refunded 
 
 ## Step 4: Committed quote (get deposit address)
 
-Once user confirms (if the quote is good), repeat exaclty the same but with `dry: false` to get the real deposit address (valid ~10 min):
+Once user confirms (if the quote is good), repeat exactly the same but with `dry: false` to get the real deposit address (valid ~10 min):
 
 ```json
 { "dry": false, ...same fields, with a fresh deadline... }
