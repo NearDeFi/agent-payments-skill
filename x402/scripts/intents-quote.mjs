@@ -2,10 +2,10 @@
 // NEAR Intents cross-chain swap: get a quote or check swap status.
 //
 // Dry quote (preview, no funds committed):
-//   node scripts/intents-quote.mjs quote --dry --usdc 1.00 --from eth:ETH --wallet 0xBase [--refund 0xAddr]
+//   node scripts/intents-quote.mjs quote --dry --usdc 1.00 --from eth:ETH --wallet 0xBase [--refund <sendingAddress>]
 //
 // Committed quote (get deposit address):
-//   node scripts/intents-quote.mjs quote --usdc 1.00 --from eth:ETH --wallet 0xBase [--refund 0xAddr]
+//   node scripts/intents-quote.mjs quote --usdc 1.00 --from eth:ETH --wallet 0xBase [--refund <sendingAddress>]
 //
 // Check swap status:
 //   node scripts/intents-quote.mjs status <depositAddress> [--memo <memo>]

@@ -34,7 +34,7 @@ node scripts/wallet.mjs address
 Ask the user:
 - How much USDC do you want on Base?
 - What asset and chain are you sending from? (e.g. ETH on Ethereum, SOL on Solana)
-- What is your sending wallet address? (used as refund address — strongly recommended)
+- What is your sending wallet address? (used as refund address — can be any format: 0x, Solana base58, NEAR, etc.)
 
 ---
 
@@ -50,7 +50,7 @@ node scripts/intents-quote.mjs quote --dry \
 
 Example — swap 1 ETH worth into USDC:
 ```bash
-node scripts/intents-quote.mjs quote --dry --usdc 50.00 --from eth:ETH --refund 0xYourEthAddress --wallet 0xYourBaseAddress
+node scripts/intents-quote.mjs quote --dry --usdc 50.00 --from eth:ETH --refund <yourSendingAddress> --wallet 0xYourBaseAddress
 ```
 
 Show the user for confirmation:
