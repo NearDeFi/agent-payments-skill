@@ -1,5 +1,5 @@
 ---
-name: x402
+name: agent-payments
 description: >
   Use this skill when the user wants to call a paid API, access an x402-protected resource,
   check the price of an endpoint, browse or search for x402 services, manage their crypto
@@ -7,7 +7,7 @@ description: >
   "paid endpoint", "find x402 services", "bazaar", "fund my wallet", "deposit", "top up",
   or a request returns a 402 response.
 compatibility: >
-  Requires internet access and viem (run `npm install` in x402/).
+  Requires internet access and viem (run `npm install` in agent-payments/).
   Wallet support: raw private key (universal), Coinbase payments-mcp, CDP SDK, Privy server wallets, Turnkey, MoonPay/Open Wallet Standard.
   payments-mcp optional — see references/payments-mcp.md.
 metadata:

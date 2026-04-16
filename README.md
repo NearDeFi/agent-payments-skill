@@ -1,4 +1,4 @@
-# x402
+# agent-payments
 
 Skill for making HTTP 402 micropayments using USDC on Base and funding it from most chains.
 
@@ -6,7 +6,7 @@ Skill for making HTTP 402 micropayments using USDC on Base and funding it from m
 
 **Node.js 20+** — required for built-in `node:test`, top-level `await`, and `.mjs` support.
 
-**viem** — used by the scripts for EIP-712 signing and key derivation. Install once before running scripts or tests:
+**viem** — used by the scripts for EIP-712 signing and key derivation. Install once before running scripts:
 
 ```bash
 npm install
@@ -16,7 +16,10 @@ No other dependencies. The scripts use Node's built-in `https`, `crypto`, and `h
 
 ## Running the tests
 
+Tests live in the `tests/` directory at the repo root (one level up). From the repo root:
+
 ```bash
+npm install          # installs test dependencies
 node --test tests/*.test.mjs
 ```
 

@@ -5,11 +5,12 @@ import { fileURLToPath } from 'url';
 import { join, dirname } from 'path';
 import { config } from 'dotenv';
 
-// Load x402/.env so wallet credentials are available without manually exporting them.
-config({ path: join(dirname(fileURLToPath(import.meta.url)), '..', '.env'), quiet: true });
+const SKILL_DIR = join(dirname(fileURLToPath(import.meta.url)), '..', 'agent-payments');
+
+// Load agent-payments/.env so wallet credentials are available without manually exporting them.
+config({ path: join(SKILL_DIR, '.env'), quiet: true });
 
 const execAsync = promisify(execFile);
-const SKILL_DIR = join(dirname(fileURLToPath(import.meta.url)), '..');
 
 // Well-known Hardhat/Anvil test key — public, no real funds at risk.
 export const TEST_KEY = '0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80';
