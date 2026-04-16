@@ -2,7 +2,22 @@
 
 Skill for making HTTP 402 micropayments using USDC on Base and funding it from most chains.
 
-## Prerequisites
+## Install
+
+```bash
+npx skills add NearDeFi/agent-payments-skill
+```
+
+Then install the runtime dependency inside the skill directory:
+
+```bash
+cd <skills-dir>/agent-payments
+npm install
+```
+
+Where `<skills-dir>` is `.agents/skills` (universal) or `.claude/skills` (Claude Code), relative to your project root or home directory depending on whether you installed globally.
+
+## Prerequisites (for development)
 
 **Node.js 20+** — required for built-in `node:test`, top-level `await`, and `.mjs` support.
 
