@@ -1,0 +1,15 @@
+{
+  "type": "module",
+  "dependencies": {
+    "viem": "^2.0.0"
+  },
+  "devDependencies": {
+    "@coinbase/cdp-sdk": "latest",
+    "@turnkey/viem": "latest",
+    "@turnkey/http": "latest",
+    "@turnkey/api-key-stamper": "latest",
+    "@x402/fetch": "latest",
+    "@x402/core": "latest",
+    "@x402/evm": "latest"
+  }
+}

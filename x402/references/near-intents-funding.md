@@ -1,7 +1,6 @@
 # Funding Your Wallet from Another Chain (NEAR Intents)
 
 Swap any supported asset into USDC on Base using the NEAR Intents 1-click API.
-**API base:** `https://1click.chaindefuser.com`
 
 ## Supported origin chains
 
@@ -18,139 +17,111 @@ A reasonable approach:
 2. Get a dry quote — it returns `quote.minAmountIn`, the solver's actual minimum for this swap
 3. Deposit `max(quote.minAmountIn, estimated_spend)` — the solver minimum is a hard floor, the estimate is advisory
 
-If the role is light (a few calls, low price), depositing just enough for the task plus a small buffer is fine. If the role will run many calls or over a longer session, depositing enough to cover that period avoids repeated top-up interruptions. Use your judgement — the goal is not to minimise deposits for their own sake, just to not fund more than the role realistically needs.
-
 ---
 
-## Step 1: Gather inputs
+## Step 1: Get your Base wallet address
 
+With payments-mcp:
 ```
 get_wallet_address(chain="base")
 ```
 
+Without payments-mcp:
+```bash
+node scripts/wallet.mjs address
+```
+
 Ask the user:
 - How much USDC do you want on Base?
-- What asset and chain are you sending from? (e.g. ETH on Ethereum, SOL on Solana, USDC on NEAR)
-- What is your sending wallet address? (used as refund address — if unknown, the Base wallet address is used)
+- What asset and chain are you sending from? (e.g. ETH on Ethereum, SOL on Solana)
+- What is your sending wallet address? (used as refund address — strongly recommended)
 
 ---
 
-## Step 2: Look up asset IDs
+## Step 2: Dry quote (preview, no charge)
 
-**Destination asset is fixed** — USDC on Base is always:
-```
-nep141:base-0x833589fcd6edb6e08f4c7c32d4f71b54bda02913.omft.near
-```
-
-For the `originAsset`, look up the user's chosen symbol + chain from the tokens endpoint:
-```
-GET https://1click.chaindefuser.com/v0/tokens
+```bash
+node scripts/intents-quote.mjs quote --dry \
+  --usdc <amount> \
+  --from <chain:SYMBOL> \
+  --refund <sendingWalletAddress> \
+  --wallet <baseWalletAddress>
 ```
 
-**Never construct origin asset IDs manually — always look them up from this endpoint.**
+Example — swap 1 ETH worth into USDC:
+```bash
+node scripts/intents-quote.mjs quote --dry --usdc 50.00 --from eth:ETH --refund 0xYourEthAddress --wallet 0xYourBaseAddress
+```
+
+Show the user for confirmation:
+- **Send:** amount and asset shown in output
+- **Receive:** USDC amount shown in output
+
+### Refund address
+
+Always provide `--refund` with the user's sending wallet address — if the swap fails, funds return directly to that address.
+
+If the sending address is unknown, omit `--refund`. The script will warn you: refunded funds will land in the NEAR Intents internal balance for the Base wallet address and must be manually withdrawn to recover them.
 
 ---
 
-## Step 3: Dry quote (preview, no charge)
+## Step 3: Committed quote (get deposit address)
 
-Use `EXACT_OUTPUT` — user wants a specific USDC amount, the input is variable.
-USDC on Base has 6 decimals — convert to atomic units by multiplying by 1,000,000 (e.g. $0.50 → `500000`).
+Once the user confirms, run the same command without `--dry`:
 
-```json
-POST https://1click.chaindefuser.com/v0/quote
-{
-  "dry": true,
-  "swapType": "EXACT_OUTPUT",
-  "originAsset": "<originAssetId>",
-  "destinationAsset": "nep141:base-0x833589fcd6edb6e08f4c7c32d4f71b54bda02913.omft.near",
-  "amount": "<desiredUsdcInAtomicUnits>",
-  "recipient": "<baseWalletAddress>",
-  "refundTo": "<see refund logic below>",
-  "depositType": "ORIGIN_CHAIN",
-  "recipientType": "DESTINATION_CHAIN",
-  "refundType": "ORIGIN_CHAIN",
-  "deadline": "<ISO8601 timestamp ~10 min from now>",
-  "slippageTolerance": 100
-}
+```bash
+node scripts/intents-quote.mjs quote \
+  --usdc <amount> \
+  --from <chain:SYMBOL> \
+  --refund <sendingWalletAddress> \
+  --wallet <baseWalletAddress>
 ```
 
-**Note:** Include all fields
-
-Show the user for confirmation:                            
-  **Send:** `quote.amountInFormatted` of origin asset      
-  **Receive:** `quote.amountOutFormatted` USDC on Base     
-  **Fee:** difference between the two (so it's transparent)
-
-### Refund address logic
-
-**Always try to get the user's sending wallet address first** — `ORIGIN_CHAIN` is the safest option as funds return directly to the chain they came from.
-
-| Situation | `refundType` | What to set |
-|-----------|-------------|-------------|
-| User provides their sending wallet address | `"ORIGIN_CHAIN"` | `refundTo`: their sending wallet address |
-| Sending address unknown | `"INTENTS"` (NEAR Intents internal account — fallback) | `refundTo`: the Base wallet `0x` address |
-
-If falling back to `INTENTS`, warn the user: if the transaction fails, refunded funds will land in the NEAR Intents internal balance for their Base wallet `0x` address — they'll need to access and withdraw from that balance to recover them. It is not automatic.
-
----
-
-## Step 4: Committed quote (get deposit address)
-
-Once user confirms (if the quote is good), repeat exactly the same but with `dry: false` to get the real deposit address (valid ~10 min):
-
-```json
-{ "dry": false, ...same fields, with a fresh deadline... }
-```
-
-Return to the user:
-- **Send**: `quote.amountInFormatted` of origin asset
-- **To address**: `quote.depositAddress`
-- **Chain**: origin chain name
-- **Asset contract**: origin token `contractAddress` (from tokens response)
-- **By**: `quote.deadline`
-
-Then include any chain-specific instructions from the table below.
+The script outputs the deposit address, asset contract, and deadline. Give all of these to the user along with any chain-specific instructions below.
 
 ## Chain-specific deposit instructions
 
 | Chain | What to tell the user |
 |-------|----------------------|
-| **Stellar** | Must include `quote.depositMemo` as the transaction memo — **funds are permanently lost if omitted** |
-| **NEAR (native NEAR)** | Cannot send native NEAR directly — must first wrap it: call `near_deposit` on `wrap.near` to get wrapped near |
+| **Stellar** | Must include the `MEMO REQUIRED` value printed by the script as the transaction memo — **funds are permanently lost if omitted** |
+| **NEAR (native NEAR)** | Cannot send native NEAR directly — must first wrap it: call `near_deposit` on `wrap.near` to get wrapped NEAR |
 | **Solana (SPL tokens)** | The recipient's Associated Token Account (ATA) may not exist yet — wallet software handles this, but warn the user if they're doing it manually |
 | **TON (Jetton tokens)** | Send to the user's own Jetton wallet address for that token, **not** the token contract address — these are different |
 
 ---
 
-## Step 5: Monitor swap status
+## Step 4: Monitor swap status
 
 Poll until a terminal status is reached:
 
-```
-GET https://1click.chaindefuser.com/v0/status?depositAddress=<quote.depositAddress>
+```bash
+node scripts/intents-quote.mjs status <depositAddress>
 ```
 
-If the quote included a `depositMemo`, append `&depositMemo=<memo>` to the request.
+If the original quote printed a `MEMO REQUIRED` value, append `--memo <value>` to the status command.
 
 | Status | Meaning |
 |--------|---------|
 | `PENDING_DEPOSIT` | Waiting for the deposit transaction to be detected |
-| `KNOWN_DEPOSIT_TX` | Deposit transaction detected, awaiting confirmation |
+| `KNOWN_DEPOSIT_TX` | Deposit detected, awaiting confirmation |
 | `INCOMPLETE_DEPOSIT` | Amount sent was less than required — may need a top-up |
 | `PROCESSING` | Swap is actively executing |
 | `SUCCESS` | Swap complete — USDC should be on Base |
 | `REFUNDED` | Swap failed, assets returned to refund address |
-| `FAILED` | Swap failed, assets not returned — check `swapDetails` |
-
-Once `SUCCESS` is confirmed, proceed to verify the balance landed.
+| `FAILED` | Swap failed, assets not returned — check details in output |
 
 ---
 
-## Step 6: Verify balance
+## Step 5: Verify balance
 
+With payments-mcp:
 ```
 get_wallet_balance(chain="base")
 ```
 
-Confirm the USDC balance has increased by the expected `quote.amountOutFormatted`. If it hasn't arrived yet, wait and re-poll the status endpoint — settlement typically takes under a minute but can vary by origin chain.
+Without payments-mcp:
+```bash
+node scripts/wallet.mjs balance <baseWalletAddress>
+```
 
+Confirm the USDC balance has increased by the expected amount. If it hasn't arrived yet, wait and re-poll — settlement typically takes under a minute but can vary by origin chain.

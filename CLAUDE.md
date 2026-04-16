@@ -54,3 +54,20 @@ skill-name/
 - Gotchas — non-obvious required conditions, silent failures, or surprising field behaviour
 
 Documenting obvious fields, types, or full schemas adds tokens for no benefit and creates a maintenance burden when APIs change.
+
+## Script conventions
+
+Each script that performs more than one kind of operation must use a named subcommand as the first positional argument to control the top-level flow — never a flag. Flags are only used as parameters within a command.
+
+```
+node scripts/foo.mjs <command> [--flag value]   ✓
+node scripts/foo.mjs --mode quote               ✗
+```
+
+Examples from this skill: `search-bazaar.mjs search`, `search-bazaar.mjs details`, `intents-quote.mjs quote`, `intents-quote.mjs status`, `sign-x402-payment.mjs sign`, `sign-x402-payment.mjs payload`.
+
+Single-operation scripts (e.g. `pay.mjs`) do not need a subcommand.
+
+## Tests 
+
+Whenever the scripts are updated the tests should be updated also.
