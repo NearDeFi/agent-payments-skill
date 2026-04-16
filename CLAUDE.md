@@ -23,7 +23,7 @@ Do **not** attempt to merge or rebase into `main` directly. Do **not** force-pus
 
 ## Version
 
-Always keep the version of the agent-payments skill at 1.0 (`metadata.version` in SKILL.md frontmatter).
+Always keep the version of the agent-payments skill at 0.1 (`metadata.version` in SKILL.md frontmatter).
 
 ## Agent Skills — Authoring Standards
 

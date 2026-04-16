@@ -11,7 +11,7 @@ compatibility: >
   Wallet support: raw private key (universal), Coinbase payments-mcp, CDP SDK, Privy server wallets, Turnkey, MoonPay/Open Wallet Standard.
   payments-mcp optional — see references/payments-mcp.md.
 metadata:
-  version: "1.0"
+  version: "0.1"
 ---
 
 # x402 — HTTP-Native Payments
