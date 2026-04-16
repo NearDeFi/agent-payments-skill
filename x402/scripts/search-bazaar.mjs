@@ -24,7 +24,12 @@ function fetchPage(offset) {
     https.get(url, (res) => {
       let data = '';
       res.on('data', chunk => { data += chunk; });
-      res.on('end', () => resolve(JSON.parse(data)));
+      res.on('end', () => {
+        if (res.statusCode < 200 || res.statusCode >= 300) {
+          return reject(new Error(`Bazaar API HTTP ${res.statusCode}: ${data.slice(0, 200)}`));
+        }
+        try { resolve(JSON.parse(data)); } catch (e) { reject(new Error(`Invalid JSON from bazaar: ${e.message}`)); }
+      });
     }).on('error', reject);
   });
 }

@@ -4,13 +4,13 @@
     "viem": "^2.0.0"
   },
   "devDependencies": {
-    "@coinbase/cdp-sdk": "latest",
-    "@turnkey/api-key-stamper": "latest",
-    "@turnkey/http": "latest",
-    "@turnkey/viem": "latest",
-    "@x402/core": "latest",
-    "@x402/evm": "latest",
-    "@x402/fetch": "latest",
+    "@coinbase/cdp-sdk": "^1.47.0",
+    "@turnkey/api-key-stamper": "^0.6.5",
+    "@turnkey/http": "^3.18.1",
+    "@turnkey/viem": "^0.14.28",
+    "@x402/core": "^2.10.0",
+    "@x402/evm": "^2.10.0",
+    "@x402/fetch": "^2.10.0",
     "dotenv": "^17.4.2"
   }
 }

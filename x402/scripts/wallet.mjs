@@ -36,7 +36,15 @@ function rpcCall(method, params) {
     }, (res) => {
       let data = '';
       res.on('data', c => { data += c; });
-      res.on('end', () => resolve(JSON.parse(data).result));
+      res.on('end', () => {
+        if (res.statusCode < 200 || res.statusCode >= 300) {
+          return reject(new Error(`RPC HTTP ${res.statusCode}: ${data.slice(0, 200)}`));
+        }
+        let parsed;
+        try { parsed = JSON.parse(data); } catch (e) { return reject(new Error(`Invalid RPC JSON: ${e.message}`)); }
+        if (parsed?.error) return reject(new Error(`RPC error: ${parsed.error.message || JSON.stringify(parsed.error)}`));
+        resolve(parsed.result);
+      });
     });
     req.on('error', reject);
     req.write(body);
@@ -66,8 +74,10 @@ if (cmd === 'address') {
   const data = `0x70a08231${paddedAddr}`;
   const result = await rpcCall('eth_call', [{ to: USDC_BASE, data }, 'latest']);
   const raw = BigInt(result);
-  const usd = Number(raw) / 1e6;
-  console.log(`${usd.toFixed(6)} USDC  (${raw} atomic units)`);
+  const { formatUnits } = await import('viem');
+  const usd = formatUnits(raw, 6);
+  const display = usd.includes('.') ? usd : `${usd}.000000`;
+  console.log(`${display} USDC  (${raw} atomic units)`);
 
 } else if (cmd === 'new') {
   const key = randomBytes(32).toString('hex');

@@ -45,12 +45,12 @@ export const PAYMENT_REQUIRED_V2_FIXTURE = Buffer.from(JSON.stringify({
   }],
 })).toString('base64');
 
-export async function run(script, args = [], env = {}) {
+export async function run(script, args = [], env = {}, { timeout = 30_000 } = {}) {
   try {
     const result = await execAsync('node', [join('scripts', script), ...args], {
       cwd: SKILL_DIR,
       env: { ...process.env, ...env },
-      timeout: 20_000,
+      timeout,
     });
     return { code: 0, stdout: result.stdout.trim(), stderr: result.stderr.trim() };
   } catch (e) {

@@ -2,10 +2,10 @@
 // NEAR Intents cross-chain swap: get a quote or check swap status.
 //
 // Dry quote (preview, no funds committed):
-//   node scripts/intents-quote.mjs quote --dry --usdc 1.00 --from eth:ETH [--refund 0xAddr] [--wallet 0xBase]
+//   node scripts/intents-quote.mjs quote --dry --usdc 1.00 --from eth:ETH --wallet 0xBase [--refund 0xAddr]
 //
 // Committed quote (get deposit address):
-//   node scripts/intents-quote.mjs quote --usdc 1.00 --from eth:ETH [--refund 0xAddr] [--wallet 0xBase]
+//   node scripts/intents-quote.mjs quote --usdc 1.00 --from eth:ETH --wallet 0xBase [--refund 0xAddr]
 //
 // Check swap status:
 //   node scripts/intents-quote.mjs status <depositAddress> [--memo <memo>]
@@ -59,10 +59,9 @@ if (cmd === 'status') {
   }
 
   const memoArg = getArg('--memo');
-  const qs = memoArg
-    ? `?depositAddress=${depositAddress}&depositMemo=${memoArg}`
-    : `?depositAddress=${depositAddress}`;
-  const result = await apiRequest('GET', `/v0/status${qs}`);
+  const params = new URLSearchParams({ depositAddress });
+  if (memoArg) params.set('depositMemo', memoArg);
+  const result = await apiRequest('GET', `/v0/status?${params}`);
 
   const labels = {
     PENDING_DEPOSIT:    'Waiting for deposit to be detected',
@@ -101,19 +100,11 @@ if (cmd === 'quote') {
   }
   const [fromChain, fromSymbol] = parts;
 
-  // Derive wallet address from private key if not provided
-  let walletAddress = walletArg;
-  if (!walletAddress) {
-    const key = process.env.PRIVATE_KEY || process.env.WALLET_PRIVATE_KEY || process.env.ETH_PRIVATE_KEY;
-    if (key) {
-      const { privateKeyToAccount } = await import('viem/accounts');
-      walletAddress = privateKeyToAccount(key.startsWith('0x') ? key : `0x${key}`).address;
-    }
-  }
-  if (!walletAddress) {
-    console.error('No wallet address. Pass --wallet <Base address> or set PRIVATE_KEY env var.');
+  if (!walletArg) {
+    console.error('--wallet <address> is required. Get your address with: node scripts/wallet.mjs address');
     process.exit(1);
   }
+  const walletAddress = walletArg;
 
   // Look up origin asset ID from tokens endpoint
   const tokens = await apiRequest('GET', '/v0/tokens');

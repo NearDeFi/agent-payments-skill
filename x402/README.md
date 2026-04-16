@@ -4,7 +4,7 @@ Skill for making HTTP 402 micropayments using USDC on Base and funding it from m
 
 ## Prerequisites
 
-**Node.js 18+** — required for built-in `node:test`, top-level `await`, and `.mjs` support.
+**Node.js 20+** — required for built-in `node:test`, top-level `await`, and `.mjs` support.
 
 **viem** — used by the scripts for EIP-712 signing and key derivation. Install once before running scripts or tests:
 
