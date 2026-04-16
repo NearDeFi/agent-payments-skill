@@ -90,7 +90,14 @@ const res = await fetch(`https://auth.privy.io/api/v1/wallets/${walletId}/rpc`, 
   },
   body: JSON.stringify({
     method: 'eth_signTypedData_v4',
-    params: { typed_data: { ...payload, primary_type: payload.primaryType } },
+    params: {
+      typed_data: {
+        domain:       payload.domain,
+        types:        payload.types,
+        primary_type: payload.primaryType,
+        message:      payload.message,
+      },
+    },
   }),
 });
 const { data: { signature } } = await res.json();
@@ -113,9 +120,9 @@ const tkClient = new TurnkeyClient(
   }),
 );
 const account = await createAccount({
-  client:          tkClient,
-  organizationId:  process.env.TURNKEY_ORGANIZATION_ID,
-  ethereumAddress: process.env.TURNKEY_SIGN_WITH,
+  client:         tkClient,
+  organizationId: process.env.TURNKEY_ORGANIZATION_ID,
+  signWith:       process.env.TURNKEY_SIGN_WITH,
 });
 const walletClient = createWalletClient({ account, chain: base, transport: http() });
 const signature = await walletClient.signTypedData({ account, ...payload });

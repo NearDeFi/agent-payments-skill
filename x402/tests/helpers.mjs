@@ -3,6 +3,10 @@ import { execFile } from 'child_process';
 import { promisify } from 'util';
 import { fileURLToPath } from 'url';
 import { join, dirname } from 'path';
+import { config } from 'dotenv';
+
+// Load x402/.env so wallet credentials are available without manually exporting them.
+config({ path: join(dirname(fileURLToPath(import.meta.url)), '..', '.env') });
 
 const execAsync = promisify(execFile);
 const SKILL_DIR = join(dirname(fileURLToPath(import.meta.url)), '..');

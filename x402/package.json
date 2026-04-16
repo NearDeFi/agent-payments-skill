@@ -5,11 +5,12 @@
   },
   "devDependencies": {
     "@coinbase/cdp-sdk": "latest",
-    "@turnkey/viem": "latest",
-    "@turnkey/http": "latest",
     "@turnkey/api-key-stamper": "latest",
-    "@x402/fetch": "latest",
+    "@turnkey/http": "latest",
+    "@turnkey/viem": "latest",
     "@x402/core": "latest",
-    "@x402/evm": "latest"
+    "@x402/evm": "latest",
+    "@x402/fetch": "latest",
+    "dotenv": "^17.4.2"
   }
 }

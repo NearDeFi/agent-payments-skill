@@ -1,5 +1,5 @@
 // Privy server wallet signing test (REST — no SDK needed).
-// Requires: PRIVY_APP_ID, PRIVY_APP_SECRET, PRIVY_WALLET_ID
+// Requires: PRIVY_APP_ID, PRIVY_APP_SECRET, PRIVY_WALLET_ID, PRIVY_WALLET_ADDRESS
 //
 // What this test does:
 //   1. Fails immediately with a list of missing env vars if credentials are not set
@@ -13,13 +13,15 @@ import assert from 'node:assert/strict';
 import { run, PAYMENT_REQUIRED_FIXTURE } from './helpers.mjs';
 
 test('Privy: signs EIP-712 payload via eth_signTypedData_v4 REST API', { timeout: 30_000 }, async () => {
-  const missing = ['PRIVY_APP_ID', 'PRIVY_APP_SECRET', 'PRIVY_WALLET_ID'].filter(k => !process.env[k]);
+  const missing = ['PRIVY_APP_ID', 'PRIVY_APP_SECRET', 'PRIVY_WALLET_ID', 'PRIVY_WALLET_ADDRESS'].filter(k => !process.env[k]);
   assert.equal(missing.length, 0, `Missing env vars — set these in .env to run Privy tests: ${missing.join(', ')}`);
 
   const { code, stdout } = await run('sign-x402-payment.mjs', ['payload', '--requirements', PAYMENT_REQUIRED_FIXTURE]);
   assert.equal(code, 0, 'payload command should succeed');
 
   const payload = JSON.parse(stdout);
+  // Replace the placeholder with the actual Privy wallet address
+  payload.message.from = process.env.PRIVY_WALLET_ADDRESS;
   const walletId = process.env.PRIVY_WALLET_ID;
   const appId = process.env.PRIVY_APP_ID;
   const credentials = Buffer.from(`${appId}:${process.env.PRIVY_APP_SECRET}`).toString('base64');

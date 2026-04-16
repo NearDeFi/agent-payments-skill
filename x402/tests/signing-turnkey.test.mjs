@@ -15,6 +15,7 @@ import assert from 'node:assert/strict';
 import { run, PAYMENT_REQUIRED_FIXTURE } from './helpers.mjs';
 
 test('Turnkey: signs EIP-712 payload via @turnkey/viem', { timeout: 30_000 }, async () => {
+  // TURNKEY_SIGN_WITH is both the wallet address and the signing identity
   const missing = ['TURNKEY_API_PUBLIC_KEY', 'TURNKEY_API_PRIVATE_KEY', 'TURNKEY_ORGANIZATION_ID', 'TURNKEY_SIGN_WITH'].filter(k => !process.env[k]);
   assert.equal(missing.length, 0, `Missing env vars — set these in .env to run Turnkey tests: ${missing.join(', ')}`);
 
@@ -22,6 +23,8 @@ test('Turnkey: signs EIP-712 payload via @turnkey/viem', { timeout: 30_000 }, as
   assert.equal(code, 0, 'payload command should succeed');
 
   const payload = JSON.parse(stdout);
+  // Replace the placeholder with the actual Turnkey wallet address
+  payload.message.from = process.env.TURNKEY_SIGN_WITH;
   // BigInt fields (validAfter, validBefore, value) come out as strings from JSON — convert back
   payload.message.validAfter  = BigInt(payload.message.validAfter);
   payload.message.validBefore = BigInt(payload.message.validBefore);
@@ -44,7 +47,7 @@ test('Turnkey: signs EIP-712 payload via @turnkey/viem', { timeout: 30_000 }, as
   const account = await createAccount({
     client:         tkClient,
     organizationId: process.env.TURNKEY_ORGANIZATION_ID,
-    ethereumAddress: process.env.TURNKEY_SIGN_WITH,
+    signWith:        process.env.TURNKEY_SIGN_WITH,
   });
 
   const walletClient = createWalletClient({ account, chain: base, transport: http() });
