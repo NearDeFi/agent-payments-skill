@@ -162,7 +162,7 @@ Three OWS quirks to handle:
 
 ```js
 import { wrapFetchWithPaymentFromConfig } from '@x402/fetch';
-import { ExactEvmScheme } from '@x402/evm/exact/client';
+import { ExactEvmSchemeV1 } from '@x402/evm/v1';
 import { getWallet, signTypedData as owsSignTypedData } from '@open-wallet-standard/core';
 
 const wallet = getWallet('my-agent');
@@ -184,14 +184,17 @@ const signer = {
     const { signature } = owsSignTypedData(
       'my-agent',
       'base',
-      JSON.stringify({ domain, types: typesWithDomain, primaryType, message }),
+      JSON.stringify(
+        { domain, types: typesWithDomain, primaryType, message },
+        (_, v) => typeof v === 'bigint' ? v.toString() : v,
+      ),
     );
     return signature.startsWith('0x') ? signature : `0x${signature}`;
   },
 };
 
 const agentFetch = wrapFetchWithPaymentFromConfig(fetch, {
-  schemes: [{ network: 'eip155:8453', client: new ExactEvmScheme(signer) }],
+  schemes: [{ x402Version: 1, network: 'base', client: new ExactEvmSchemeV1(signer) }],
 });
 
 // Use agentFetch exactly like fetch — payment is handled automatically
