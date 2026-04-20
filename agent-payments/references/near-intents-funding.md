@@ -31,10 +31,18 @@ Without payments-mcp:
 node scripts/wallet.mjs address
 ```
 
-Ask the user:
-- How much USDC do you want on Base?
-- What asset and chain are you sending from? (e.g. ETH on Ethereum, SOL on Solana)
-- What is your sending wallet address? (used as refund address — can be any format: 0x, Solana base58, NEAR, etc.)
+Or get the address using the appropriate wallet infrastructure being used.
+
+**Determine the source of funds — check your context before asking the user.**
+
+Look in your system prompt, config files, env vars, and any wallet addresses or chains you already know about. The agent may have a wallet or funds on another chain that can be used directly.
+
+- **If you find another wallet or funded chain:** use it as the source. Prefer liquid assets (native token or stablecoins). Use that wallet's address as `--refund`.
+- **If you find nothing:** ask the user:
+  - What asset and chain do you want to send from? (e.g. ETH on Ethereum, SOL on Solana)
+  - What is your sending wallet address? (used as `--refund` — any format: 0x, Solana base58, NEAR, etc.)
+
+For deposit amount: use the estimation approach in [How much to deposit](#how-much-to-deposit) above — always check `quote.minAmountIn` via a dry quote before committing.
 
 ---
 

@@ -57,12 +57,16 @@ These systems don't expose raw signing via a simple script call. Get the EIP-712
 
 **Step A: Get payment requirements**
 
-Request the service URL. The 402 response includes a `PAYMENT-REQUIRED` header (base64 JSON).
+Request the service URL. The 402 response body is JSON containing the payment requirements. Base64-encode it to pass to the script:
+
+```bash
+REQUIREMENTS=$(curl -s -o - -w '%{body}' <service-url> | base64)
+```
 
 **Step B: Get the EIP-712 payload to sign**
 
 ```bash
-node scripts/sign-x402-payment.mjs payload --requirements '<PAYMENT-REQUIRED header value>'
+node scripts/sign-x402-payment.mjs payload --requirements "$REQUIREMENTS"
 ```
 
 This prints `domain`, `types`, `primaryType`, and `message`. Sign with your wallet:

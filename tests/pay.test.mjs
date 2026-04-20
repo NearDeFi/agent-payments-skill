@@ -65,20 +65,20 @@ test('pay: handles 402 and sends signed retry', { timeout: 10_000 }, async () =>
   const { server, url } = await startServer((req, res) => {
     requestCount++;
     if (requestCount === 1) {
-      const requirements = Buffer.from(JSON.stringify({
+      const requirementsJson = JSON.stringify({
         x402Version: 1,
         accepts: [{
           scheme: 'exact',
-          network: 'eip155:8453',
-          amount: '10000',
+          network: 'base',
+          maxAmountRequired: '10000',
           asset: '0x833589fcd6edb6e08f4c7c32d4f71b54bda02913',
           payTo: '0x1234567890123456789012345678901234567890',
           maxTimeoutSeconds: 60,
-          extra: { tokenName: 'USD Coin', tokenVersion: '2' },
+          extra: { name: 'USD Coin', version: '2' },
         }],
-      })).toString('base64');
-      res.writeHead(402, { 'payment-required': requirements });
-      res.end();
+      });
+      res.writeHead(402, { 'Content-Type': 'application/json' });
+      res.end(requirementsJson);
     } else {
       retryHeaders = req.headers;
       res.writeHead(200);
@@ -90,10 +90,10 @@ test('pay: handles 402 and sends signed retry', { timeout: 10_000 }, async () =>
     const { code, stdout } = await run('pay.mjs', ['--url', url, '--key', TEST_KEY]);
     assert.equal(code, 0);
     assert.match(stdout, /Payment required:.*USDC/i, 'should log price before paying');
-    assert.ok(retryHeaders?.['payment-signature'], 'retry should include PAYMENT-SIGNATURE header');
+    assert.ok(retryHeaders?.['x-payment'], 'retry should include X-PAYMENT header');
 
-    // Verify the signature header decodes to valid JSON with a signature
-    const decoded = JSON.parse(Buffer.from(retryHeaders['payment-signature'], 'base64').toString('utf8'));
+    // Verify the payment header decodes to valid JSON with a signature
+    const decoded = JSON.parse(Buffer.from(retryHeaders['x-payment'], 'base64').toString('utf8'));
     assert.match(decoded.payload.signature, /^0x[0-9a-fA-F]{130}$/);
   } finally {
     server.close();

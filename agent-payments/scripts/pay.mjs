@@ -31,6 +31,14 @@ if (!keyArg) {
   process.exit(1);
 }
 
+// x402 v1 uses short network names; v0 used eip155:<chainId>
+const CHAIN_IDS = { 'base': 8453, 'base-sepolia': 84532 };
+
+function evmChainId(network) {
+  if (network?.startsWith('eip155:')) return parseInt(network.split(':')[1], 10);
+  return CHAIN_IDS[network] ?? null;
+}
+
 function makeRequest(url, options = {}) {
   return new Promise((resolve, reject) => {
     const parsed = new URL(url);
@@ -67,38 +75,33 @@ if (initial.status !== 402) {
   process.exit(initial.status >= 200 && initial.status < 300 ? 0 : 1);
 }
 
-// Decode payment requirements from 402 response
-const requirementsB64 = initial.headers['payment-required'];
-if (!requirementsB64) {
-  console.error('Got 402 but no PAYMENT-REQUIRED header found.');
-  process.exit(1);
-}
-
+// Decode payment requirements from 402 response body (x402 v1)
 let requirements;
 try {
-  requirements = JSON.parse(Buffer.from(requirementsB64, 'base64').toString('utf8'));
+  requirements = JSON.parse(initial.body);
 } catch {
-  console.error('Failed to decode PAYMENT-REQUIRED header.');
+  console.error('Got 402 but could not parse payment requirements from response body.');
   process.exit(1);
 }
 
-const accepted = (requirements.accepts || []).find(a => a.network?.startsWith('eip155:'));
+const accepted = (requirements.accepts || []).find(a => evmChainId(a.network) !== null);
 if (!accepted) {
-  console.error('No EVM payment method in requirements. Only eip155:* networks are supported.');
+  console.error('No EVM payment method in requirements. Only base and base-sepolia are supported.');
   process.exit(1);
 }
 
-const amountUsd = (parseInt(accepted.amount, 10) / 1e6).toFixed(6);
+const amount      = accepted.maxAmountRequired || accepted.amount;
+const amountUsd   = (parseInt(amount, 10) / 1e6).toFixed(6);
 console.log(`Payment required: ${amountUsd} USDC on network ${accepted.network}`);
 
 // Build EIP-712 TransferWithAuthorization payload
-const chainId     = parseInt(accepted.network.split(':')[1], 10);
-const tokenName   = accepted.extra?.tokenName   || 'USD Coin';
-const tokenVersion= accepted.extra?.tokenVersion || '2';
-const now         = Math.floor(Date.now() / 1000);
-const validAfter  = BigInt(now - 5);
-const validBefore = BigInt(now + (accepted.maxTimeoutSeconds || 60));
-const nonce       = '0x' + randomBytes(32).toString('hex');
+const chainId      = evmChainId(accepted.network);
+const tokenName    = accepted.extra?.name    || accepted.extra?.tokenName    || 'USD Coin';
+const tokenVersion = accepted.extra?.version || accepted.extra?.tokenVersion || '2';
+const now          = Math.floor(Date.now() / 1000);
+const validAfter   = BigInt(now - 5);
+const validBefore  = BigInt(now + (accepted.maxTimeoutSeconds || 60));
+const nonce        = '0x' + randomBytes(32).toString('hex');
 
 const domain = {
   name: tokenName,
@@ -126,7 +129,7 @@ const account = privateKeyToAccount(hexKey);
 const message = {
   from:        account.address,
   to:          accepted.payTo,
-  value:       BigInt(accepted.amount),
+  value:       BigInt(amount),
   validAfter,
   validBefore,
   nonce,
@@ -136,7 +139,7 @@ const signature = await account.signTypedData({
   domain, types, primaryType: 'TransferWithAuthorization', message,
 });
 
-// Build PAYMENT-SIGNATURE header
+// Build X-PAYMENT header
 const payment = {
   x402Version: requirements.x402Version || 1,
   scheme:  accepted.scheme,
@@ -146,7 +149,7 @@ const payment = {
     authorization: {
       from:        account.address,
       to:          accepted.payTo,
-      value:       accepted.amount,
+      value:       amount,
       validAfter:  validAfter.toString(),
       validBefore: validBefore.toString(),
       nonce,
@@ -160,7 +163,7 @@ const paymentHeader = Buffer.from(JSON.stringify(payment)).toString('base64');
 const result = await makeRequest(urlArg, {
   method,
   body: bodyArg,
-  headers: { 'PAYMENT-SIGNATURE': paymentHeader },
+  headers: { 'X-PAYMENT': paymentHeader },
 });
 
 console.log(`Status: ${result.status}`);
