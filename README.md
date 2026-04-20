@@ -21,13 +21,11 @@ Where `<skills-dir>` is `.agents/skills` (universal) or `.claude/skills` (Claude
 
 **Node.js 20+** — required for built-in `node:test`, top-level `await`, and `.mjs` support.
 
-**viem** — used by the scripts for EIP-712 signing and key derivation. Install once before running scripts:
+**viem**, **@x402/fetch**, **@x402/evm** — used by the scripts for payment signing and protocol handling. Install once before running scripts:
 
 ```bash
 npm install
 ```
-
-No other dependencies. The scripts use Node's built-in `https`, `crypto`, and `http` modules for everything else.
 
 ## Running the tests
 

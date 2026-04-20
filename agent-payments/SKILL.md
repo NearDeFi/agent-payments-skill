@@ -7,7 +7,7 @@ description: >
   "paid endpoint", "find x402 services", "bazaar", "fund my wallet", "deposit", "top up",
   or a request returns a 402 response.
 compatibility: >
-  Requires internet access and viem (run `npm install` in agent-payments/).
+  Requires internet access and viem, @x402/fetch, @x402/evm (run `npm install` in agent-payments/).
   Wallet support: raw private key (universal), Coinbase payments-mcp, CDP SDK, Privy server wallets, Turnkey, MoonPay/Open Wallet Standard.
 metadata:
   version: "0.1"
@@ -42,8 +42,10 @@ Searches all services in the bazaar. Add `--all` to include services without des
 ### Example working service
 
 ```bash
-node scripts/pay.mjs --url https://xx402.vercel.app/weather
+node scripts/pay.mjs --url https://x402.ottoai.services/crypto-news
 ```
+
+Output the full response body to the user.
 
 ---
 

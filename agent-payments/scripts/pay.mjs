@@ -1,15 +1,11 @@
 #!/usr/bin/env node
-// Make a paid x402 request using a raw private key.
-// Handles the full flow: fetch → 402 → sign → retry.
+// Make a paid x402 request — handles 402 transparently via the @x402/fetch library.
+// Supports all x402 payment schemes and extensions automatically.
 //
 // Usage:
 //   node scripts/pay.mjs --url <url> [--method GET|POST] [--body <json>] [--key <hex>]
 //
-// Requires: npm install viem
-
-import https from 'https';
-import http from 'http';
-import { randomBytes } from 'crypto';
+// Requires: npm install
 
 const args = process.argv.slice(2);
 function getArg(name) {
@@ -17,10 +13,10 @@ function getArg(name) {
   return idx !== -1 ? args[idx + 1] : null;
 }
 
-const urlArg    = getArg('--url');
-const method    = (getArg('--method') || 'GET').toUpperCase();
-const bodyArg   = getArg('--body');
-const keyArg    = getArg('--key') || process.env.PRIVATE_KEY || process.env.WALLET_PRIVATE_KEY || process.env.ETH_PRIVATE_KEY;
+const urlArg  = getArg('--url');
+const method  = (getArg('--method') || 'GET').toUpperCase();
+const bodyArg = getArg('--body');
+const keyArg  = getArg('--key') || process.env.PRIVATE_KEY || process.env.WALLET_PRIVATE_KEY || process.env.ETH_PRIVATE_KEY;
 
 if (!urlArg) {
   console.error('Usage: node scripts/pay.mjs --url <url> [--method GET|POST] [--body <json>] [--key <hex>]');
@@ -31,144 +27,69 @@ if (!keyArg) {
   process.exit(1);
 }
 
-// x402 v1 uses short network names; v0 used eip155:<chainId>
+// Initial probe to detect 402 and display price before paying
 const CHAIN_IDS = { 'base': 8453, 'base-sepolia': 84532 };
-
 function evmChainId(network) {
   if (network?.startsWith('eip155:')) return parseInt(network.split(':')[1], 10);
   return CHAIN_IDS[network] ?? null;
 }
 
-function makeRequest(url, options = {}) {
-  return new Promise((resolve, reject) => {
-    const parsed = new URL(url);
-    const lib = parsed.protocol === 'https:' ? https : http;
-    const bodyStr = options.body || null;
+const reqHeaders = bodyArg ? { 'Content-Type': 'application/json' } : {};
+const probe = await fetch(urlArg, { method, headers: reqHeaders, body: bodyArg || undefined });
 
-    const req = lib.request({
-      hostname: parsed.hostname,
-      port: parsed.port,
-      path: parsed.pathname + parsed.search,
-      method: options.method || 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        ...(bodyStr ? { 'Content-Length': Buffer.byteLength(bodyStr) } : {}),
-        ...(options.headers || {}),
-      },
-    }, (res) => {
-      let data = '';
-      res.on('data', c => { data += c; });
-      res.on('end', () => resolve({ status: res.statusCode, headers: res.headers, body: data }));
-    });
-    req.on('error', reject);
-    if (bodyStr) req.write(bodyStr);
-    req.end();
-  });
+if (probe.status !== 402) {
+  console.log(`Status: ${probe.status}`);
+  console.log(await probe.text());
+  process.exit(probe.ok ? 0 : 1);
 }
 
-// Initial request
-const initial = await makeRequest(urlArg, { method, body: bodyArg });
-
-if (initial.status !== 402) {
-  console.log(`Status: ${initial.status}`);
-  console.log(initial.body);
-  process.exit(initial.status >= 200 && initial.status < 300 ? 0 : 1);
-}
-
-// Decode payment requirements — v1: JSON body, v2: payment-required header (base64)
+// Decode payment requirements for price display
 let requirements = null;
-try { requirements = JSON.parse(initial.body); } catch {}
+const probeText = await probe.text();
+try { requirements = JSON.parse(probeText); } catch {}
 if (!requirements?.accepts) {
-  const hdr = initial.headers['payment-required'];
-  if (!hdr) {
-    console.error('Got 402 but no payment requirements found in body or payment-required header.');
-    process.exit(1);
-  }
-  try { requirements = JSON.parse(Buffer.from(hdr, 'base64').toString('utf8')); }
-  catch { console.error('Failed to decode payment-required header.'); process.exit(1); }
+  const hdr = probe.headers.get('payment-required');
+  if (hdr) try { requirements = JSON.parse(Buffer.from(hdr, 'base64').toString('utf8')); } catch {}
 }
 
-const accepted = (requirements.accepts || []).find(a => evmChainId(a.network) !== null);
-if (!accepted) {
-  console.error('No EVM payment method in requirements. Only base and base-sepolia are supported.');
+if (requirements?.accepts) {
+  const evmOptions = requirements.accepts
+    .filter(a => a.scheme === 'exact' && evmChainId(a.network) !== null)
+    .sort((a, b) => {
+      const aMain = evmChainId(a.network) === 8453 ? 0 : 1;
+      const bMain = evmChainId(b.network) === 8453 ? 0 : 1;
+      if (aMain !== bMain) return aMain - bMain;
+      return parseInt(a.maxAmountRequired || a.amount || 0) - parseInt(b.maxAmountRequired || b.amount || 0);
+    });
+  const accepted = evmOptions[0];
+  if (accepted) {
+    const amount = accepted.maxAmountRequired || accepted.amount;
+    console.log(`Payment required: ${(parseInt(amount, 10) / 1e6).toFixed(6)} USDC on network ${accepted.network}`);
+  }
+}
+
+// Set up x402 client — handles all payment schemes and extensions automatically
+try {
+  const { privateKeyToAccount } = await import('viem/accounts');
+  const { x402Client, wrapFetchWithPayment } = await import('@x402/fetch');
+  const { registerExactEvmScheme } = await import('@x402/evm/exact/client');
+
+  const hexKey = keyArg.startsWith('0x') ? keyArg : `0x${keyArg}`;
+  const signer = privateKeyToAccount(hexKey);
+
+  const client = new x402Client();
+  registerExactEvmScheme(client, { signer });
+  const fetchWithPayment = wrapFetchWithPayment(fetch, client);
+
+  // Library handles 402 → sign → retry transparently, including all extensions
+  const result = await fetchWithPayment(urlArg, { method, headers: reqHeaders, body: bodyArg || undefined });
+  console.log(`Status: ${result.status}`);
+  console.log(await result.text());
+} catch (e) {
+  if (e.code === 'ERR_MODULE_NOT_FOUND' || e.message?.includes('Cannot find package')) {
+    console.error('Dependencies missing: npm install');
+  } else {
+    console.error('Payment failed:', e.message);
+  }
   process.exit(1);
 }
-
-const amount      = accepted.maxAmountRequired || accepted.amount;
-const amountUsd   = (parseInt(amount, 10) / 1e6).toFixed(6);
-console.log(`Payment required: ${amountUsd} USDC on network ${accepted.network}`);
-
-// Build EIP-712 TransferWithAuthorization payload
-const chainId      = evmChainId(accepted.network);
-const tokenName    = accepted.extra?.name    || accepted.extra?.tokenName    || 'USD Coin';
-const tokenVersion = accepted.extra?.version || accepted.extra?.tokenVersion || '2';
-const now          = Math.floor(Date.now() / 1000);
-const validAfter   = BigInt(now - 5);
-const validBefore  = BigInt(now + (accepted.maxTimeoutSeconds || 60));
-const nonce        = '0x' + randomBytes(32).toString('hex');
-
-const domain = {
-  name: tokenName,
-  version: tokenVersion,
-  chainId,
-  verifyingContract: accepted.asset,
-};
-
-const types = {
-  TransferWithAuthorization: [
-    { name: 'from',        type: 'address' },
-    { name: 'to',          type: 'address' },
-    { name: 'value',       type: 'uint256' },
-    { name: 'validAfter',  type: 'uint256' },
-    { name: 'validBefore', type: 'uint256' },
-    { name: 'nonce',       type: 'bytes32' },
-  ],
-};
-
-// Sign
-const { privateKeyToAccount } = await import('viem/accounts');
-const hexKey  = keyArg.startsWith('0x') ? keyArg : `0x${keyArg}`;
-const account = privateKeyToAccount(hexKey);
-
-const message = {
-  from:        account.address,
-  to:          accepted.payTo,
-  value:       BigInt(amount),
-  validAfter,
-  validBefore,
-  nonce,
-};
-
-const signature = await account.signTypedData({
-  domain, types, primaryType: 'TransferWithAuthorization', message,
-});
-
-// Build X-PAYMENT header
-const payment = {
-  x402Version: requirements.x402Version || 1,
-  scheme:  accepted.scheme,
-  network: accepted.network,
-  payload: {
-    signature,
-    authorization: {
-      from:        account.address,
-      to:          accepted.payTo,
-      value:       amount,
-      validAfter:  validAfter.toString(),
-      validBefore: validBefore.toString(),
-      nonce,
-    },
-  },
-};
-
-const paymentHeader = Buffer.from(JSON.stringify(payment)).toString('base64');
-
-// Retry with payment
-const result = await makeRequest(urlArg, {
-  method,
-  body: bodyArg,
-  headers: { 'X-PAYMENT': paymentHeader },
-});
-
-console.log(`Status: ${result.status}`);
-console.log(result.body);

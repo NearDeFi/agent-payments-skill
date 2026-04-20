@@ -22,7 +22,13 @@ A raw secp256k1 private key works across all agent stacks (OpenClaw, Eliza, cust
 node scripts/wallet.mjs new
 ```
 
-Store the printed private key as `PRIVATE_KEY=<hex>` in your `.env` file. Keep it out of version control.
+After running, immediately write the key to `.env` in the project root — do not just display it and move on:
+
+```
+PRIVATE_KEY=<hex from above>
+```
+
+Keep `.env` out of version control (add to `.gitignore` if not already there). The key must be persisted so it survives session restarts.
 
 ---
 

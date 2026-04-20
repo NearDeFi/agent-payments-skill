@@ -55,12 +55,13 @@ test('pay: errors with no key', async () => {
 test('pay: handles 402 and sends signed retry', { timeout: 10_000 }, async () => {
   let retryHeaders;
 
-  // First request → 402 with payment requirements
-  // Second request → 200 (the retry)
+  // Request 1 → 402 (our probe, displays price)
+  // Request 2 → 402 (library's own probe)
+  // Request 3 → 200 (library's signed retry)
   let requestCount = 0;
   const { server, url } = await startServer((req, res) => {
     requestCount++;
-    if (requestCount === 1) {
+    if (requestCount <= 2) {
       const requirementsJson = JSON.stringify({
         x402Version: 1,
         accepts: [{
@@ -102,7 +103,7 @@ test('pay: handles v2 402 (requirements in payment-required header)', { timeout:
 
   const { server, url } = await startServer((req, res) => {
     requestCount++;
-    if (requestCount === 1) {
+    if (requestCount <= 2) {
       const requirements = Buffer.from(JSON.stringify({
         x402Version: 2,
         accepts: [{
@@ -128,9 +129,10 @@ test('pay: handles v2 402 (requirements in payment-required header)', { timeout:
     const { code, stdout } = await run('pay.mjs', ['--url', url, '--key', TEST_KEY]);
     assert.equal(code, 0);
     assert.match(stdout, /Payment required:.*USDC/i, 'should log price before paying');
-    assert.ok(retryHeaders?.['x-payment'], 'retry should include X-PAYMENT header');
+    // v2: library sends PAYMENT-SIGNATURE header (not X-PAYMENT which is v1)
+    assert.ok(retryHeaders?.['payment-signature'], 'retry should include PAYMENT-SIGNATURE header');
 
-    const decoded = JSON.parse(Buffer.from(retryHeaders['x-payment'], 'base64').toString('utf8'));
+    const decoded = JSON.parse(Buffer.from(retryHeaders['payment-signature'], 'base64').toString('utf8'));
     assert.match(decoded.payload.signature, /^0x[0-9a-fA-F]{130}$/);
   } finally {
     server.close();
