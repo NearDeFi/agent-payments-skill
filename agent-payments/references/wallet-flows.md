@@ -125,6 +125,11 @@ const { data: { signature } } = await res.json();
 
 #### Turnkey (`@turnkey/viem`)
 
+Requires packages not included in this skill — install separately:
+```bash
+npm install @turnkey/viem @turnkey/http @turnkey/api-key-stamper
+```
+
 ```js
 import { createAccount } from '@turnkey/viem';
 import { TurnkeyClient } from '@turnkey/http';
@@ -150,16 +155,37 @@ const signature = await walletClient.signTypedData({ account, ...payload });
 
 #### MoonPay / Open Wallet Standard (`@x402/fetch`)
 
-OWS does not expose `signTypedData()` directly. Use `wrapFetchWithPaymentFromConfig` from `@x402/fetch` instead — it handles the full 402 → sign → retry loop automatically. The OWS wallet provides the viem-compatible signer.
+OWS does not expose `signTypedData()` directly. Use `wrapFetchWithPaymentFromConfig` from `@x402/fetch` instead — it handles the full 402 → sign → retry loop automatically.
+
+Two OWS quirks require a signer wrapper:
+1. `signTypedData` requires `EIP712Domain` to be explicit in the `types` object
+2. The returned signature has no `0x` prefix — must be added manually
 
 ```js
 import { wrapFetchWithPaymentFromConfig } from '@x402/fetch';
-import { ExactEvmScheme } from '@x402/evm';
+import { ExactEvmScheme } from '@x402/evm/exact/client';
 import { createWallet } from '@open-wallet-standard/core';
-import { base } from 'viem/chains';
 
 const wallet = createWallet('my-agent'); // loads encrypted vault
-const signer = wallet.accounts.find(a => a.chainId === 'eip155:8453');
+const owsAccount = wallet.accounts.find(a => a.chainId === 'eip155:8453');
+
+// Wrapper to handle OWS quirks
+const signer = {
+  ...owsAccount,
+  signTypedData: async ({ domain, types, primaryType, message }) => {
+    const typesWithDomain = {
+      EIP712Domain: [
+        { name: 'name',              type: 'string'  },
+        { name: 'version',           type: 'string'  },
+        { name: 'chainId',           type: 'uint256' },
+        { name: 'verifyingContract', type: 'address' },
+      ],
+      ...types,
+    };
+    const sig = await owsAccount.signTypedData({ domain, types: typesWithDomain, primaryType, message });
+    return sig.startsWith('0x') ? sig : `0x${sig}`;
+  },
+};
 
 const agentFetch = wrapFetchWithPaymentFromConfig(fetch, {
   schemes: [{ network: 'eip155:8453', client: new ExactEvmScheme(signer) }],

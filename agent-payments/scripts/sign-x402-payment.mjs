@@ -52,8 +52,16 @@ function evmChainId(network) {
   return CHAIN_IDS[network] ?? null;
 }
 
-// Find first EVM accepts entry
-const accepted = (requirements.accepts || []).find(a => evmChainId(a.network) !== null);
+// Filter to exact scheme + known EVM networks, prefer Base mainnet, then cheapest
+const evmOptions = (requirements.accepts || [])
+  .filter(a => a.scheme === 'exact' && evmChainId(a.network) !== null)
+  .sort((a, b) => {
+    const aMain = evmChainId(a.network) === 8453 ? 0 : 1;
+    const bMain = evmChainId(b.network) === 8453 ? 0 : 1;
+    if (aMain !== bMain) return aMain - bMain;
+    return parseInt(a.maxAmountRequired || a.amount || 0) - parseInt(b.maxAmountRequired || b.amount || 0);
+  });
+const accepted = evmOptions[0];
 if (!accepted) {
   console.error('No EVM payment method in requirements. Only base and base-sepolia are supported by this script.');
   process.exit(1);
