@@ -57,10 +57,20 @@ These systems don't expose raw signing via a simple script call. Get the EIP-712
 
 **Step A: Get payment requirements**
 
-Request the service URL. The 402 response body is JSON containing the payment requirements. Base64-encode it to pass to the script:
+Request the service URL. The 402 response will contain requirements in one of two places
+depending on the server's x402 version:
+
+- **v1** (newer): requirements are in the JSON response body
+- **v2** (older): requirements are in the `payment-required` response header (base64 JSON)
+
+Base64-encode whichever one contains the `accepts` array:
 
 ```bash
-REQUIREMENTS=$(curl -s -o - -w '%{body}' <service-url> | base64)
+# v1 — body contains the JSON
+REQUIREMENTS=$(curl -s <service-url> | base64)
+
+# v2 — header contains the base64 JSON (already encoded, pass through as-is)
+REQUIREMENTS=$(curl -sI <service-url> | awk '/^[Pp]ayment-[Rr]equired:/{print $2}' | tr -d '\r\n')
 ```
 
 **Step B: Get the EIP-712 payload to sign**

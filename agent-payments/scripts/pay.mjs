@@ -75,13 +75,17 @@ if (initial.status !== 402) {
   process.exit(initial.status >= 200 && initial.status < 300 ? 0 : 1);
 }
 
-// Decode payment requirements from 402 response body (x402 v1)
-let requirements;
-try {
-  requirements = JSON.parse(initial.body);
-} catch {
-  console.error('Got 402 but could not parse payment requirements from response body.');
-  process.exit(1);
+// Decode payment requirements — v1: JSON body, v2: payment-required header (base64)
+let requirements = null;
+try { requirements = JSON.parse(initial.body); } catch {}
+if (!requirements?.accepts) {
+  const hdr = initial.headers['payment-required'];
+  if (!hdr) {
+    console.error('Got 402 but no payment requirements found in body or payment-required header.');
+    process.exit(1);
+  }
+  try { requirements = JSON.parse(Buffer.from(hdr, 'base64').toString('utf8')); }
+  catch { console.error('Failed to decode payment-required header.'); process.exit(1); }
 }
 
 const accepted = (requirements.accepts || []).find(a => evmChainId(a.network) !== null);

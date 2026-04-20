@@ -93,6 +93,7 @@ The script outputs the deposit address, asset contract, and deadline. Give all o
 |-------|----------------------|
 | **Stellar** | Must include the `MEMO REQUIRED` value printed by the script as the transaction memo — **funds are permanently lost if omitted** |
 | **NEAR (native NEAR)** | Cannot send native NEAR directly — must first wrap it: call `near_deposit` on `wrap.near` to get wrapped NEAR |
+| **NEAR (NEP-141 tokens)** | No storage deposit needed — the 1-click API deposit address already has storage registered for all supported tokens |
 | **Solana (SPL tokens)** | The recipient's Associated Token Account (ATA) may not exist yet — wallet software handles this, but warn the user if they're doing it manually |
 | **TON (Jetton tokens)** | Send to the user's own Jetton wallet address for that token, **not** the token contract address — these are different |
 

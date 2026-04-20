@@ -39,7 +39,7 @@ node --test tests/*.test.mjs
 ```
 
 The tests are integration tests — they run the scripts as child processes and make real network requests to:
-- The x402 bazaar API (`api.cdp.coinbase.com`) — for search-bazaar tests
+- x402-list.com (primary) and the Coinbase bazaar (`api.cdp.coinbase.com`) — for search-bazaar tests
 - The NEAR Intents API (`1click.chaindefuser.com`) — for intents-quote tests
 - Base mainnet RPC (`mainnet.base.org`) — for the wallet balance test
 
