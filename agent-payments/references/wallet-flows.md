@@ -127,51 +127,50 @@ const { data: { signature } } = await res.json();
 
 Requires packages not included in this skill — install separately:
 ```bash
-npm install @turnkey/viem @turnkey/http @turnkey/api-key-stamper
+npm install @turnkey/viem @turnkey/sdk-server
 ```
 
 ```js
 import { createAccount } from '@turnkey/viem';
-import { TurnkeyClient } from '@turnkey/http';
-import { ApiKeyStamper } from '@turnkey/api-key-stamper';
+import { Turnkey } from '@turnkey/sdk-server';
 import { createWalletClient, http } from 'viem';
 import { base } from 'viem/chains';
 
-const tkClient = new TurnkeyClient(
-  { baseUrl: 'https://api.turnkey.com' },
-  new ApiKeyStamper({
-    apiPublicKey:  process.env.TURNKEY_API_PUBLIC_KEY,
-    apiPrivateKey: process.env.TURNKEY_API_PRIVATE_KEY,
-  }),
-);
+const turnkey = new Turnkey({
+  apiBaseUrl:            'https://api.turnkey.com',
+  apiPublicKey:          process.env.TURNKEY_API_PUBLIC_KEY,
+  apiPrivateKey:         process.env.TURNKEY_API_PRIVATE_KEY,
+  defaultOrganizationId: process.env.TURNKEY_ORGANIZATION_ID,
+});
 const account = await createAccount({
-  client:         tkClient,
+  client:         turnkey.apiClient(),
   organizationId: process.env.TURNKEY_ORGANIZATION_ID,
   signWith:       process.env.TURNKEY_SIGN_WITH,
 });
 const walletClient = createWalletClient({ account, chain: base, transport: http() });
-const signature = await walletClient.signTypedData({ account, ...payload });
+const signature = await walletClient.signTypedData({ ...payload });
 ```
 
 #### MoonPay / Open Wallet Standard (`@x402/fetch`)
 
-OWS does not expose `signTypedData()` directly. Use `wrapFetchWithPaymentFromConfig` from `@x402/fetch` instead — it handles the full 402 → sign → retry loop automatically.
+OWS `signTypedData` is a top-level function, not a method on the account object. Use `wrapFetchWithPaymentFromConfig` from `@x402/fetch` with a custom signer wrapper.
 
-Two OWS quirks require a signer wrapper:
-1. `signTypedData` requires `EIP712Domain` to be explicit in the `types` object
-2. The returned signature has no `0x` prefix — must be added manually
+Three OWS quirks to handle:
+1. Accounts use `eip155:1` chainId (not `eip155:8453`) — find any EVM account for the address
+2. `signTypedData` requires `EIP712Domain` to be explicit in the `types` object
+3. The returned signature may have no `0x` prefix — add it if missing
 
 ```js
 import { wrapFetchWithPaymentFromConfig } from '@x402/fetch';
 import { ExactEvmScheme } from '@x402/evm/exact/client';
-import { createWallet } from '@open-wallet-standard/core';
+import { getWallet, signTypedData as owsSignTypedData } from '@open-wallet-standard/core';
 
-const wallet = createWallet('my-agent'); // loads encrypted vault
-const owsAccount = wallet.accounts.find(a => a.chainId === 'eip155:8453');
+const wallet = getWallet('my-agent');
+// OWS accounts use eip155:1 — pick any EVM account (same address across all EVM chains)
+const evmAccount = wallet.accounts.find(a => a.chainId?.startsWith('eip155:'));
 
-// Wrapper to handle OWS quirks
 const signer = {
-  ...owsAccount,
+  address: evmAccount.address,
   signTypedData: async ({ domain, types, primaryType, message }) => {
     const typesWithDomain = {
       EIP712Domain: [
@@ -182,8 +181,12 @@ const signer = {
       ],
       ...types,
     };
-    const sig = await owsAccount.signTypedData({ domain, types: typesWithDomain, primaryType, message });
-    return sig.startsWith('0x') ? sig : `0x${sig}`;
+    const { signature } = owsSignTypedData(
+      'my-agent',
+      'base',
+      JSON.stringify({ domain, types: typesWithDomain, primaryType, message }),
+    );
+    return signature.startsWith('0x') ? signature : `0x${signature}`;
   },
 };
 
