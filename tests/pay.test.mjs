@@ -6,7 +6,7 @@
 //   2. Exits 1 and prints usage when --url is not provided
 //   3. Exits 1 with "No private key" when no key is available in env or args
 //   4. Handles the full v1 402 flow (requirements in JSON body, X-PAYMENT header)
-//   5. Handles the full v2 402 flow (requirements in payment-required header, X-PAYMENT header)
+//   5. Handles the full v2 402 flow (requirements in payment-required header, PAYMENT-SIGNATURE header)
 
 import { test } from 'node:test';
 import assert from 'node:assert/strict';

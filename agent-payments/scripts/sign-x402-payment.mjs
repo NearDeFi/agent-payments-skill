@@ -63,7 +63,7 @@ const evmOptions = (requirements.accepts || [])
   });
 const accepted = evmOptions[0];
 if (!accepted) {
-  console.error('No EVM payment method in requirements. Only base and base-sepolia are supported by this script.');
+  console.error('No EVM payment method in requirements. Script supports base, base-sepolia, and eip155:<chainId> networks.');
   process.exit(1);
 }
 

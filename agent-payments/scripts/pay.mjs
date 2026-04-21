@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 // Make a paid x402 request — handles 402 transparently via the @x402/fetch library.
-// Supports all x402 payment schemes and extensions automatically.
+// Supports v1 (body) and v2 (payment-required header) 402 responses using the exact-evm scheme.
 //
 // Usage:
 //   node scripts/pay.mjs --url <url> [--method GET|POST] [--body <json>] [--key <hex>]
@@ -35,7 +35,13 @@ function evmChainId(network) {
 }
 
 const reqHeaders = bodyArg ? { 'Content-Type': 'application/json' } : {};
-const probe = await fetch(urlArg, { method, headers: reqHeaders, body: bodyArg || undefined });
+let probe;
+try {
+  probe = await fetch(urlArg, { method, headers: reqHeaders, body: bodyArg || undefined });
+} catch (e) {
+  console.error(`Request failed: ${e.message}`);
+  process.exit(1);
+}
 
 if (probe.status !== 402) {
   console.log(`Status: ${probe.status}`);

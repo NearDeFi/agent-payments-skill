@@ -73,7 +73,7 @@ if (cmd === 'details') {
       const svc = detail.data || detail;
       console.log(`Service:  ${svc.name}`);
       console.log(`URL:      ${svc.base_url}`);
-      console.log(`Status:   ${svc.status} | Uptime 24h: ${svc.uptime?.['24h'] ?? svc.uptime_24h}% | 7d: ${svc.uptime?.['7d'] ?? '?'}%`);
+      console.log(`Status:   ${svc.status} | Uptime 24h: ${svc.uptime?.['24h'] ?? svc.uptime_24h ?? '?'}% | 7d: ${svc.uptime?.['7d'] ?? '?'}%`);
       if (svc.description) console.log(`Desc:     ${svc.description}`);
       console.log(`Networks: ${(svc.networks || []).join(', ')}`);
       if (svc.endpoints?.length) {
@@ -119,7 +119,11 @@ if (cmd === 'details') {
 
 if (cmd === 'search') {
   const showAll = args.includes('--all');
-  const keyword = args.slice(1).filter(a => !a.startsWith('--') && a !== 'bazaar').join(' ').toLowerCase();
+  const sliced = args.slice(1);
+  const localSourceIdx = sliced.indexOf('--source');
+  const keyword = sliced
+    .filter((a, i) => !a.startsWith('--') && !(localSourceIdx !== -1 && i === localSourceIdx + 1))
+    .join(' ').toLowerCase();
 
   if (!useBazaar) {
     // x402-list: filter online by default, --all includes offline
