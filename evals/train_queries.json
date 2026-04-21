@@ -1,0 +1,14 @@
+[
+  { "query": "I got a 402 Payment Required response from this API — how do I pay for it?", "should_trigger": true },
+  { "query": "Can you fetch crypto news from https://x402.ottoai.services/crypto-news for me?", "should_trigger": true },
+  { "query": "My wallet on Base is empty, I need to fund it from my ETH on Ethereum mainnet", "should_trigger": true },
+  { "query": "Find me x402 services that provide weather data", "should_trigger": true },
+  { "query": "How much does calling https://x402.example.com/analyze cost per request?", "should_trigger": true },
+  { "query": "I want to top up my USDC balance on Base to use some paid APIs", "should_trigger": true },
+  { "query": "How do I set up API key authentication for my Express server?", "should_trigger": false },
+  { "query": "I'm getting a 401 Unauthorized from the GitHub API, how do I fix it?", "should_trigger": false },
+  { "query": "Can you help me build a Stripe payment form for my SaaS product?", "should_trigger": false },
+  { "query": "How do I check my bank account balance online?", "should_trigger": false },
+  { "query": "I need to make a POST request to this webhook — can you write the fetch() call?", "should_trigger": false },
+  { "query": "How do I create a new Bitcoin wallet and secure the seed phrase?", "should_trigger": false }
+]
