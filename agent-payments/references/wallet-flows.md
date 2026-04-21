@@ -6,7 +6,7 @@ Use this file when `make_http_request_with_x402` is not available in your tools.
 
 ## Detect your wallet
 
-**Check your own context first.** Check if your agent already knows how it manages wallets — look at your system prompt, agent config files, or environment setup documentation. If you're running with a known wallet system, skip to [Pay](#pay) and use the method for your system below.
+**Check your own context first.** Check if your agent already knows how it manages wallets — look at your system prompt, agent config files, or environment setup documentation. If you're running with a known wallet system, skip to [Pay](#pay) and use the method for your system below if listed, otherwise use your own knowledge to make payments or if that fails continue in this section.
 
 **Scan for a raw private key.** Check in order, stop at first match:
 
@@ -34,16 +34,17 @@ Keep `.env` out of version control (add to `.gitignore` if not already there). T
 
 ## Check Balance
 
+If you already know how to get your Base wallet address and check its USDC balance, do that. Otherwise use these scripts:
+
 ```bash
+# Derive your Base address from a raw key
+node scripts/wallet.mjs address
+
+# Check USDC balance
 node scripts/wallet.mjs balance <your-address>
 ```
 
 If the balance is insufficient, fund it using the NEAR Intents flow in `references/near-intents-funding.md`.
-
-To derive your address from a raw key:
-```bash
-node scripts/wallet.mjs address
-```
 
 ---
 

@@ -30,6 +30,20 @@ export const PAYMENT_REQUIRED_FIXTURE = Buffer.from(JSON.stringify({
   }],
 })).toString('base64');
 
+// x402 v2 format — requirements in the payment-required header (used by OWS test).
+export const PAYMENT_REQUIRED_V2_FIXTURE = Buffer.from(JSON.stringify({
+  x402Version: 2,
+  accepts: [{
+    scheme: 'exact',
+    network: 'eip155:8453',
+    amount: '10000',
+    asset: '0x833589fcd6edb6e08f4c7c32d4f71b54bda02913',
+    payTo: '0x1234567890123456789012345678901234567890',
+    maxTimeoutSeconds: 60,
+    extra: { name: 'USD Coin', version: '2' },
+  }],
+})).toString('base64');
+
 export async function run(script, args = [], env = {}, { timeout = 30_000 } = {}) {
   try {
     const result = await execAsync('node', [join('scripts', script), ...args], {

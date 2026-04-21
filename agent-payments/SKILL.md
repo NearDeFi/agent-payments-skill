@@ -2,8 +2,7 @@
 name: agent-payments
 description: >
   Use this skill when the user wants to call a paid API, access an x402-protected resource,
-  check the price of an endpoint, browse or search for x402 services, manage their crypto
-  wallet, fund their wallet from another chain or pay for x402 services from any chain. Triggers: "x402", "HTTP 402", "pay for API",
+  check the price of an endpoint, browse or search for x402 services, fund their wallet from another chain or pay for x402 services from any chain. Triggers: "x402", "HTTP 402", "pay for API",
   "paid endpoint", "find x402 services", "bazaar", "fund my wallet", "deposit", "top up",
   or a request returns a 402 response.
 compatibility: >
@@ -21,8 +20,6 @@ x402 gates API resources behind USDC micropayments using HTTP `402 Payment Requi
 
 ## Step 1: Detect your wallet
 
-Check how your agent manages wallets:
-
 - **payments-mcp tools present** → read `references/payments-mcp.md` for auth and enhanced tools, then continue from Step 2
 - **Raw private key or other wallet system** → read `references/wallet-flows.md` to confirm your setup, then continue from Step 2
 
@@ -32,20 +29,30 @@ Check how your agent manages wallets:
 
 Applies to all wallet types including payments-mcp.
 
+**If you already have a specific service URL in mind, skip straight to `details`.**
+
+Otherwise, list all available services from x402-list and pick the most appropriate one:
 ```bash
-node scripts/search-bazaar.mjs search <keyword> [--all]
-node scripts/search-bazaar.mjs details <resource-url>
+node scripts/search-services.mjs search
 ```
 
-Searches all services in the bazaar. Add `--all` to include services without descriptions. Use `details` to get full schemas, parameters, and examples for a specific service.
+If nothing suitable is found, try the Coinbase bazaar:
+```bash
+node scripts/search-services.mjs search <keyword> --source bazaar
+```
+
+If still nothing, search the internet for x402 services matching the user's need.
+
+Once you have a service URL, get its full details (schemas, parameters, examples):
+```bash
+node scripts/search-services.mjs details <resource-url>
+```
 
 ### Example working service
 
 ```bash
-node scripts/pay.mjs --url https://x402.ottoai.services/crypto-news
+https://x402.ottoai.services/crypto-news
 ```
-
-Output the full response body to the user.
 
 ---
 
@@ -83,4 +90,3 @@ Report the response body and any transaction hash to the user.
 - Never pay silently — always show the decoded price first
 - Confirm with user before any payment > $0.10 USDC
 - Always report the tx hash after a successful payment
-- `send` and `trade` execute real financial transactions — always confirm recipient, asset, and amount with the user before calling

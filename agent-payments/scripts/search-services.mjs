@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 // Search x402 services by keyword, or get full details for a specific service.
 // Default source: x402-list.com (curated, uptime-monitored).
-// Usage:  node scripts/search-bazaar.mjs search <keyword> [--all] [--source bazaar]
-//         node scripts/search-bazaar.mjs details <resource-url>
+// Usage:  node scripts/search-services.mjs search <keyword> [--all] [--source bazaar]
+//         node scripts/search-services.mjs details <resource-url>
 // Flags:  --all            include offline services (x402-list) or undescribed (bazaar)
 //         --source bazaar  use Coinbase bazaar instead of x402-list
 import https from 'https';
@@ -17,8 +17,8 @@ const useBazaar = args.includes('--source') && args[args.indexOf('--source') + 1
 
 if (!cmd) {
   console.log('Usage:');
-  console.log('  node scripts/search-bazaar.mjs search <keyword> [--all] [--source bazaar]');
-  console.log('  node scripts/search-bazaar.mjs details <resource-url>');
+  console.log('  node scripts/search-services.mjs search <keyword> [--all] [--source bazaar]');
+  console.log('  node scripts/search-services.mjs details <resource-url>');
   process.exit(0);
 }
 
@@ -60,7 +60,7 @@ async function fetchBazaar() {
 if (cmd === 'details') {
   const detailsUrl = args[1];
   if (!detailsUrl) {
-    console.error('Usage: node scripts/search-bazaar.mjs details <resource-url>');
+    console.error('Usage: node scripts/search-services.mjs details <resource-url>');
     process.exit(1);
   }
 
@@ -176,7 +176,7 @@ if (cmd === 'search') {
 } else {
   console.error(`Unknown command: ${cmd}`);
   console.error('Usage:');
-  console.error('  node scripts/search-bazaar.mjs search <keyword> [--all] [--source bazaar]');
-  console.error('  node scripts/search-bazaar.mjs details <resource-url>');
+  console.error('  node scripts/search-services.mjs search <keyword> [--all] [--source bazaar]');
+  console.error('  node scripts/search-services.mjs details <resource-url>');
   process.exit(1);
 }

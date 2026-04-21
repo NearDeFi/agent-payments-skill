@@ -1,0 +1,82 @@
+{
+  "skill_name": "agent-payments",
+  "evals": [
+    {
+      "id": "search-services",
+      "wallet": "raw",
+      "fund": false,
+      "prompt": "Search for x402 services and list what's available — show service name, URL, and price per request.",
+      "assertions": [
+        "Output includes at least one service URL",
+        "Output includes a price in USDC for at least one service",
+        "Output does not say no services were found"
+      ]
+    },
+    {
+      "id": "bitcoin-price",
+      "wallet": "raw",
+      "fund": true,
+      "prompt": "You have USDC in your NEAR account (bed9cc78b590bfb6fd1db39811ded08b689b8772b06cbb67e74a86b36f56d399). Use it to fund your Base wallet with 0.01 USDC. NEAR_PRIVATE_KEY is in your environment.\n\nTo send USDC from NEAR (USDC contract: 17208628f84f5d6ad33f0da3bbbeb27ffcb398eac501a31bd6ad2011e36133a1):\n  node --input-type=module -e \"\n  import { Account, JsonRpcProvider } from 'near-api-js';\n  const provider = new JsonRpcProvider({ url: 'https://free.rpc.fastnear.com' });\n  const account = new Account('bed9cc78b590bfb6fd1db39811ded08b689b8772b06cbb67e74a86b36f56d399', provider, process.env.NEAR_PRIVATE_KEY);\n  const r = await account.callFunctionRaw({ contractId: '17208628f84f5d6ad33f0da3bbbeb27ffcb398eac501a31bd6ad2011e36133a1', methodName: 'ft_transfer', args: { receiver_id: '<DEPOSIT_ADDRESS>', amount: '<AMOUNT_IN>' }, deposit: 1n, gas: 30000000000000n });\n  console.log(r.transaction.hash);\n  \"\nInstall near-api-js if not present: npm install near-api-js@7.2.0 (in agent-payments directory)\n\nOnce funded, find an x402 service that provides the current Bitcoin price, pay for it, and tell me the price of Bitcoin.",
+      "assertions": [
+        "Output includes a Bitcoin price figure in USD",
+        "Output confirms a payment was made or shows a transaction hash"
+      ]
+    },
+    {
+      "id": "pay-raw-key",
+      "wallet": "raw",
+      "fund": true,
+      "prompt": "You have USDC in your NEAR account (bed9cc78b590bfb6fd1db39811ded08b689b8772b06cbb67e74a86b36f56d399). Use it to fund your Base wallet with 0.01 USDC. NEAR_PRIVATE_KEY is in your environment.\n\nTo send USDC from NEAR (USDC contract: 17208628f84f5d6ad33f0da3bbbeb27ffcb398eac501a31bd6ad2011e36133a1):\n  node --input-type=module -e \"\n  import { Account, JsonRpcProvider } from 'near-api-js';\n  const provider = new JsonRpcProvider({ url: 'https://free.rpc.fastnear.com' });\n  const account = new Account('bed9cc78b590bfb6fd1db39811ded08b689b8772b06cbb67e74a86b36f56d399', provider, process.env.NEAR_PRIVATE_KEY);\n  const r = await account.callFunctionRaw({ contractId: '17208628f84f5d6ad33f0da3bbbeb27ffcb398eac501a31bd6ad2011e36133a1', methodName: 'ft_transfer', args: { receiver_id: '<DEPOSIT_ADDRESS>', amount: '<AMOUNT_IN>' }, deposit: 1n, gas: 30000000000000n });\n  console.log(r.transaction.hash);\n  \"\nInstall near-api-js if not present: npm install near-api-js@7.2.0 (in agent-payments directory)\n\nOnce funded, fetch the latest crypto news from https://x402.ottoai.services/crypto-news and show me the full response body.",
+      "assertions": [
+        "Output includes article or news content (not just an error or metadata)",
+        "Output reports a transaction hash or confirms payment succeeded",
+        "Output does not say the payment failed"
+      ]
+    },
+    {
+      "id": "pay-cdp",
+      "wallet": "cdp",
+      "fund": true,
+      "prompt": "You have USDC in your NEAR account (bed9cc78b590bfb6fd1db39811ded08b689b8772b06cbb67e74a86b36f56d399). Use it to fund your Base wallet with 0.01 USDC. NEAR_PRIVATE_KEY is in your environment.\n\nTo send USDC from NEAR (USDC contract: 17208628f84f5d6ad33f0da3bbbeb27ffcb398eac501a31bd6ad2011e36133a1):\n  node --input-type=module -e \"\n  import { Account, JsonRpcProvider } from 'near-api-js';\n  const provider = new JsonRpcProvider({ url: 'https://free.rpc.fastnear.com' });\n  const account = new Account('bed9cc78b590bfb6fd1db39811ded08b689b8772b06cbb67e74a86b36f56d399', provider, process.env.NEAR_PRIVATE_KEY);\n  const r = await account.callFunctionRaw({ contractId: '17208628f84f5d6ad33f0da3bbbeb27ffcb398eac501a31bd6ad2011e36133a1', methodName: 'ft_transfer', args: { receiver_id: '<DEPOSIT_ADDRESS>', amount: '<AMOUNT_IN>' }, deposit: 1n, gas: 30000000000000n });\n  console.log(r.transaction.hash);\n  \"\nInstall near-api-js if not present: npm install near-api-js@7.2.0 (in agent-payments directory)\n\nOnce funded, fetch the latest crypto news from https://x402.ottoai.services/crypto-news and show me the full response body.",
+      "assertions": [
+        "Output includes article or news content (not just an error or metadata)",
+        "Output reports a transaction hash or confirms payment succeeded",
+        "Output does not say the payment failed"
+      ]
+    },
+    {
+      "id": "pay-privy",
+      "wallet": "privy",
+      "fund": true,
+      "prompt": "You have USDC in your NEAR account (bed9cc78b590bfb6fd1db39811ded08b689b8772b06cbb67e74a86b36f56d399). Use it to fund your Base wallet with 0.01 USDC. NEAR_PRIVATE_KEY is in your environment.\n\nTo send USDC from NEAR (USDC contract: 17208628f84f5d6ad33f0da3bbbeb27ffcb398eac501a31bd6ad2011e36133a1):\n  node --input-type=module -e \"\n  import { Account, JsonRpcProvider } from 'near-api-js';\n  const provider = new JsonRpcProvider({ url: 'https://free.rpc.fastnear.com' });\n  const account = new Account('bed9cc78b590bfb6fd1db39811ded08b689b8772b06cbb67e74a86b36f56d399', provider, process.env.NEAR_PRIVATE_KEY);\n  const r = await account.callFunctionRaw({ contractId: '17208628f84f5d6ad33f0da3bbbeb27ffcb398eac501a31bd6ad2011e36133a1', methodName: 'ft_transfer', args: { receiver_id: '<DEPOSIT_ADDRESS>', amount: '<AMOUNT_IN>' }, deposit: 1n, gas: 30000000000000n });\n  console.log(r.transaction.hash);\n  \"\nInstall near-api-js if not present: npm install near-api-js@7.2.0 (in agent-payments directory)\n\nOnce funded, fetch the latest crypto news from https://x402.ottoai.services/crypto-news and show me the full response body.",
+      "assertions": [
+        "Output includes article or news content (not just an error or metadata)",
+        "Output reports a transaction hash or confirms payment succeeded",
+        "Output does not say the payment failed"
+      ]
+    },
+    {
+      "id": "pay-turnkey",
+      "wallet": "turnkey",
+      "fund": true,
+      "prompt": "You have USDC in your NEAR account (bed9cc78b590bfb6fd1db39811ded08b689b8772b06cbb67e74a86b36f56d399). Use it to fund your Base wallet with 0.01 USDC. NEAR_PRIVATE_KEY is in your environment.\n\nTo send USDC from NEAR (USDC contract: 17208628f84f5d6ad33f0da3bbbeb27ffcb398eac501a31bd6ad2011e36133a1):\n  node --input-type=module -e \"\n  import { Account, JsonRpcProvider } from 'near-api-js';\n  const provider = new JsonRpcProvider({ url: 'https://free.rpc.fastnear.com' });\n  const account = new Account('bed9cc78b590bfb6fd1db39811ded08b689b8772b06cbb67e74a86b36f56d399', provider, process.env.NEAR_PRIVATE_KEY);\n  const r = await account.callFunctionRaw({ contractId: '17208628f84f5d6ad33f0da3bbbeb27ffcb398eac501a31bd6ad2011e36133a1', methodName: 'ft_transfer', args: { receiver_id: '<DEPOSIT_ADDRESS>', amount: '<AMOUNT_IN>' }, deposit: 1n, gas: 30000000000000n });\n  console.log(r.transaction.hash);\n  \"\nInstall near-api-js if not present: npm install near-api-js@7.2.0 (in agent-payments directory)\n\nOnce funded, fetch the latest crypto news from https://x402.ottoai.services/crypto-news and show me the full response body.",
+      "assertions": [
+        "Output includes article or news content (not just an error or metadata)",
+        "Output reports a transaction hash or confirms payment succeeded",
+        "Output does not say the payment failed"
+      ]
+    },
+    {
+      "id": "pay-payments-mcp",
+      "wallet": "payments-mcp",
+      "fund": true,
+      "uses_mcp": true,
+      "prompt": "You have USDC in your NEAR account (bed9cc78b590bfb6fd1db39811ded08b689b8772b06cbb67e74a86b36f56d399). Use it to fund your Base wallet with 0.01 USDC. NEAR_PRIVATE_KEY is in your environment.\n\nTo send USDC from NEAR (USDC contract: 17208628f84f5d6ad33f0da3bbbeb27ffcb398eac501a31bd6ad2011e36133a1):\n  node --input-type=module -e \"\n  import { Account, JsonRpcProvider } from 'near-api-js';\n  const provider = new JsonRpcProvider({ url: 'https://free.rpc.fastnear.com' });\n  const account = new Account('bed9cc78b590bfb6fd1db39811ded08b689b8772b06cbb67e74a86b36f56d399', provider, process.env.NEAR_PRIVATE_KEY);\n  const r = await account.callFunctionRaw({ contractId: '17208628f84f5d6ad33f0da3bbbeb27ffcb398eac501a31bd6ad2011e36133a1', methodName: 'ft_transfer', args: { receiver_id: '<DEPOSIT_ADDRESS>', amount: '<AMOUNT_IN>' }, deposit: 1n, gas: 30000000000000n });\n  console.log(r.transaction.hash);\n  \"\nInstall near-api-js if not present: npm install near-api-js@7.2.0 (in agent-payments directory)\n\nOnce funded, fetch the latest crypto news from https://x402.ottoai.services/crypto-news and show me the full response body.",
+      "assertions": [
+        "Output includes article or news content (not just an error or metadata)",
+        "Output reports a transaction hash or confirms payment succeeded",
+        "Output does not say the payment failed"
+      ]
+    }
+  ]
+}

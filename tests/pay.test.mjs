@@ -7,6 +7,7 @@
 //   3. Exits 1 with "No private key" when no key is available in env or args
 //   4. Handles the full v1 402 flow (requirements in JSON body, X-PAYMENT header)
 //   5. Handles the full v2 402 flow (requirements in payment-required header, PAYMENT-SIGNATURE header)
+//   6. POST with --body sends the body to the server and handles 402 → retry
 
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
@@ -92,6 +93,49 @@ test('pay: handles 402 and sends signed retry', { timeout: 10_000 }, async () =>
     // Verify the payment header decodes to valid JSON with a signature
     const decoded = JSON.parse(Buffer.from(retryHeaders['x-payment'], 'base64').toString('utf8'));
     assert.match(decoded.payload.signature, /^0x[0-9a-fA-F]{130}$/);
+  } finally {
+    server.close();
+  }
+});
+
+test('pay: POST with --body sends body and handles 402 → retry', { timeout: 10_000 }, async () => {
+  let receivedBody;
+  let requestCount = 0;
+
+  const { server, url } = await startServer((req, res) => {
+    requestCount++;
+    let body = '';
+    req.on('data', c => { body += c; });
+    req.on('end', () => {
+      if (requestCount <= 2) {
+        const requirementsJson = JSON.stringify({
+          x402Version: 1,
+          accepts: [{
+            scheme: 'exact',
+            network: 'base',
+            maxAmountRequired: '10000',
+            asset: '0x833589fcd6edb6e08f4c7c32d4f71b54bda02913',
+            payTo: '0x1234567890123456789012345678901234567890',
+            maxTimeoutSeconds: 60,
+            extra: { name: 'USD Coin', version: '2' },
+          }],
+        });
+        res.writeHead(402, { 'Content-Type': 'application/json' });
+        res.end(requirementsJson);
+      } else {
+        receivedBody = body;
+        res.writeHead(200);
+        res.end(JSON.stringify({ paid: true }));
+      }
+    });
+  });
+
+  try {
+    const { code } = await run('pay.mjs', [
+      '--url', url, '--method', 'POST', '--body', '{"key":"value"}', '--key', TEST_KEY,
+    ]);
+    assert.equal(code, 0);
+    assert.equal(receivedBody, '{"key":"value"}', 'retry should re-send the original body');
   } finally {
     server.close();
   }
