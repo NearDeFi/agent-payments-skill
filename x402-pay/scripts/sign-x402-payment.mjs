@@ -45,19 +45,34 @@ try {
   process.exit(1);
 }
 
-// Find first EVM (eip155:*) accepts entry
-const accepted = (requirements.accepts || []).find(a => a.network?.startsWith('eip155:'));
+// x402 v1 uses short network names; v0 used eip155:<chainId>
+const CHAIN_IDS = { 'base': 8453, 'base-sepolia': 84532 };
+function evmChainId(network) {
+  if (network?.startsWith('eip155:')) return parseInt(network.split(':')[1], 10);
+  return CHAIN_IDS[network] ?? null;
+}
+
+// Filter to exact scheme + known EVM networks, prefer Base mainnet, then cheapest
+const evmOptions = (requirements.accepts || [])
+  .filter(a => a.scheme === 'exact' && evmChainId(a.network) !== null)
+  .sort((a, b) => {
+    const aMain = evmChainId(a.network) === 8453 ? 0 : 1;
+    const bMain = evmChainId(b.network) === 8453 ? 0 : 1;
+    if (aMain !== bMain) return aMain - bMain;
+    return parseInt(a.maxAmountRequired || a.amount || 0) - parseInt(b.maxAmountRequired || b.amount || 0);
+  });
+const accepted = evmOptions[0];
 if (!accepted) {
-  console.error('No EVM payment method in requirements. Only eip155:* networks are supported by this script.');
+  console.error('No EVM payment method in requirements. Script supports base, base-sepolia, and eip155:<chainId> networks.');
   process.exit(1);
 }
 
-const chainId      = parseInt(accepted.network.split(':')[1], 10);
-const tokenName    = accepted.extra?.tokenName    || 'USD Coin';
-const tokenVersion = accepted.extra?.tokenVersion || '2';
+const chainId      = evmChainId(accepted.network);
+const tokenName    = accepted.extra?.name    || accepted.extra?.tokenName    || 'USD Coin';
+const tokenVersion = accepted.extra?.version || accepted.extra?.tokenVersion || '2';
 const tokenAddress = accepted.asset;
 const payTo        = accepted.payTo;
-const amount       = accepted.amount;
+const amount       = accepted.maxAmountRequired || accepted.amount;
 const maxTimeout   = accepted.maxTimeoutSeconds || 60;
 
 const domain = {

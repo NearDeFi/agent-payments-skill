@@ -2,7 +2,7 @@
 
 If `make_http_request_with_x402` is available in your tools, use this flow. It handles auth, signing, and retries automatically — no scripts needed.
 
-For Step 2 (finding a service), use `search-bazaar.mjs` — same as all other wallets.
+For finding a service, use `search-services.mjs` as described in `skill.md` — same as all other wallets.
 
 ---
 
@@ -54,12 +54,6 @@ For Step 3 (balance check), use `get_wallet_balance(chain="base")`.
 
 ---
 
-## Setup
+## No payments-mcp?
 
-*Only needed if payments-mcp is not yet installed.*
-
-```bash
-npx @coinbase/payments-mcp --client claude-code --auto-config
-```
-
-Restart Claude Code, then sign in via `show_wallet_app()`.
+If payments-mcp tools are not available, fall back to `references/wallet-flows.md` to set up a wallet using a private key.

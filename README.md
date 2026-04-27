@@ -1,18 +1,31 @@
-# agent-payments
+# x402-pay
 
 Skill for making HTTP 402 micropayments using USDC on Base and funding it from most chains.
 
-## Prerequisites
+## Install
+
+```bash
+npx skills add NearDeFi/agent-payments-skill
+```
+
+Then install the runtime dependency inside the skill directory:
+
+```bash
+cd <skills-dir>/x402-pay
+npm install
+```
+
+Where `<skills-dir>` is `.agents/skills` (universal) or `.claude/skills` (Claude Code), relative to your project root or home directory depending on whether you installed globally.
+
+## Prerequisites (for development)
 
 **Node.js 20+** — required for built-in `node:test`, top-level `await`, and `.mjs` support.
 
-**viem** — used by the scripts for EIP-712 signing and key derivation. Install once before running scripts:
+**viem**, **@x402/fetch**, **@x402/evm** — used by the scripts for payment signing and protocol handling. Install once before running scripts:
 
 ```bash
 npm install
 ```
-
-No other dependencies. The scripts use Node's built-in `https`, `crypto`, and `http` modules for everything else.
 
 ## Running the tests
 
@@ -24,8 +37,8 @@ node --test tests/*.test.mjs
 ```
 
 The tests are integration tests — they run the scripts as child processes and make real network requests to:
-- The x402 bazaar API (`api.cdp.coinbase.com`) — for search-bazaar tests
-- The NEAR Intents API (`1click.chaindefuser.com`) — for intents-quote tests
+- x402-list.com (primary) and the Coinbase bazaar (`api.cdp.coinbase.com`) — for search-services tests
+- The NEAR Intents API (`1click.chaindefuser.com`) — for near-intents tests
 - Base mainnet RPC (`mainnet.base.org`) — for the wallet balance test
 
 ### Wallet signing tests
@@ -56,16 +69,88 @@ TURNKEY_ORGANIZATION_ID=<organization id>
 TURNKEY_SIGN_WITH=<0x wallet address>
 ```
 
-All other tests (OWS, pay, search-bazaar, intents-quote, wallet, sign) use a well-known Hardhat/Anvil test key and require no wallet setup.
+All other tests (OWS, pay, search-services, near-intents, wallet, sign) use a well-known Hardhat/Anvil test key and require no wallet setup.
 
 ## Scripts
 
 | Script | Commands |
 |--------|----------|
 | `scripts/wallet.mjs` | `address`, `balance`, `new` |
-| `scripts/search-bazaar.mjs` | `search`, `details` |
-| `scripts/intents-quote.mjs` | `quote`, `status` |
+| `scripts/search-services.mjs` | `search`, `details` |
+| `scripts/near-intents.mjs` | `tokens`, `quote`, `status` |
 | `scripts/sign-x402-payment.mjs` | `sign`, `payload` |
 | `scripts/pay.mjs` | _(single operation)_ |
 
 Run any script without arguments to see its usage.
+
+## Evals
+
+Two types of evals verify the skill works correctly:
+
+### Description evals — does the skill trigger on the right queries?
+
+Tests whether Claude activates the skill for relevant queries and ignores it for unrelated ones. Each query is run 3 times in parallel; a query passes if at least 2/3 runs agree.
+
+**Prerequisites:** `claude` CLI, `jq`. No wallet credentials required.
+
+The repo includes `.claude/skills/x402-pay` as a symlink so Claude Code picks up the skill automatically when run from this directory. If you need it globally (e.g. for manual testing outside the repo), symlink it to your home skills directory:
+
+```bash
+ln -sf "$(pwd)/x402-pay" ~/.claude/skills/x402-pay
+```
+
+```bash
+# Training set (12 queries)
+bash evals/run-eval.sh evals/train_queries.json
+
+# Validation set (8 queries)
+bash evals/run-eval.sh evals/validation_queries.json
+```
+
+Query sets live in `evals/train_queries.json` and `evals/validation_queries.json`. The full combined set is in `evals/eval_queries.json`.
+
+### Output quality evals — does the skill complete real payment tasks correctly?
+
+Runs 6 end-to-end payment tasks using all four wallet types (raw private key, CDP, Privy, Turnkey) plus service discovery and a Bitcoin price lookup. Each funded eval bridges NEAR USDC → Base via NEAR Intents before making the x402 payment.
+
+All 6 evals run in parallel; grading is done by a second Claude call per assertion.
+
+**Prerequisites:** `claude` CLI, `jq`, wallet credentials in `x402-pay/.env`. The `.claude/skills/x402-pay` symlink in the repo means no manual skill setup is needed.
+
+**Environment variables** — add to `x402-pay/.env`:
+
+```
+# NEAR source account (funds the Base wallets)
+NEAR_PRIVATE_KEY=<ed25519 private key for the NEAR account>
+
+# Raw private key wallet
+PRIVATE_KEY=<hex private key>
+
+# CDP wallet
+CDP_API_KEY_ID=<key id>
+CDP_API_KEY_SECRET=<key secret>
+CDP_WALLET_ADDRESS=<0x address>
+CDP_WALLET_SECRET=<wallet secret>
+
+# Privy wallet
+PRIVY_APP_ID=<app id>
+PRIVY_APP_SECRET=<app secret>
+PRIVY_WALLET_ID=<server wallet id>
+PRIVY_WALLET_ADDRESS=<0x address>
+
+# Turnkey wallet
+TURNKEY_API_PUBLIC_KEY=<API public key>
+TURNKEY_API_PRIVATE_KEY=<API private key>
+TURNKEY_ORGANIZATION_ID=<organization id>
+TURNKEY_SIGN_WITH=<0x wallet address>
+```
+
+```bash
+# Run iteration 1 (results saved to evals/workspace/iteration-1/)
+bash evals/run-output-eval.sh 1
+
+# Run a second iteration
+bash evals/run-output-eval.sh 2
+```
+
+Results for each eval are written to `evals/workspace/iteration-<N>/<eval-id>/output.txt` (agent output) and `grading.json` (per-assertion grades with evidence).

@@ -1,0 +1,10 @@
+[
+  { "query": "The server keeps returning 'payment required' and I don't know how to handle it", "should_trigger": true },
+  { "query": "Can you search the bazaar for AI inference endpoints I can pay for with USDC?", "should_trigger": true },
+  { "query": "I need to deposit funds to my crypto wallet from my Solana holdings", "should_trigger": true },
+  { "query": "My agent needs to call this paid endpoint at $0.001 per request — set it up for me", "should_trigger": true },
+  { "query": "My API endpoint returns 403 Forbidden — what permission is missing?", "should_trigger": false },
+  { "query": "I want to deploy a token contract on Base — how do I write the Solidity?", "should_trigger": false },
+  { "query": "Can you help me write a Python script to call the OpenAI API?", "should_trigger": false },
+  { "query": "I need to set up automatic invoice generation for my subscription customers", "should_trigger": false }
+]

@@ -1,14 +1,14 @@
 #!/usr/bin/env node
-// NEAR Intents cross-chain swap: get a quote or check swap status.
+// NEAR Intents 1-click API: list supported tokens, get swap quotes, check swap status.
 //
-// Dry quote (preview, no funds committed):
-//   node scripts/intents-quote.mjs quote --dry --usdc 1.00 --from eth:ETH --wallet 0xBase [--refund <sendingAddress>]
+// List tokens (find the right --from value for quote):
+//   node scripts/near-intents.mjs tokens [--chain <chain>]
 //
-// Committed quote (get deposit address):
-//   node scripts/intents-quote.mjs quote --usdc 1.00 --from eth:ETH --wallet 0xBase [--refund <sendingAddress>]
+// Get a committed quote (deposit address + exact send amount):
+//   node scripts/near-intents.mjs quote --usdc <amount> --from <chain:SYMBOL> --wallet <baseAddress> [--refund <sendingAddress>]
 //
 // Check swap status:
-//   node scripts/intents-quote.mjs status <depositAddress> [--memo <memo>]
+//   node scripts/near-intents.mjs status <depositAddress> [--memo <memo>]
 
 import https from 'https';
 
@@ -49,12 +49,36 @@ function apiRequest(method, path, body) {
   });
 }
 
+// ── Tokens ────────────────────────────────────────────────────────────────────
+
+if (cmd === 'tokens') {
+  const chainFilter = getArg('--chain');
+
+  const tokens = await apiRequest('GET', '/v0/tokens');
+
+  let filtered = tokens;
+  if (chainFilter) {
+    filtered = tokens.filter(t => t.blockchain?.toLowerCase() === chainFilter.toLowerCase());
+    if (filtered.length === 0) {
+      console.error(`No tokens found for chain: ${chainFilter}`);
+      console.error('Available chains: ' + [...new Set(tokens.map(t => t.blockchain?.toLowerCase()))].sort().join(', '));
+      process.exit(1);
+    }
+  }
+
+  console.log('Use <chain>:<SYMBOL> as the --from argument to the quote command:\n');
+  for (const t of filtered) {
+    const fromArg = `${t.blockchain?.toLowerCase()}:${t.symbol?.toUpperCase()}`;
+    const price   = t.price ? ` ($${parseFloat(t.price).toFixed(4)})` : '';
+    console.log(`  ${fromArg.padEnd(20)} ${t.symbol}${price}`);
+  }
+
 // ── Status ────────────────────────────────────────────────────────────────────
 
-if (cmd === 'status') {
+} else if (cmd === 'status') {
   const depositAddress = args[1];
   if (!depositAddress) {
-    console.error('Usage: node scripts/intents-quote.mjs status <depositAddress> [--memo <memo>]');
+    console.error('Usage: node scripts/near-intents.mjs status <depositAddress> [--memo <memo>]');
     process.exit(1);
   }
 
@@ -76,32 +100,32 @@ if (cmd === 'status') {
   console.log(`Status: ${result.status}${labels[result.status] ? ` — ${labels[result.status]}` : ''}`);
   if (result.swapDetails) console.log('Details:', JSON.stringify(result.swapDetails, null, 2));
   process.exit(0);
-}
 
 // ── Quote ─────────────────────────────────────────────────────────────────────
 
-if (cmd === 'quote') {
+} else if (cmd === 'quote') {
   const usdcArg   = getArg('--usdc');
   const fromArg   = getArg('--from');
   const refundArg = getArg('--refund');
   const walletArg = getArg('--wallet');
-  const isDry     = args.includes('--dry');
 
   if (!usdcArg || !fromArg) {
     console.error('Usage:');
-    console.error('  node scripts/intents-quote.mjs quote [--dry] --usdc <amount> --from <chain:SYMBOL> [--refund <address>] [--wallet <address>]');
+    console.error('  node scripts/near-intents.mjs quote --usdc <amount> --from <chain:SYMBOL> --wallet <address> [--refund <address>]');
+    console.error('  Use "tokens" subcommand to list valid --from values');
     process.exit(1);
   }
 
   const parts = fromArg.split(':');
   if (parts.length !== 2) {
-    console.error('--from must be chain:SYMBOL, e.g. eth:ETH or sol:SOL or base:USDC');
+    console.error('--from must be chain:SYMBOL, e.g. eth:ETH or sol:SOL or near:USDC');
+    console.error('Run: node scripts/near-intents.mjs tokens  to list all valid values');
     process.exit(1);
   }
   const [fromChain, fromSymbol] = parts;
 
   if (!walletArg) {
-    console.error('--wallet <address> is required. Get your address with: node scripts/wallet.mjs address');
+    console.error('--wallet <address> is required — your Base wallet address');
     process.exit(1);
   }
   const walletAddress = walletArg;
@@ -114,23 +138,22 @@ if (cmd === 'quote') {
   );
   if (!token) {
     console.error(`Token not found: ${fromSymbol} on ${fromChain}`);
-    console.error('Supported tokens: https://1click.chaindefuser.com/v0/tokens');
+    console.error('Run: node scripts/near-intents.mjs tokens  to list all valid chain:SYMBOL pairs');
     process.exit(1);
   }
-
-  const amount   = Math.round(parseFloat(usdcArg) * 1_000_000).toString();
-  const deadline = new Date(Date.now() + 10 * 60 * 1000).toISOString();
-
-  const refundType = refundArg ? 'ORIGIN_CHAIN' : 'INTENTS';
-  const refundTo   = refundArg ?? walletAddress;
 
   if (!refundArg) {
     console.warn('Note: no --refund address provided. If the swap fails, funds will land in the NEAR Intents');
     console.warn('internal balance for your Base wallet address and must be manually withdrawn to recover them.\n');
   }
 
+  const amount   = Math.round(parseFloat(usdcArg) * 1_000_000).toString();
+  const deadline = new Date(Date.now() + 10 * 60 * 1000).toISOString();
+  const refundType = refundArg ? 'ORIGIN_CHAIN' : 'INTENTS';
+  const refundTo   = refundArg ?? walletAddress;
+
   const quoteBody = {
-    dry:              isDry,
+    dry:              false,
     swapType:         'EXACT_OUTPUT',
     originAsset:      token.assetId,
     destinationAsset: DEST_ASSET,
@@ -155,24 +178,21 @@ if (cmd === 'quote') {
 
   console.log(`Send:    ${q.amountInFormatted} ${fromSymbol} on ${fromChain}`);
   console.log(`Receive: ${q.amountOutFormatted} USDC on Base`);
+  console.log(`Send (units): ${q.amountIn}`);
+  console.log(`\nDeposit to: ${q.depositAddress}`);
+  if (token.contractAddress) console.log(`Asset:      ${token.contractAddress}`);
+  console.log(`By:         ${q.deadline}`);
 
-  if (isDry) {
-    console.log('\n(Dry quote — confirm with user before proceeding)');
-  } else {
-    console.log(`\nDeposit to: ${q.depositAddress}`);
-    if (token.contractAddress) console.log(`Asset:      ${token.contractAddress}`);
-    console.log(`By:         ${q.deadline}`);
-
-    if (q.depositMemo) {
-      console.log(`\nMEMO REQUIRED: ${q.depositMemo}`);
-      console.log('You MUST include this as the transaction memo — funds are permanently lost if omitted.');
-    }
+  if (q.depositMemo) {
+    console.log(`\nMEMO REQUIRED: ${q.depositMemo}`);
+    console.log('You MUST include this as the transaction memo — funds are permanently lost if omitted.');
   }
 
 } else {
   console.error(`Unknown command: ${cmd ?? '(none)'}`);
   console.error('Usage:');
-  console.error('  node scripts/intents-quote.mjs quote [--dry] --usdc <amount> --from <chain:SYMBOL>');
-  console.error('  node scripts/intents-quote.mjs status <depositAddress> [--memo <memo>]');
+  console.error('  node scripts/near-intents.mjs tokens [--chain <chain>]');
+  console.error('  node scripts/near-intents.mjs quote --usdc <amount> --from <chain:SYMBOL> --wallet <address> [--refund <address>]');
+  console.error('  node scripts/near-intents.mjs status <depositAddress> [--memo <memo>]');
   process.exit(1);
 }

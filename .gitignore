@@ -20,3 +20,6 @@ build/
 # Editor
 .vscode/
 .idea/
+
+# Eval output
+evals/workspace/

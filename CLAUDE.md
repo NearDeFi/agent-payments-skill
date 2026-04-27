@@ -21,10 +21,6 @@ Always work on a branch prefixed with `claude/`. Examples:
 
 Do **not** attempt to merge or rebase into `main` directly. Do **not** force-push.
 
-## Version
-
-Always keep the version of the agent-payments skill at 0.1 (`metadata.version` in SKILL.md frontmatter).
-
 ## Agent Skills — Authoring Standards
 
 When creating or editing skills, follow the [Agent Skills spec](https://agentskills.io/specification):
@@ -64,7 +60,7 @@ node scripts/foo.mjs <command> [--flag value]   ✓
 node scripts/foo.mjs --mode quote               ✗
 ```
 
-Examples from the agent-payments skill: `search-bazaar.mjs search`, `search-bazaar.mjs details`, `intents-quote.mjs quote`, `intents-quote.mjs status`, `sign-x402-payment.mjs sign`, `sign-x402-payment.mjs payload`.
+Examples from the x402-pay skill: `search-services.mjs search`, `search-services.mjs details`, `near-intents.mjs tokens`, `near-intents.mjs quote`, `near-intents.mjs status`, `sign-x402-payment.mjs sign`, `sign-x402-payment.mjs payload`.
 
 Single-operation scripts (e.g. `pay.mjs`) do not need a subcommand.
 

@@ -5,16 +5,19 @@
 //   node scripts/wallet.mjs address [--key <hex>]
 //
 // Check USDC balance on Base:
-//   node scripts/wallet.mjs balance <address>
+//   node scripts/wallet.mjs balance <address> [--rpc <url>] [--rpc-key <key>]
+//   Defaults to https://mainnet.base.org. --rpc-key is sent as `Authorization: Bearer <key>`.
+//   Env fallbacks: BASE_RPC_URL, BASE_RPC_KEY.
 //
 // Generate a new private key:
 //   node scripts/wallet.mjs new
 
 import { randomBytes } from 'crypto';
+import http from 'http';
 import https from 'https';
 
 const USDC_BASE = '0x833589fcd6edb6e08f4c7c32d4f71b54bda02913';
-const BASE_RPC  = 'https://mainnet.base.org';
+const BASE_RPC_DEFAULT = 'https://mainnet.base.org';
 
 const args = process.argv.slice(2);
 const cmd  = args[0];
@@ -27,13 +30,21 @@ function getKey() {
     || process.env.ETH_PRIVATE_KEY;
 }
 
-function rpcCall(method, params) {
+function getRpcConfig() {
+  const urlIdx = args.indexOf('--rpc');
+  const url = urlIdx !== -1 ? args[urlIdx + 1] : process.env.BASE_RPC_URL || BASE_RPC_DEFAULT;
+  const keyIdx = args.indexOf('--rpc-key');
+  const key = keyIdx !== -1 ? args[keyIdx + 1] : process.env.BASE_RPC_KEY || null;
+  return { url, key };
+}
+
+function rpcCall(method, params, { url, key } = {}) {
   return new Promise((resolve, reject) => {
     const body = JSON.stringify({ jsonrpc: '2.0', id: 1, method, params });
-    const req = https.request(BASE_RPC, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Content-Length': Buffer.byteLength(body) },
-    }, (res) => {
+    const headers = { 'Content-Type': 'application/json', 'Content-Length': Buffer.byteLength(body) };
+    if (key) headers['Authorization'] = `Bearer ${key}`;
+    const lib = new URL(url).protocol === 'http:' ? http : https;
+    const req = lib.request(url, { method: 'POST', headers }, (res) => {
       let data = '';
       res.on('data', c => { data += c; });
       res.on('end', () => {
@@ -72,7 +83,7 @@ if (cmd === 'address') {
   // Call balanceOf(address) on the USDC contract
   const paddedAddr = address.toLowerCase().replace('0x', '').padStart(64, '0');
   const data = `0x70a08231${paddedAddr}`;
-  const result = await rpcCall('eth_call', [{ to: USDC_BASE, data }, 'latest']);
+  const result = await rpcCall('eth_call', [{ to: USDC_BASE, data }, 'latest'], getRpcConfig());
   const raw = BigInt(result);
   const { formatUnits } = await import('viem');
   const usd = formatUnits(raw, 6);
@@ -90,6 +101,7 @@ if (cmd === 'address') {
 } else {
   console.log('Usage:');
   console.log('  node scripts/wallet.mjs address [--key <hex>]   Derive address from private key');
-  console.log('  node scripts/wallet.mjs balance <address>        Check USDC balance on Base');
+  console.log('  node scripts/wallet.mjs balance <address> [--rpc <url>] [--rpc-key <key>]');
+  console.log('                                                   Check USDC balance on Base');
   console.log('  node scripts/wallet.mjs new                      Generate a new private key');
 }
