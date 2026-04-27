@@ -5,9 +5,9 @@ import { fileURLToPath } from 'url';
 import { join, dirname } from 'path';
 import { config } from 'dotenv';
 
-const SKILL_DIR = join(dirname(fileURLToPath(import.meta.url)), '..', 'agent-payments');
+const SKILL_DIR = join(dirname(fileURLToPath(import.meta.url)), '..', 'x402-pay');
 
-// Load agent-payments/.env so wallet credentials are available without manually exporting them.
+// Load x402-pay/.env so wallet credentials are available without manually exporting them.
 config({ path: join(SKILL_DIR, '.env'), quiet: true });
 
 const execAsync = promisify(execFile);

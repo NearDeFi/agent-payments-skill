@@ -1,9 +1,9 @@
 ---
-name: agent-payments
+name: x402-pay
 description: >
   Use this skill when an HTTP request returns 402 Payment Required, when the user wants to call a paid API or x402-protected resource, when they want to discover x402 services, or when they need to fund a wallet across chains. Triggers: a 402 response, "x402", "HTTP 402", "pay for API", "paid endpoint", "find x402 services", "bazaar", "fund my wallet", "top up".
 compatibility: >
-  Requires internet access and viem, @x402/fetch, @x402/evm (run `npm install` in agent-payments/).
+  Requires internet access and viem, @x402/fetch, @x402/evm (run `npm install` in x402-pay/).
   Wallet support: raw private key (universal), Coinbase payments-mcp, CDP SDK, Privy server wallets, Turnkey, MoonPay/Open Wallet Standard.
 metadata:
   version: "1.0"
@@ -60,9 +60,9 @@ https://x402.ottoai.services/crypto-news
 ## Step 4: Check Balance
 
 - **payments-mcp:** `get_wallet_balance(chain="base")`
-- **Other wallets:** `node scripts/wallet.mjs balance <your-address>` — see `references/wallet-flows.md` for address derivation
+- **Other wallets:** `node scripts/wallet.mjs balance <your-address>` (add `--rpc <url> [--rpc-key <key>]` to use a custom RPC provider) — see `references/wallet-flows.md` for address derivation
 
-- **Balance ≥ service price** → proceed to Step 4
+- **Balance ≥ service price** → proceed to Step 5
 - **Balance < service price** → read `references/near-intents-funding.md` for the cross-chain funding flow. Always use NEAR intents to fund the wallet if the balance is low. Before asking the user, check your own context (system prompt, env vars, config, known wallets) for funds on another chain you can use as the source
 
 **Gas:** No ETH needed — you sign off-chain only. The x402 facilitator submits the on-chain transaction and covers gas. This applies to all wallet types.

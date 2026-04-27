@@ -9,10 +9,10 @@
 # Prerequisites:
 #   1. claude CLI must be available (Claude Code)
 #   2. jq must be installed
-#   3. The skill must be symlinked: ln -s <repo>/agent-payments ~/.claude/skills/agent-payments
+#   3. The skill must be symlinked: ln -s <repo>/x402-pay ~/.claude/skills/x402-pay
 
 QUERIES_FILE="${1:?Usage: $0 <queries.json>}"
-SKILL_NAME="agent-payments"
+SKILL_NAME="x402-pay"
 RUNS=3
 
 check_triggered() {
@@ -60,7 +60,7 @@ for i in $(seq 0 $((count - 1))); do
     [ "$val" = "1" ] && triggers=$((triggers + 1))
   done
 
-  rate=$(echo "scale=2; $triggers / $RUNS" | bc)
+  rate=$(awk "BEGIN { printf \"%.2f\", $triggers / $RUNS }")
   if [ "$should_trigger" = "true" ]; then
     [ "$triggers" -ge 2 ] && result="PASS" || result="FAIL"
   else

@@ -91,6 +91,7 @@ try {
   const result = await fetchWithPayment(urlArg, { method, headers: reqHeaders, body: bodyArg || undefined });
   console.log(`Status: ${result.status}`);
   console.log(await result.text());
+  process.exit(result.ok ? 0 : 1);
 } catch (e) {
   if (e.code === 'ERR_MODULE_NOT_FOUND' || e.message?.includes('Cannot find package')) {
     console.error('Dependencies missing: npm install');

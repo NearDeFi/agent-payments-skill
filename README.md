@@ -1,4 +1,4 @@
-# agent-payments
+# x402-pay
 
 Skill for making HTTP 402 micropayments using USDC on Base and funding it from most chains.
 
@@ -11,7 +11,7 @@ npx skills add NearDeFi/agent-payments-skill
 Then install the runtime dependency inside the skill directory:
 
 ```bash
-cd <skills-dir>/agent-payments
+cd <skills-dir>/x402-pay
 npm install
 ```
 
@@ -93,10 +93,10 @@ Tests whether Claude activates the skill for relevant queries and ignores it for
 
 **Prerequisites:** `claude` CLI, `jq`. No wallet credentials required.
 
-The repo includes `.claude/skills/agent-payments` as a symlink so Claude Code picks up the skill automatically when run from this directory. If you need it globally (e.g. for manual testing outside the repo), symlink it to your home skills directory:
+The repo includes `.claude/skills/x402-pay` as a symlink so Claude Code picks up the skill automatically when run from this directory. If you need it globally (e.g. for manual testing outside the repo), symlink it to your home skills directory:
 
 ```bash
-ln -sf "$(pwd)/agent-payments" ~/.claude/skills/agent-payments
+ln -sf "$(pwd)/x402-pay" ~/.claude/skills/x402-pay
 ```
 
 ```bash
@@ -115,9 +115,9 @@ Runs 6 end-to-end payment tasks using all four wallet types (raw private key, CD
 
 All 6 evals run in parallel; grading is done by a second Claude call per assertion.
 
-**Prerequisites:** `claude` CLI, `jq`, wallet credentials in `agent-payments/.env`. The `.claude/skills/agent-payments` symlink in the repo means no manual skill setup is needed.
+**Prerequisites:** `claude` CLI, `jq`, wallet credentials in `x402-pay/.env`. The `.claude/skills/x402-pay` symlink in the repo means no manual skill setup is needed.
 
-**Environment variables** — add to `agent-payments/.env`:
+**Environment variables** — add to `x402-pay/.env`:
 
 ```
 # NEAR source account (funds the Base wallets)

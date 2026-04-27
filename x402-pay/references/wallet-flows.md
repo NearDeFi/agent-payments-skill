@@ -42,6 +42,9 @@ node scripts/wallet.mjs address
 
 # Check USDC balance
 node scripts/wallet.mjs balance <your-address>
+
+# Check via a custom RPC provider
+node scripts/wallet.mjs balance <your-address> --rpc <url> [--rpc-key <key>]
 ```
 
 If the balance is insufficient, fund it using the NEAR Intents flow in `references/near-intents-funding.md`.

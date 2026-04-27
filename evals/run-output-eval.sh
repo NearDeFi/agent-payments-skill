@@ -1,20 +1,20 @@
 #!/bin/bash
 # Usage: bash evals/run-output-eval.sh [iteration]
 #
-# Runs output quality evals for the agent-payments skill — all evals and all
+# Runs output quality evals for the x402-pay skill — all evals and all
 # grading calls run in parallel. Results are written to evals/workspace/iteration-<N>/
 #
 # Prerequisites:
 #   1. claude CLI must be available (Claude Code)
 #   2. jq must be installed
-#   3. agent-payments/.env must exist with wallet credentials
-#   4. NEAR_PRIVATE_KEY must be set in environment (or in agent-payments/.env)
-#   5. The skill must be symlinked: ln -s <repo>/agent-payments ~/.claude/skills/agent-payments
+#   3. x402-pay/.env must exist with wallet credentials
+#   4. NEAR_PRIVATE_KEY must be set in environment (or in x402-pay/.env)
+#   5. The skill must be symlinked: ln -s <repo>/x402-pay ~/.claude/skills/x402-pay
 
 ITER="${1:-1}"
 WORKSPACE="evals/workspace/iteration-${ITER}"
 EVALS_FILE="evals/evals.json"
-SKILL_DIR="agent-payments"
+SKILL_DIR="x402-pay"
 
 mkdir -p "$WORKSPACE"
 
@@ -27,7 +27,7 @@ if [ -f "$SKILL_DIR/.env" ]; then
 fi
 
 if [ -z "${NEAR_PRIVATE_KEY:-}" ]; then
-  echo "Error: NEAR_PRIVATE_KEY is not set. Export it or add it to agent-payments/.env" >&2
+  echo "Error: NEAR_PRIVATE_KEY is not set. Export it or add it to x402-pay/.env" >&2
   exit 1
 fi
 
@@ -47,7 +47,7 @@ wallet_env() {
 
 count=$(jq '.evals | length' "$EVALS_FILE")
 
-echo "Running $count evals in parallel against skill: agent-payments"
+echo "Running $count evals in parallel against skill: x402-pay"
 echo "Workspace: $WORKSPACE"
 echo ""
 
