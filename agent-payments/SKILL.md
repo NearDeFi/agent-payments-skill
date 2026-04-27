@@ -1,15 +1,12 @@
 ---
 name: agent-payments
 description: >
-  Use this skill when the user wants to call a paid API, access an x402-protected resource,
-  check the price of an endpoint, browse or search for x402 services, fund their wallet from another chain or pay for x402 services from any chain. Triggers: "x402", "HTTP 402", "pay for API",
-  "paid endpoint", "find x402 services", "bazaar", "fund my wallet", "deposit", "top up",
-  or a request returns a 402 response.
+  Use this skill when an HTTP request returns 402 Payment Required, when the user wants to call a paid API or x402-protected resource, when they want to discover x402 services, or when they need to fund a wallet across chains. Triggers: a 402 response, "x402", "HTTP 402", "pay for API", "paid endpoint", "find x402 services", "bazaar", "fund my wallet", "top up".
 compatibility: >
   Requires internet access and viem, @x402/fetch, @x402/evm (run `npm install` in agent-payments/).
   Wallet support: raw private key (universal), Coinbase payments-mcp, CDP SDK, Privy server wallets, Turnkey, MoonPay/Open Wallet Standard.
 metadata:
-  version: "0.1"
+  version: "1.0"
 ---
 
 # x402 — HTTP-Native Payments
@@ -25,13 +22,15 @@ x402 gates API resources behind USDC micropayments using HTTP `402 Payment Requi
 
 ---
 
-## Step 2: Find a Service
+## Step 2: Is the Service Known?
 
-Applies to all wallet types including payments-mcp.
+If you already have a specific service URL in mind that returned 402 payment required, skip straight to `Step 3: Get the Service Details`.
 
-**If you already have a specific service URL in mind, skip straight to `details`.**
+Otherwise continue to `Step 2a: Find a Service`
 
-Otherwise, list all available services from x402-list and pick the most appropriate one:
+## Step 2a: Find a Service
+
+List all available services from x402-list and pick the most appropriate one:
 ```bash
 node scripts/search-services.mjs search
 ```
@@ -42,6 +41,8 @@ node scripts/search-services.mjs search <keyword> --source bazaar
 ```
 
 If still nothing, search the internet for x402 services matching the user's need.
+
+## Step 3: Get the Service Details 
 
 Once you have a service URL, get its full details (schemas, parameters, examples):
 ```bash
@@ -56,7 +57,7 @@ https://x402.ottoai.services/crypto-news
 
 ---
 
-## Step 3: Check Balance
+## Step 4: Check Balance
 
 - **payments-mcp:** `get_wallet_balance(chain="base")`
 - **Other wallets:** `node scripts/wallet.mjs balance <your-address>` — see `references/wallet-flows.md` for address derivation
@@ -68,7 +69,7 @@ https://x402.ottoai.services/crypto-news
 
 ---
 
-## Step 4: Pay
+## Step 5: Pay
 
 **Always show the price before paying. Confirm with user if > $0.10 USDC.**
 
@@ -79,7 +80,7 @@ https://x402.ottoai.services/crypto-news
 
 ---
 
-## Step 5: Confirm
+## Step 6: Confirm
 
 Report the response body and any transaction hash to the user.
 

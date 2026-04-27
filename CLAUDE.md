@@ -21,10 +21,6 @@ Always work on a branch prefixed with `claude/`. Examples:
 
 Do **not** attempt to merge or rebase into `main` directly. Do **not** force-push.
 
-## Version
-
-Always keep the version of the agent-payments skill at 0.1 (`metadata.version` in SKILL.md frontmatter).
-
 ## Agent Skills — Authoring Standards
 
 When creating or editing skills, follow the [Agent Skills spec](https://agentskills.io/specification):
