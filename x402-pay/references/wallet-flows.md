@@ -2,6 +2,8 @@
 
 Use this file when `make_http_request_with_x402` is not available in your tools.
 
+When writing one-off scripts, put them in this skill's `scripts/` directory (or `cd` into the skill dir before running) so they can resolve `@x402/fetch`, `viem`, and other deps from the skill's `node_modules`.
+
 ---
 
 ## Detect your wallet
@@ -61,51 +63,49 @@ Use `pay.mjs` — it handles the full flow (fetch → 402 → sign → retry) in
 node scripts/pay.mjs --url <service-url> [--method GET|POST] [--body '{"key":"value"}']
 ```
 
-### If you are using another wallet system
+### If you are using CDP / Privy / Turnkey / OWS
 
-These systems don't expose raw signing via a simple script call. Get the EIP-712 payload from the script, sign it with your wallet, then retry with the signature.
+These wallets plug into `@x402/fetch` via a small custom signer. The library performs the 402 → sign → retry handshake (including v2 extensions like `offer-receipt` and `sign-in-with-x`) — you only supply a `signTypedData` function. Same shape `scripts/pay.mjs` uses for raw keys.
 
-**Step A: Get payment requirements**
+The wrapper boilerplate is identical for every wallet — only the body of `signTypedData` differs:
 
-Request the service URL. The 402 response will contain requirements in one of two places
-depending on the server's x402 version:
+```js
+import { x402Client, wrapFetchWithPayment } from '@x402/fetch';
+import { registerExactEvmScheme } from '@x402/evm/exact/client';
 
-- **v1** (newer): requirements are in the JSON response body
-- **v2** (older): requirements are in the `payment-required` response header (base64 JSON)
+const signer = {
+  address: '<your wallet address>',
+  signTypedData: async ({ domain, types, primaryType, message }) => {
+    // wallet-specific call — see per-wallet bodies below — returns hex signature
+  },
+};
 
-Base64-encode whichever one contains the `accepts` array:
+const client = new x402Client();
+registerExactEvmScheme(client, { signer });
+const fetchWithPayment = wrapFetchWithPayment(fetch, client);
 
-```bash
-# v1 — body contains the JSON
-REQUIREMENTS=$(curl -s <service-url> | base64)
-
-# v2 — header contains the base64 JSON (already encoded, pass through as-is)
-REQUIREMENTS=$(curl -sI <service-url> | awk '/^[Pp]ayment-[Rr]equired:/{print $2}' | tr -d '\r\n')
+const res = await fetchWithPayment('https://api.example.com/data');
 ```
-
-**Step B: Get the EIP-712 payload to sign**
-
-```bash
-node scripts/sign-x402-payment.mjs payload --requirements "$REQUIREMENTS"
-```
-
-This prints `domain`, `types`, `primaryType`, and `message`. Sign with your wallet:
 
 #### CDP SDK (`@coinbase/cdp-sdk`)
 
 ```js
 import { CdpClient } from '@coinbase/cdp-sdk';
 const cdp = new CdpClient(); // reads CDP_API_KEY_ID + CDP_API_KEY_SECRET from env
+
+// signer.signTypedData body:
 const { signature } = await cdp.evm.signTypedData({
-  address: '<your wallet address>',
-  ...payload, // spread domain, types, primaryType, message from above
+  address: signer.address,
+  domain, types, primaryType, message,
 });
+return signature;
 ```
 
 #### Privy server wallet (REST — no SDK needed)
 
 ```js
-const res = await fetch(`https://auth.privy.io/api/v1/wallets/${walletId}/rpc`, {
+// signer.signTypedData body:
+const res = await fetch(`https://auth.privy.io/api/v1/wallets/${process.env.PRIVY_WALLET_ID}/rpc`, {
   method: 'POST',
   headers: {
     'privy-app-id': process.env.PRIVY_APP_ID,
@@ -114,17 +114,11 @@ const res = await fetch(`https://auth.privy.io/api/v1/wallets/${walletId}/rpc`, 
   },
   body: JSON.stringify({
     method: 'eth_signTypedData_v4',
-    params: {
-      typed_data: {
-        domain:       payload.domain,
-        types:        payload.types,
-        primary_type: payload.primaryType,
-        message:      payload.message,
-      },
-    },
+    params: { typed_data: { domain, types, primary_type: primaryType, message } },
   }),
 });
 const { data: { signature } } = await res.json();
+return signature;
 ```
 
 #### Turnkey (`@turnkey/viem`)
@@ -152,64 +146,44 @@ const account = await createAccount({
   signWith:       process.env.TURNKEY_SIGN_WITH,
 });
 const walletClient = createWalletClient({ account, chain: base, transport: http() });
-const signature = await walletClient.signTypedData({ ...payload });
+
+// signer.signTypedData body:
+return walletClient.signTypedData({ domain, types, primaryType, message });
 ```
 
-#### MoonPay / Open Wallet Standard (`@x402/fetch`)
+#### OWS (Open Wallet Standard)
 
-OWS `signTypedData` is a top-level function, not a method on the account object. Use `wrapFetchWithPaymentFromConfig` from `@x402/fetch` with a custom signer wrapper.
+OWS `signTypedData` is a top-level function, not a method on the account object. Three OWS-specific quirks to handle inside the signer body:
 
-Three OWS quirks to handle:
 1. Accounts use `eip155:1` chainId (not `eip155:8453`) — find any EVM account for the address
 2. `signTypedData` requires `EIP712Domain` to be explicit in the `types` object
 3. The returned signature may have no `0x` prefix — add it if missing
 
 ```js
-import { wrapFetchWithPaymentFromConfig } from '@x402/fetch';
-import { ExactEvmSchemeV1 } from '@x402/evm/v1';
 import { getWallet, signTypedData as owsSignTypedData } from '@open-wallet-standard/core';
 
 const wallet = getWallet('my-agent');
 // OWS accounts use eip155:1 — pick any EVM account (same address across all EVM chains)
 const evmAccount = wallet.accounts.find(a => a.chainId?.startsWith('eip155:'));
 
-const signer = {
-  address: evmAccount.address,
-  signTypedData: async ({ domain, types, primaryType, message }) => {
-    const typesWithDomain = {
-      EIP712Domain: [
-        { name: 'name',              type: 'string'  },
-        { name: 'version',           type: 'string'  },
-        { name: 'chainId',           type: 'uint256' },
-        { name: 'verifyingContract', type: 'address' },
-      ],
-      ...types,
-    };
-    const { signature } = owsSignTypedData(
-      'my-agent',
-      'base',
-      JSON.stringify(
-        { domain, types: typesWithDomain, primaryType, message },
-        (_, v) => typeof v === 'bigint' ? v.toString() : v,
-      ),
-    );
-    return signature.startsWith('0x') ? signature : `0x${signature}`;
-  },
+// signer.address: evmAccount.address
+// signer.signTypedData body:
+const typesWithDomain = {
+  EIP712Domain: [
+    { name: 'name',              type: 'string'  },
+    { name: 'version',           type: 'string'  },
+    { name: 'chainId',           type: 'uint256' },
+    { name: 'verifyingContract', type: 'address' },
+  ],
+  ...types,
 };
-
-const agentFetch = wrapFetchWithPaymentFromConfig(fetch, {
-  schemes: [{ x402Version: 1, network: 'base', client: new ExactEvmSchemeV1(signer) }],
-});
-
-// Use agentFetch exactly like fetch — payment is handled automatically
-const res = await agentFetch('https://api.example.com/data');
-```
-
-This replaces the manual `pay.mjs` flow for OWS users. The `sign-x402-payment.mjs` steps above are not needed.
-
-### Step C: Retry with signature (CDP / Privy / Turnkey only)
-
-Re-send the original request with:
-```
-PAYMENT-SIGNATURE: <base64-encoded payment JSON — see sign-x402-payment.mjs output format>
+const { signature } = owsSignTypedData(
+  'my-agent',
+  'base',
+  JSON.stringify(
+    { domain, types: typesWithDomain, primaryType, message },
+    (_, v) => typeof v === 'bigint' ? v.toString() : v,
+  ),
+);
+return signature.startsWith('0x') ? signature : `0x${signature}`;
 ```

@@ -51,7 +51,7 @@ echo "Running $count evals in parallel against skill: x402-pay"
 echo "Workspace: $WORKSPACE"
 echo ""
 
-# Phase 1: launch all evals in parallel
+# Phase 1: launch all evals in parallel — capture stream-json so we can extract errors
 for i in $(seq 0 $((count - 1))); do
   eval_id=$(jq -r ".evals[$i].id" "$EVALS_FILE")
   wallet=$(jq -r ".evals[$i].wallet" "$EVALS_FILE")
@@ -60,27 +60,34 @@ for i in $(seq 0 $((count - 1))); do
   mkdir -p "$outdir"
 
   uses_mcp=$(jq -r ".evals[$i].uses_mcp // false" "$EVALS_FILE")
+  mcp_args="--mcp-config {\"mcpServers\":{}} --strict-mcp-config"
+  [ "$uses_mcp" = "true" ] && mcp_args=""
 
-  if [ "$uses_mcp" = "true" ]; then
-    (
-      env $(wallet_env "$wallet") \
-        claude -p "$prompt" \
-        --permission-mode bypassPermissions \
-        --output-format text \
-        > "$outdir/output.txt" 2>&1
-      echo "$eval_id: done"
-    ) &
-  else
-    (
-      env $(wallet_env "$wallet") \
-        claude -p "$prompt" \
-        --permission-mode bypassPermissions \
-        --mcp-config '{"mcpServers":{}}' --strict-mcp-config \
-        --output-format text \
-        > "$outdir/output.txt" 2>&1
-      echo "$eval_id: done"
-    ) &
-  fi
+  (
+    env $(wallet_env "$wallet") \
+      claude -p "$prompt" \
+      --permission-mode bypassPermissions \
+      $mcp_args \
+      --output-format stream-json --verbose \
+      > "$outdir/transcript.jsonl" 2> "$outdir/stderr.log"
+
+    # Final assistant text → output.txt (preserves existing assertion grading)
+    jq -r 'select(.type=="result") | .result // empty' \
+      "$outdir/transcript.jsonl" > "$outdir/output.txt"
+
+    # Errors → errors.jsonl (one event per failed tool call, with tool name + input + error text)
+    jq -c -s '
+      ([.[] | select(.type=="assistant") | .message.content[]? | select(.type=="tool_use")]
+        | map({(.id): {name, input}}) | add // {}) as $tools
+      | .[] | select(.type=="user") | .message.content[]?
+      | select(.type=="tool_result" and .is_error==true)
+      | { tool: ($tools[.tool_use_id].name // "unknown"),
+          input: ($tools[.tool_use_id].input // null),
+          error: .content }
+    ' "$outdir/transcript.jsonl" > "$outdir/errors.jsonl"
+
+    echo "$eval_id: done"
+  ) &
 done
 
 wait
@@ -116,6 +123,8 @@ wait
 # Phase 3: aggregate and report in eval order
 total_pass=0
 total_assertions=0
+total_errors=0
+clean_runs=0
 
 for i in $(seq 0 $((count - 1))); do
   eval_id=$(jq -r ".evals[$i].id" "$EVALS_FILE")
@@ -140,12 +149,44 @@ for i in $(seq 0 $((count - 1))); do
     echo "$grade_raw" >> "$outdir/grading.json"
   done
 
+  # Deterministic no-errors check (separate from LLM-graded assertions)
+  err_count=$(wc -l < "$outdir/errors.jsonl" 2>/dev/null | tr -d ' ')
+  err_count=${err_count:-0}
+  if [ "$err_count" -eq 0 ]; then
+    err_result="PASS"
+    clean_runs=$((clean_runs + 1))
+  else
+    err_result="FAIL"
+  fi
+  printf "  %s  no-errors check: %d failed tool call(s)\n" "$err_result" "$err_count"
+
   total_pass=$((total_pass + eval_pass))
   total_assertions=$((total_assertions + assertions_count))
-  echo "  Score: $eval_pass/$assertions_count"
+  total_errors=$((total_errors + err_count))
+  echo "  Score: $eval_pass/$assertions_count assertions, $err_count errors"
   echo ""
 done
 
+# Per-eval error summary — first error per eval, one line each
+echo "=== Error summary ==="
+any_errors=0
+for i in $(seq 0 $((count - 1))); do
+  eval_id=$(jq -r ".evals[$i].id" "$EVALS_FILE")
+  outdir="${WORKSPACE}/${eval_id}"
+  err_count=$(wc -l < "$outdir/errors.jsonl" 2>/dev/null | tr -d ' ')
+  err_count=${err_count:-0}
+  [ "$err_count" -eq 0 ] && continue
+  any_errors=1
+  # Show tool + first 80 chars of error per error event
+  while IFS= read -r line; do
+    tool=$(echo "$line" | jq -r '.tool')
+    msg=$(echo "$line" | jq -r 'if (.error|type)=="string" then .error else (.error|tostring) end' | tr '\n' ' ' | cut -c1-100)
+    printf "  %-20s %-12s %s\n" "$eval_id" "$tool" "$msg"
+  done < "$outdir/errors.jsonl"
+done
+[ "$any_errors" -eq 0 ] && echo "  (no errors across any eval)"
+echo ""
+
 rm -rf "$tmpdir"
-echo "=== Total: $total_pass/$total_assertions assertions passed ==="
+echo "=== Total: $total_pass/$total_assertions assertions passed, $clean_runs/$count clean runs, $total_errors errors ==="
 echo "Results in $WORKSPACE/"

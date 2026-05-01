@@ -1,6 +1,7 @@
 {
   "type": "module",
   "dependencies": {
+    "@coinbase/cdp-sdk": "^1.48.2",
     "@x402/evm": "^2.0.0",
     "@x402/fetch": "^2.0.0",
     "near-api-js": "^7.2.0",

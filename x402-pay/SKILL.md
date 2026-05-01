@@ -4,7 +4,7 @@ description: >
   Use this skill when an HTTP request returns 402 Payment Required, when the user wants to call a paid API or x402-protected resource, when they want to discover x402 services, or when they need to fund a wallet across chains. Triggers: a 402 response, "x402", "HTTP 402", "pay for API", "paid endpoint", "find x402 services", "bazaar", "fund my wallet", "top up".
 compatibility: >
   Requires internet access and viem, @x402/fetch, @x402/evm (run `npm install` in x402-pay/).
-  Wallet support: raw private key (universal), Coinbase payments-mcp, CDP SDK, Privy server wallets, Turnkey, MoonPay/Open Wallet Standard.
+  Wallet support: raw private key (universal), Coinbase payments-mcp, CDP SDK, Privy server wallets, Turnkey, Open Wallet Standard (OWS).
 metadata:
   version: "1.0"
 ---
@@ -75,8 +75,7 @@ https://x402.ottoai.services/crypto-news
 
 - **payments-mcp:** `make_http_request_with_x402(...)` — see `references/payments-mcp.md`
 - **Raw private key:** `node scripts/pay.mjs --url <url> [--method POST] [--body '{"key":"value"}']`
-- **CDP / Privy / Turnkey:** sign EIP-712 payload then retry — see `references/wallet-flows.md`
-- **MoonPay / OWS:** `wrapFetchWithPaymentFromConfig` — see `references/wallet-flows.md`
+- **CDP / Privy / Turnkey / OWS:** `wrapFetchWithPayment` with a custom signer — see `references/wallet-flows.md`
 
 ---
 
