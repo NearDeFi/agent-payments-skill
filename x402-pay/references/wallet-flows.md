@@ -89,6 +89,11 @@ const res = await fetchWithPayment('https://api.example.com/data');
 
 #### CDP SDK (`@coinbase/cdp-sdk`)
 
+Requires packages not included in this skill — install separately:
+```bash
+npm install @coinbase/cdp-sdk
+```
+
 ```js
 import { CdpClient } from '@coinbase/cdp-sdk';
 const cdp = new CdpClient(); // reads CDP_API_KEY_ID + CDP_API_KEY_SECRET from env
