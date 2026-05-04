@@ -1,15 +1,9 @@
-// Turnkey signing test using @turnkey/viem.
+// Turnkey signing test using @turnkey/sdk-server + @turnkey/viem.
 // Requires: TURNKEY_API_PUBLIC_KEY, TURNKEY_API_PRIVATE_KEY, TURNKEY_ORGANIZATION_ID, TURNKEY_SIGN_WITH
 //
-// What this test does:
-//   1. Fails immediately with a list of missing env vars if credentials are not set
-//   2. Runs sign-x402-payment.mjs payload to get an EIP-712 signing payload from the fixture requirements
-//   3. Converts BigInt fields (validAfter, validBefore, value) from JSON strings back to BigInt
-//      (required because JSON.parse cannot represent BigInt natively)
-//   4. Builds the signer object exactly as documented in references/wallet-flows.md
-//      (Turnkey sub-section under "If you are using CDP / Privy / Turnkey / OWS")
-//   5. Calls signer.signTypedData(payload) — the body forwards to viem's walletClient.signTypedData
-//   6. Asserts the returned signature is a valid 65-byte hex string (0x + 130 chars)
+// This test mirrors the snippet in references/wallet-flows.md (Turnkey sub-section)
+// verbatim — the doc snippet is the source of truth and this test exercises it as
+// written. If the doc changes, this test changes with it.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { run, PAYMENT_REQUIRED_FIXTURE } from './helpers.mjs';
@@ -29,22 +23,19 @@ test('Turnkey: documented signer wrapper produces a valid EIP-712 signature', { 
   payload.message.validBefore = BigInt(payload.message.validBefore);
   payload.message.value       = BigInt(payload.message.value);
 
-  const { createAccount }  = await import('@turnkey/viem');
-  const { TurnkeyClient }  = await import('@turnkey/http');
-  const { ApiKeyStamper }  = await import('@turnkey/api-key-stamper');
+  const { createAccount }            = await import('@turnkey/viem');
+  const { Turnkey }                  = await import('@turnkey/sdk-server');
   const { createWalletClient, http } = await import('viem');
-  const { base }           = await import('viem/chains');
+  const { base }                     = await import('viem/chains');
 
-  const tkClient = new TurnkeyClient(
-    { baseUrl: 'https://api.turnkey.com' },
-    new ApiKeyStamper({
-      apiPublicKey:  process.env.TURNKEY_API_PUBLIC_KEY,
-      apiPrivateKey: process.env.TURNKEY_API_PRIVATE_KEY,
-    }),
-  );
-
+  const turnkey = new Turnkey({
+    apiBaseUrl:            'https://api.turnkey.com',
+    apiPublicKey:          process.env.TURNKEY_API_PUBLIC_KEY,
+    apiPrivateKey:         process.env.TURNKEY_API_PRIVATE_KEY,
+    defaultOrganizationId: process.env.TURNKEY_ORGANIZATION_ID,
+  });
   const account = await createAccount({
-    client:         tkClient,
+    client:         turnkey.apiClient(),
     organizationId: process.env.TURNKEY_ORGANIZATION_ID,
     signWith:       process.env.TURNKEY_SIGN_WITH,
   });
@@ -53,7 +44,7 @@ test('Turnkey: documented signer wrapper produces a valid EIP-712 signature', { 
   const signer = {
     address: process.env.TURNKEY_SIGN_WITH,
     signTypedData: async ({ domain, types, primaryType, message }) => {
-      return walletClient.signTypedData({ account, domain, types, primaryType, message });
+      return walletClient.signTypedData({ domain, types, primaryType, message });
     },
   };
 

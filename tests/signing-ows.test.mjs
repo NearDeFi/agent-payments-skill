@@ -1,25 +1,28 @@
-// OWS signing test using @x402/fetch + x402Client + registerExactEvmScheme.
-// Runs without credentials — uses the well-known Hardhat/Anvil test key, no real wallet needed.
+// OWS signing test exercising the documented wallet-flows.md OWS snippet end-to-end.
+// Imports the test private key into a fresh OWS vault, builds the documented signer
+// (with the EIP712Domain injection, eip155:1 account lookup, and 0x-prefix handling
+// quirks), then plugs it into wrapFetchWithPayment against a 402 mock server.
 //
-// What this test does:
-//   1. Starts a local HTTP server that returns 402 (with fixture payment requirements) on the
-//      first request, then 200 on the second
-//   2. Creates a viem account from the test private key (stands in for the OWS signer object —
-//      same { address, signTypedData } shape the doc snippet builds)
-//   3. Wraps fetch using the unified pattern documented in references/wallet-flows.md:
-//      new x402Client() → registerExactEvmScheme(client, { signer }) → wrapFetchWithPayment(fetch, client)
-//   4. Makes a single fetch call — the wrapper intercepts the 402, signs the EIP-712 authorization,
-//      and automatically retries with a PAYMENT-SIGNATURE header
-//   5. Asserts the final response status is 200
-//   6. Asserts exactly 2 HTTP requests were made (initial + signed retry)
-//   7. Asserts the retry included a PAYMENT-SIGNATURE header containing a valid 65-byte signature
+// The only deviation from the doc snippet is that every OWS call here passes an
+// explicit `vaultPathOpt` pointing at a per-test temp dir — so the test doesn't
+// touch the user's real wallet vault. End-users running the snippet as-is omit
+// that argument and use the default vault.
+//
+// Asserts:
+//   1. The wrapper fires the documented signer body (the OWS quirks above)
+//   2. wrapFetchWithPayment intercepts 402 and retries with a PAYMENT-SIGNATURE header
+//   3. Exactly 2 HTTP requests are made (initial + signed retry)
+//   4. The retry signature is a valid 65-byte hex string with 0x prefix
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import http from 'http';
+import os from 'node:os';
+import path from 'node:path';
+import fs from 'node:fs';
 import { TEST_KEY, PAYMENT_REQUIRED_V2_FIXTURE } from './helpers.mjs';
 import { x402Client, wrapFetchWithPayment } from '@x402/fetch';
 import { registerExactEvmScheme } from '@x402/evm/exact/client';
-import { privateKeyToAccount } from 'viem/accounts';
+import { importWalletPrivateKey, getWallet, signTypedData as owsSignTypedData } from '@open-wallet-standard/core';
 
 function startServer(handler) {
   return new Promise((resolve) => {
@@ -28,7 +31,11 @@ function startServer(handler) {
   });
 }
 
-test('OWS: wrapFetchWithPayment handles 402 and sends signed retry', { timeout: 10_000 }, async () => {
+test('OWS: documented signer body produces a valid signed retry via wrapFetchWithPayment', { timeout: 10_000 }, async () => {
+  // Per-test temp vault — keeps OWS state isolated and out of the user's real wallet store.
+  const VAULT = fs.mkdtempSync(path.join(os.tmpdir(), 'ows-test-'));
+  importWalletPrivateKey('my-agent', TEST_KEY.replace(/^0x/, ''), undefined, VAULT);
+
   let retryHeaders;
   let requestCount = 0;
 
@@ -45,7 +52,39 @@ test('OWS: wrapFetchWithPayment handles 402 and sends signed retry', { timeout: 
   });
 
   try {
-    const signer = privateKeyToAccount(TEST_KEY);
+    // ── Documented OWS signer body (verbatim from references/wallet-flows.md, plus VAULT) ──
+    const wallet = getWallet('my-agent', VAULT);
+    // OWS accounts use eip155:1 — pick any EVM account (same address across all EVM chains)
+    const evmAccount = wallet.accounts.find(a => a.chainId?.startsWith('eip155:'));
+
+    const signer = {
+      address: evmAccount.address,
+      signTypedData: async ({ domain, types, primaryType, message }) => {
+        const typesWithDomain = {
+          EIP712Domain: [
+            { name: 'name',              type: 'string'  },
+            { name: 'version',           type: 'string'  },
+            { name: 'chainId',           type: 'uint256' },
+            { name: 'verifyingContract', type: 'address' },
+          ],
+          ...types,
+        };
+        const { signature } = owsSignTypedData(
+          'my-agent',
+          'base',
+          JSON.stringify(
+            { domain, types: typesWithDomain, primaryType, message },
+            (_, v) => typeof v === 'bigint' ? v.toString() : v,
+          ),
+          undefined, // passphrase
+          undefined, // index
+          VAULT,     // vaultPathOpt — test-only, default vault used by end-users
+        );
+        return signature.startsWith('0x') ? signature : `0x${signature}`;
+      },
+    };
+    // ── End documented snippet ──
+
     const client = new x402Client();
     registerExactEvmScheme(client, { signer });
     const fetchWithPayment = wrapFetchWithPayment(fetch, client);
@@ -60,5 +99,6 @@ test('OWS: wrapFetchWithPayment handles 402 and sends signed retry', { timeout: 
     assert.match(decoded.payload.signature, /^0x[0-9a-fA-F]{130}$/, 'signature should be 65 bytes');
   } finally {
     server.close();
+    fs.rmSync(VAULT, { recursive: true, force: true });
   }
 });
