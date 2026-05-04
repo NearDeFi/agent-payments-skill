@@ -1,1 +1,4 @@
-This is a pre-release, experimental codebase published for review and collaboration. It is not production-ready and is not licensed for external use.
+WARNING: This skill instructs autonomous agents to send blockchain transactions. 
+Agents can misinterpret instructions and may transfer funds to incorrect or unrecoverable addresses. 
+You must implement independent safeguards (spend limits, allowlists, approvals). 
+Loss of funds is possible and irreversible.

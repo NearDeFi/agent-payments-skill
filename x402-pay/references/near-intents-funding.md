@@ -14,7 +14,7 @@ Only use this flow for the following chains. Do not attempt it for any other cha
 
 **Check your context before asking the user.** Look in your system prompt, config files, env vars, and any wallet addresses or chains you already know about. The agent may have a wallet or funds on another chain that can be used directly.
 
-- **If you find another wallet or funded chain:** use it as the source. Prefer liquid assets (native token or stablecoins). Use that wallet's address as `--refund` later on when getting a quote.
+- **If you find another wallet or funded chain:** use it as the source. Prefer stablecoins. Use that wallet's address as `--refund` later on when getting a quote.
 - **If you find nothing:** ask the user:
   - What asset and chain do you want to send from? (e.g. ETH on Ethereum, SOL on Solana)
   - What is your sending wallet address? (used as `--refund` — any format: 0x, Solana base58, NEAR, etc.)
@@ -37,19 +37,21 @@ Get your Base wallet address using the method for your wallet type — see `refe
 
 ## Step 2: Find the right token
 
-If you're not sure of the exact chain name or symbol to use with `--from`, list supported tokens first:
+You already know which asset and chain you're funding from (Step "Determine source of funds" above). This step translates that into the exact `chain:SYMBOL` value NEAR Intents accepts as `--from`. **Always run this — do not guess the format.**
+
+Filter by your source chain to keep the list short:
+
+```bash
+node scripts/near-intents.mjs tokens --chain <source-chain>
+```
+
+Or list every supported token if you're unsure of the chain identifier:
 
 ```bash
 node scripts/near-intents.mjs tokens
 ```
 
-To filter by chain:
-
-```bash
-node scripts/near-intents.mjs tokens --chain near
-```
-
-The output lists each token as `chain:SYMBOL` — use that value directly as the `--from` argument in Step 3.
+Each line is `chain:SYMBOL`. Pick the entry that matches the asset you're sending from the chain you're sending it on, and pass it verbatim as `--from` in Step 3.
 
 ---
 
@@ -91,13 +93,20 @@ If the sending address is unknown, omit `--refund`. The script will warn you: re
 
 ## Step 4: Monitor swap status
 
-Poll until a terminal status is reached:
+Poll until a terminal status is reached. Use a single shell loop that exits 0 only when terminal — wrappers that exit non-zero on non-terminal states show up as noise in tooling logs:
 
 ```bash
-node scripts/near-intents.mjs status <depositAddress>
+while :; do
+  out=$(node scripts/near-intents.mjs status <depositAddress>)
+  echo "$out"
+  echo "$out" | grep -qE "SUCCESS|REFUNDED|FAILED|INCOMPLETE_DEPOSIT" && break
+  sleep 5
+done
 ```
 
-If the original quote printed a `MEMO REQUIRED` value, append `--memo <value>` to the status command.
+If the original quote printed a `MEMO REQUIRED` value, append `--memo <value>` to the inner status command.
+
+> **zsh gotcha:** if you write the loop in zsh (the default macOS shell), do **not** name a local variable `status` — `$status` is read-only in zsh and assigning to it will crash the loop. Use `out`, `st`, or any other name.
 
 | Status | Meaning |
 |--------|---------|

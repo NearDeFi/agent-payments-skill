@@ -1,10 +1,10 @@
 ---
 name: x402-pay
 description: >
-  Use this skill when an HTTP request returns 402 Payment Required, when the user wants to call a paid API or x402-protected resource, when they want to discover x402 services, or when they need to fund a wallet across chains. Triggers: a 402 response, "x402", "HTTP 402", "pay for API", "paid endpoint", "find x402 services", "bazaar", "fund my wallet", "top up".
+  Use this skill when a HTTP request returns 402 Payment Required, when the user wants to call a paid API or x402-protected resource, when they want to discover x402 services, or when they need to fund a wallet across chains. Triggers: a 402 response, "x402", "HTTP 402", "pay for API", "paid endpoint", "find x402 services", "bazaar", "fund my wallet", "top up".
 compatibility: >
-  Requires internet access and viem, @x402/fetch, @x402/evm (run `npm install` in x402-pay/).
-  Wallet support: raw private key (universal), Coinbase payments-mcp, CDP SDK, Privy server wallets, Turnkey, Open Wallet Standard (OWS).
+  Requires internet access and `npm install` in x402-pay/. Wallet support: raw private key,
+  Coinbase payments-mcp, CDP SDK, Privy server wallets, Turnkey, Open Wallet Standard (OWS).
 metadata:
   version: "1.0"
 ---

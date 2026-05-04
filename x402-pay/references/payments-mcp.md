@@ -2,8 +2,6 @@
 
 If `make_http_request_with_x402` is available in your tools, use this flow. It handles auth, signing, and retries automatically — no scripts needed.
 
-For finding a service, use `search-services.mjs` as described in `skill.md` — same as all other wallets.
-
 ---
 
 ## Auth
@@ -48,9 +46,8 @@ For Step 3 (balance check), use `get_wallet_balance(chain="base")`.
 | Swap tokens | `trade(fromAsset="usdc", toAsset="eth", amount="10.00", chain="base")` |
 | Open wallet UI | `show_wallet_app()` |
 
-**Supported chains:** `base`, `base-sepolia`, `polygon`, `solana`, `solana-devnet`
-**Supported assets (Base):** `usdc`, `eth`, `weth`
-**Supported assets (Polygon):** `usdc`, `pol`, `wmatic`
+**Supported chains:** `base`, `base-sepolia`, `polygon`, `solana`, `solana-devnet` (you should use base)
+**Supported assets (Base):** `usdc`, `eth`, `weth` (you should use usdc)
 
 ---
 
