@@ -1,0 +1,31 @@
+THIRD-PARTY LICENSE NOTICES
+
+This file summarizes certain third-party software licenses and notices for the Agent Payments Skill. It is provided for notice and attribution purposes only. Third-party software remains subject to the applicable third-party license terms.
+
+Primary project license: [APACHE-2.0]
+
+The primary project license does not apply to third-party software, hosted services, SDKs, APIs, protocols, wallets, payment facilitators, RPC endpoints, service catalogs, or other third-party materials, except to the extent expressly stated by the applicable third party.
+
+1. WalletConnect / Reown
+
+Status: Transitive or optional wallet-provider dependency
+License: WalletConnect Community License Agreement
+License copy: third_party_licenses/WalletConnect-Community-License.md
+
+Required notice:
+
+Portions © 2025 Reown, Inc. All Rights Reserved.
+
+WalletConnect / Reown software, including WalletKit-related packages where present, is subject to the WalletConnect Community License Agreement and is not licensed under the primary project license.
+
+The WalletConnect Community License Agreement is not a standard permissive open-source license. It may impose attribution, license-copying, network-infrastructure, commercial-license, export-control, arbitration, and other obligations. Users and redistributors should review the license before distributing, modifying, bundling, making available, or using WalletConnect / Reown software in production.
+
+For avoidance of doubt, WalletConnect / Reown is included here because it may appear as an optional or transitive wallet-provider dependency. Inclusion of this notice does not imply that WalletConnect / Reown is a core dependency of the Agent Payments Skill, that Reown endorses this project, or that this project endorses Reown.
+
+2. Other third-party software
+
+This project may depend on additional third-party packages, including packages used for x402 payments, wallet integrations, blockchain interactions, environment configuration, and related functionality.
+
+Each such package is licensed under its own license terms. Redistributors should generate and review a complete dependency license report from the applicable lockfile before publication or distribution.
+
+If this project is distributed as a bundled artifact, container image, package, compiled binary, hosted service, or embedded component of another product, redistributors should confirm whether additional license notices, source-code offers, license copies, or attribution files are required.

@@ -27,6 +27,19 @@ Where `<skills-dir>` is `.agents/skills` (universal) or `.claude/skills` (Claude
 npm install
 ```
 
+## RPC provider (optional)
+
+`scripts/wallet.mjs balance` defaults to the public Base RPC (`https://mainnet.base.org`), which is rate-limited. For production, point it at your own provider via env vars in `.env`:
+
+```
+BASE_RPC_URL=https://your-provider.example/v2/<project>
+BASE_RPC_KEY=<bearer token>   # optional
+```
+
+Or per-invocation: `node scripts/wallet.mjs balance <address> --rpc <url> [--rpc-key <key>]`.
+
+`--rpc-key` is sent as `Authorization: Bearer <key>`. Most providers (Alchemy, Infura, QuickNode) embed the key in the URL — for those, put the full URL with the key in `BASE_RPC_URL` and omit `BASE_RPC_KEY`.
+
 ## Running the tests
 
 Tests live in the `tests/` directory at the repo root (one level up). From the repo root:

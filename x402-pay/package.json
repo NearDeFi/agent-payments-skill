@@ -1,9 +1,9 @@
 {
+  "license": "Apache-2.0",
   "type": "module",
   "dependencies": {
     "@x402/evm": "2.10.0",
     "@x402/fetch": "2.10.0",
-    "near-api-js": "7.2.0",
     "viem": "2.47.18"
   }
 }
