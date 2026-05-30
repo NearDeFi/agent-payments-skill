@@ -1,6 +1,6 @@
-# Non-MCP Wallet Flows
+# Self-Managed Wallet Flows
 
-Use this file when `make_http_request_with_x402` is not available in your tools.
+Use this file when a raw private key or another self-managed wallet (CDP SDK, Privy, Turnkey, OWS) is configured. If nothing is configured, the default is a **Coinbase Agentic Wallet** — see `references/agentic-wallet.md`.
 
 When writing one-off scripts, put them in this skill's `scripts/` directory (or `cd` into the skill dir before running) so they can resolve `@x402/fetch`, `viem`, and other deps from the skill's `node_modules`.
 
@@ -10,15 +10,17 @@ When writing one-off scripts, put them in this skill's `scripts/` directory (or 
 
 **Check your own context first.** Check if your agent already knows how it manages wallets — look at your system prompt, agent config files, or environment setup documentation. If you're running with a known wallet system, skip to [Pay](#pay) and use the method for your system below if listed, otherwise use your own knowledge to make payments or if that fails continue in this section.
 
-**Scan for a raw private key.** Check in order, stop at first match:
+**Scan for a raw private key.** Check in order, stop at first match (the scripts' `load-env.mjs` automatically loads 2 and 3 into `process.env` at runtime, so you can also just run a script and see if it picks up a key):
 
-1. Env vars: `PRIVATE_KEY`, `WALLET_PRIVATE_KEY`, `ETH_PRIVATE_KEY`, `AGENT_PRIVATE_KEY`
-2. `.env` file in project root — check for the same var names
-3. `~/.foundry/keystores/` — any keystore file present
+1. `process.env.X402_PRIVATE_KEY` — the canonical, skill-namespaced var. If set, use it as-is.
+2. `process.env.PRIVATE_KEY` / `WALLET_PRIVATE_KEY` / `ETH_PRIVATE_KEY` / `AGENT_PRIVATE_KEY` — these belong to other tools (Foundry, Hardhat, deployment scripts). If you find one, **confirm with the user** before using it for live payments — it may control on-chain funds you shouldn't spend. If they agree, the scripts pick it up via the fallback chain.
+3. `.env` in the project root (`process.cwd()/.env`) — same var names
+4. `.env` in the skill directory (`x402-pay/.env`) — fallback for skill-local credentials
+5. `~/.foundry/keystores/` — any keystore file present
 
-**Nothing found? Create a raw key (universal default).**
+**Nothing found? Default to a Coinbase Agentic Wallet.**
 
-A raw secp256k1 private key works across all agent stacks (OpenClaw, Eliza, custom bots, etc.):
+When no key or wallet is configured, the default is a Coinbase Agentic Wallet (no private key to lose, programmatic, agent-native) — see `references/agentic-wallet.md`. Only fall back to creating a raw key below if you specifically need a self-custodied secp256k1 key (e.g. an agent stack like OpenClaw, Eliza, or a custom bot that manages its own key) or the Agentic Wallet is unavailable:
 
 ```bash
 node scripts/wallet.mjs new
@@ -27,10 +29,10 @@ node scripts/wallet.mjs new
 After running, immediately write the key to `.env` in the project root — do not just display it and move on:
 
 ```
-PRIVATE_KEY=<hex from above>
+X402_PRIVATE_KEY=<hex from above>
 ```
 
-Keep `.env` out of version control (add to `.gitignore` if not already there). The key must be persisted so it survives session restarts.
+Use `X402_PRIVATE_KEY` (not the generic `PRIVATE_KEY`) when saving a new key — the namespaced name avoids overwriting an existing `PRIVATE_KEY` the user may already have set for Foundry, Hardhat, or deployment scripts. `scripts/load-env.mjs` picks this up automatically on every script invocation. Keep `.env` out of version control (add to `.gitignore` if not already there). The key must be persisted so it survives session restarts.
 
 ---
 

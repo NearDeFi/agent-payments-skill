@@ -15,6 +15,8 @@
 import { randomBytes } from 'crypto';
 import http from 'http';
 import https from 'https';
+import { loadEnv } from './load-env.mjs';
+loadEnv();
 
 const USDC_BASE = '0x833589fcd6edb6e08f4c7c32d4f71b54bda02913';
 const BASE_RPC_DEFAULT = 'https://mainnet.base.org';
@@ -25,7 +27,8 @@ const cmd  = args[0];
 function getKey() {
   const idx = args.indexOf('--key');
   return idx !== -1 ? args[idx + 1]
-    : process.env.PRIVATE_KEY
+    : process.env.X402_PRIVATE_KEY
+    || process.env.PRIVATE_KEY
     || process.env.WALLET_PRIVATE_KEY
     || process.env.ETH_PRIVATE_KEY;
 }
@@ -66,7 +69,7 @@ function rpcCall(method, params, { url, key } = {}) {
 if (cmd === 'address') {
   const key = getKey();
   if (!key) {
-    console.error('No private key. Set PRIVATE_KEY env var or pass --key <hex>.');
+    console.error('No private key. Set X402_PRIVATE_KEY env var or pass --key <hex>.');
     process.exit(1);
   }
   const { privateKeyToAccount } = await import('viem/accounts');
@@ -96,7 +99,7 @@ if (cmd === 'address') {
   const account = privateKeyToAccount(`0x${key}`);
   console.log(`Private key: ${key}`);
   console.log(`Address:     ${account.address}`);
-  console.log('\nStore the private key as PRIVATE_KEY=<hex> in your .env file. Keep it out of version control.');
+  console.log('\nStore the private key as X402_PRIVATE_KEY=<hex> in your .env file. Keep it out of version control.');
 
 } else {
   console.log('Usage:');

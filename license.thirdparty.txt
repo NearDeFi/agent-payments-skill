@@ -10,7 +10,7 @@ The primary project license does not apply to third-party software, hosted servi
 
 Status: Transitive or optional wallet-provider dependency
 License: WalletConnect Community License Agreement
-License copy: third_party_licenses/WalletConnect-Community-License.md
+License copy: LICENSE-THIRD_PARTY.txt
 
 Required notice:
 

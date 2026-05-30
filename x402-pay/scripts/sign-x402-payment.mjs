@@ -10,6 +10,8 @@
 // Requires: npm install viem
 
 import { randomBytes } from 'crypto';
+import { loadEnv } from './load-env.mjs';
+loadEnv();
 
 const args = process.argv.slice(2);
 const cmd  = args[0];
@@ -27,7 +29,7 @@ if (cmd !== 'sign' && cmd !== 'payload') {
 }
 
 const requirementsB64 = getFlag('--requirements');
-const keyArg = getFlag('--key') || process.env.PRIVATE_KEY || process.env.WALLET_PRIVATE_KEY || process.env.ETH_PRIVATE_KEY;
+const keyArg = getFlag('--key') || process.env.X402_PRIVATE_KEY || process.env.PRIVATE_KEY || process.env.WALLET_PRIVATE_KEY || process.env.ETH_PRIVATE_KEY;
 
 if (!requirementsB64) {
   console.error('Usage:');
@@ -122,7 +124,7 @@ if (cmd === 'payload') {
 
 if (!keyArg) {
   console.error(
-    'No private key found. Set PRIVATE_KEY env var, pass --key <hex>, or use the payload command to get the EIP-712 JSON for manual signing.'
+    'No private key found. Set X402_PRIVATE_KEY env var, pass --key <hex>, or use the payload command to get the EIP-712 JSON for manual signing.'
   );
   process.exit(1);
 }

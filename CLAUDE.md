@@ -64,6 +64,19 @@ Examples from the x402-pay skill: `search-services.mjs search`, `search-services
 
 Single-operation scripts (e.g. `pay.mjs`) do not need a subcommand.
 
+### Loading `.env` in scripts
+
+Any script that reads `process.env.*` for user-supplied secrets or config must load `.env` via the shared loader, not by calling `dotenv.config()` directly. This keeps the lookup order consistent across scripts and harnesses (Claude Code, OpenClow, Cline, manual invocation).
+
+```js
+import { loadEnv } from './load-env.mjs';
+loadEnv();
+```
+
+`loadEnv()` checks the project root (`process.cwd()/.env`) first, then the skill directory (`x402-pay/.env`). `dotenv` never overrides existing `process.env` vars, so the effective runtime precedence is **shell-exported > project root > skill dir**. Document the project-root location to users — the skill-dir fallback is for developers running scripts manually from inside the skill directory.
+
+Scripts that don't read any env vars (e.g. `near-intents.mjs`, `search-services.mjs`) must not import the loader.
+
 ## Tests
 
 Whenever the scripts are updated the tests should be updated also.

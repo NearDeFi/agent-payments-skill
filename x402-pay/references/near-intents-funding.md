@@ -31,7 +31,7 @@ Estimate spend across the likely execution period (calls per session × price pe
 
 ## Step 1: Get your Base wallet address
 
-Get your Base wallet address using the method for your wallet type — see `references/payments-mcp.md` or `references/wallet-flows.md`.
+Get your Base wallet address using the method for your wallet type — see `references/agentic-wallet.md` or `references/wallet-flows.md`.
 
 ---
 
@@ -122,6 +122,6 @@ If the original quote printed a `MEMO REQUIRED` value, append `--memo <value>` t
 
 ## Step 5: Verify balance
 
-Get your Base wallet balance using the method for your wallet type — see `references/payments-mcp.md` or `references/wallet-flows.md`.
+Get your Base wallet balance using the method for your wallet type — see `references/agentic-wallet.md` or `references/wallet-flows.md`.
 
 Confirm the USDC balance has increased by the expected amount. If it hasn't arrived yet, wait and re-poll — settlement typically takes under a minute but can vary by origin chain.

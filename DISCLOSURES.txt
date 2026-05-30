@@ -2,10 +2,10 @@ DISCLOSURES
 
 This software may interact with third-party hosted services. These services are not provided by the authors of this software and are subject to their own terms, fees, limitations, and compliance requirements.
 
-1. Coinbase Developer Platform (CDP) and Coinbase payments-mcp
+1. Coinbase Developer Platform (CDP) and Coinbase Agentic Wallet
 
-Used for optional wallet integration if selected by the user (via the CDP SDK or the Coinbase payments-mcp hosted wallet), and as a fallback service-discovery source. Coinbase services are third-party services subject to their own terms, fees, policies, and availability limitations.
-CDP terms of service: https://www.coinbase.com/legal/developer-platform/terms-of-service, Base Wallet terms of service: https://wallet.coinbase.com/terms-of-service. 
+Used for optional wallet integration — the default Coinbase Agentic Wallet (the `awal` CLI/MCP, an MPC/TEE non-custodial embedded wallet authenticated by email one-time code) or the CDP SDK server wallet — and as a fallback service-discovery source. Coinbase services are third-party services subject to their own terms, fees, policies, and availability limitations. The Agentic Wallet and CDP server wallets are governed by the CDP Terms of Service; the embedded wallet is additionally subject to the Coinbase/Base Wallet terms.
+CDP terms of service: https://www.coinbase.com/legal/developer-platform/terms-of-service, Base Wallet terms of service: https://wallet.coinbase.com/terms-of-service.
 
 2. NEAR Intents / 1Click
 

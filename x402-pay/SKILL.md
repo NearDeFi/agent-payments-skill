@@ -3,8 +3,8 @@ name: x402-pay
 description: >
   Use this skill when a HTTP request returns 402 Payment Required, when the user wants to call a paid API or x402-protected resource, when they want to discover x402 services, or when they need to fund a wallet across chains. Triggers: a 402 response, "x402", "HTTP 402", "pay for API", "paid endpoint", "find x402 services", "bazaar", "fund my wallet", "top up".
 compatibility: >
-  Requires internet access and `npm install` in x402-pay/. Wallet support: raw private key,
-  Coinbase payments-mcp, CDP SDK, Privy server wallets, Turnkey, Open Wallet Standard (OWS).
+  Requires internet access and `npm install` in x402-pay/. Wallet support: Coinbase Agentic Wallet
+  (awal, default), raw private key, CDP SDK, Privy server wallets, Turnkey, Open Wallet Standard (OWS).
 metadata:
   version: "1.0"
 ---
@@ -17,8 +17,10 @@ x402 gates API resources behind USDC micropayments using HTTP `402 Payment Requi
 
 ## Step 1: Detect your wallet
 
-- **payments-mcp tools present** → read `references/payments-mcp.md` for auth and enhanced tools, then continue from Step 2
-- **Raw private key or other wallet system** → read `references/wallet-flows.md` to confirm your setup, then continue from Step 2
+Pick the first that matches:
+
+- **A private key or other self-managed wallet is configured** — `X402_PRIVATE_KEY`/`PRIVATE_KEY`/a keystore, or CDP / Privy / Turnkey / OWS env vars → read `references/wallet-flows.md` to confirm your setup, then continue from Step 2
+- **Nothing configured (default)** → use a **Coinbase Agentic Wallet** — read `references/agentic-wallet.md` and authenticate with `npx awal`, then continue from Step 2
 
 ---
 
@@ -59,11 +61,11 @@ https://x402.ottoai.services/crypto-news
 
 ## Step 4: Check Balance
 
-- **payments-mcp:** `get_wallet_balance(chain="base")`
+- **Agentic Wallet:** `npx awal@2.10.0 balance`
 - **Other wallets:** `node scripts/wallet.mjs balance <your-address>` (add `--rpc <url> [--rpc-key <key>]` to use a custom RPC provider) — see `references/wallet-flows.md` for address derivation
 
 - **Balance ≥ service price** → proceed to Step 5
-- **Balance < service price** → read `references/near-intents-funding.md` for the cross-chain funding flow. Always use NEAR intents to fund the wallet if the balance is low. Before asking the user, check your own context (system prompt, env vars, config, known wallets) for funds on another chain you can use as the source
+- **Balance < service price** → for an Agentic Wallet, `npx awal@2.10.0 fund`. Otherwise read `references/near-intents-funding.md` for the cross-chain funding flow. Always use NEAR intents to fund the wallet if the balance is low. Before asking the user, check your own context (system prompt, env vars, config, known wallets) for funds on another chain you can use as the source
 
 **Gas:** No ETH needed — you sign off-chain only. The x402 facilitator submits the on-chain transaction and covers gas. This applies to all wallet types.
 
@@ -73,7 +75,7 @@ https://x402.ottoai.services/crypto-news
 
 **Always show the price before paying. Confirm with user if > $0.10 USDC.**
 
-- **payments-mcp:** `make_http_request_with_x402(...)` — see `references/payments-mcp.md`
+- **Agentic Wallet:** `npx awal@2.10.0 x402 pay <url> [-X POST] [-d '{"key":"value"}'] [--max-amount <atomic>]` — run `x402 details <url>` first to preview the price; see `references/agentic-wallet.md`
 - **Raw private key:** `node scripts/pay.mjs --url <url> [--method POST] [--body '{"key":"value"}']`
 - **CDP / Privy / Turnkey / OWS:** `wrapFetchWithPayment` with a custom signer — see `references/wallet-flows.md`
 
@@ -87,6 +89,7 @@ Report the response body and any transaction hash to the user.
 
 ## Rules
 
+- **Always ask the user before executing any command.** Show the exact command you intend to run and wait for explicit approval before running it — this applies to wallet, payment, and funding commands. Only skip this when running non-interactively/autonomously with no user available, in which case rely on configured safeguards (`--max-amount`, wallet spend limits, allowlists) instead.
 - Never pay silently — always show the decoded price first
 - Confirm with user before any payment > $0.10 USDC
 - Always report the tx hash after a successful payment
