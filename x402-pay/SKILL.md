@@ -17,10 +17,7 @@ x402 gates API resources behind USDC micropayments using HTTP `402 Payment Requi
 
 ## Step 1: Detect your wallet
 
-Pick the first that matches:
-
-- **A private key or other self-managed wallet is configured** — `X402_PRIVATE_KEY`/`PRIVATE_KEY`/a keystore, or CDP / Privy / Turnkey / OWS env vars → read `references/wallet-flows.md` to confirm your setup, then continue from Step 2
-- **Nothing configured (default)** → use a **Coinbase Agentic Wallet** — read `references/agentic-wallet.md` and authenticate with `npx awal`, then continue from Step 2
+Read `references/detecting-wallets.md` to choose which wallet to use — it scans your context and environment and, with no clear signal, defaults to a Coinbase Agentic Wallet. Once you've picked one, return here and continue from Step 2. For *how* to perform any wallet action (address, balance, fund, pay), see `references/wallet-flows.md`.
 
 ---
 
@@ -61,11 +58,10 @@ https://x402.ottoai.services/crypto-news
 
 ## Step 4: Check Balance
 
-- **Agentic Wallet:** `npx awal@2.10.0 balance`
-- **Other wallets:** `node scripts/wallet.mjs balance <your-address>` (add `--rpc <url> [--rpc-key <key>]` to use a custom RPC provider) — see `references/wallet-flows.md` for address derivation
+Check your wallet's USDC balance on Base — see `references/wallet-flows.md` for the method for your wallet (if you don't already know it).
 
 - **Balance ≥ service price** → proceed to Step 5
-- **Balance < service price** → for an Agentic Wallet, `npx awal@2.10.0 fund`. Otherwise read `references/near-intents-funding.md` for the cross-chain funding flow. Always use NEAR intents to fund the wallet if the balance is low. Before asking the user, check your own context (system prompt, env vars, config, known wallets) for funds on another chain you can use as the source
+- **Balance < service price** → fund it: for a Coinbase Agentic Wallet use `npx awal@2.10.0 fund`; otherwise read `references/near-intents-funding.md` for the cross-chain funding flow. Always use NEAR intents to fund the wallet if the balance is low. Before asking the user, check your own context (system prompt, env vars, config, known wallets) for funds on another chain you can use as the source
 
 **Gas:** No ETH needed — you sign off-chain only. The x402 facilitator submits the on-chain transaction and covers gas. This applies to all wallet types.
 
@@ -75,9 +71,7 @@ https://x402.ottoai.services/crypto-news
 
 **Always show the price before paying. Confirm with user if > $0.10 USDC.**
 
-- **Agentic Wallet:** `npx awal@2.10.0 x402 pay <url> [-X POST] [-d '{"key":"value"}'] [--max-amount <atomic>]` — run `x402 details <url>` first to preview the price; see `references/agentic-wallet.md`
-- **Raw private key:** `node scripts/pay.mjs --url <url> [--method POST] [--body '{"key":"value"}']`
-- **CDP / Privy / Turnkey / OWS:** `wrapFetchWithPayment` with a custom signer — see `references/wallet-flows.md`
+Pay the endpoint using your wallet — see `references/wallet-flows.md` for the method for your wallet (if not already known). For a Coinbase Agentic Wallet, run `npx awal@2.10.0 x402 details <url>` first to preview the price.
 
 ---
 

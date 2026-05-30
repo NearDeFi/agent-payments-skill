@@ -1,75 +1,77 @@
-# Self-Managed Wallet Flows
+# Wallet Flows — How to Use Each Wallet
 
-Use this file when a raw private key or another self-managed wallet (CDP SDK, Privy, Turnkey, OWS) is configured. If nothing is configured, the default is a **Coinbase Agentic Wallet** — see `references/agentic-wallet.md`.
+How to perform wallet actions (get address, check balance, fund, pay) for each supported wallet. To decide *which* wallet to use, see `references/detecting-wallets.md` first.
 
 When writing one-off scripts, put them in this skill's `scripts/` directory (or `cd` into the skill dir before running) so they can resolve `@x402/fetch`, `viem`, and other deps from the skill's `node_modules`.
 
----
-
-## Detect your wallet
-
-**Check your own context first.** Check if your agent already knows how it manages wallets — look at your system prompt, agent config files, or environment setup documentation. If you're running with a known wallet system, skip to [Pay](#pay) and use the method for your system below if listed, otherwise use your own knowledge to make payments or if that fails continue in this section.
-
-**Scan for a raw private key.** Check in order, stop at first match (the scripts' `load-env.mjs` automatically loads 2 and 3 into `process.env` at runtime, so you can also just run a script and see if it picks up a key):
-
-1. `process.env.X402_PRIVATE_KEY` — the canonical, skill-namespaced var. If set, use it as-is.
-2. `process.env.PRIVATE_KEY` / `WALLET_PRIVATE_KEY` / `ETH_PRIVATE_KEY` / `AGENT_PRIVATE_KEY` — these belong to other tools (Foundry, Hardhat, deployment scripts). If you find one, **confirm with the user** before using it for live payments — it may control on-chain funds you shouldn't spend. If they agree, the scripts pick it up via the fallback chain.
-3. `.env` in the project root (`process.cwd()/.env`) — same var names
-4. `.env` in the skill directory (`x402-pay/.env`) — fallback for skill-local credentials
-5. `~/.foundry/keystores/` — any keystore file present
-
-**Nothing found? Default to a Coinbase Agentic Wallet.**
-
-When no key or wallet is configured, the default is a Coinbase Agentic Wallet (no private key to lose, programmatic, agent-native) — see `references/agentic-wallet.md`. Only fall back to creating a raw key below if you specifically need a self-custodied secp256k1 key (e.g. an agent stack like OpenClaw, Eliza, or a custom bot that manages its own key) or the Agentic Wallet is unavailable:
+**Common — check any Base address's USDC balance** (works for every wallet once you know its address):
 
 ```bash
-node scripts/wallet.mjs new
+node scripts/wallet.mjs balance <your-address> [--rpc <url>] [--rpc-key <key>]
 ```
 
-After running, immediately write the key to `.env` in the project root — do not just display it and move on:
+Defaults to the public Base RPC; `--rpc-key` is sent as `Authorization: Bearer <key>`. If the balance is insufficient, fund via `references/near-intents-funding.md` (or `npx awal fund` for the Agentic Wallet).
 
-```
-X402_PRIVATE_KEY=<hex from above>
-```
-
-Use `X402_PRIVATE_KEY` (not the generic `PRIVATE_KEY`) when saving a new key — the namespaced name avoids overwriting an existing `PRIVATE_KEY` the user may already have set for Foundry, Hardhat, or deployment scripts. `scripts/load-env.mjs` picks this up automatically on every script invocation. Keep `.env` out of version control (add to `.gitignore` if not already there). The key must be persisted so it survives session restarts.
+**Gas:** No ETH needed for any wallet — you sign off-chain only. The x402 facilitator submits the on-chain transaction and covers gas.
 
 ---
 
-## Check Balance
+## Coinbase Agentic Wallet (awal) — default
 
-If you already know how to get your Base wallet address and check its USDC balance, do that. Otherwise use these scripts:
+An MPC wallet whose key is split and signs inside an AWS Nitro Enclave (TEE). There is **no private key to hold, leak, or lose** — you authenticate with an email one-time code, and Coinbase never has custody. It speaks x402 natively via the `awal` CLI. Pin the version (`awal@2.10.0`) so behaviour is stable.
+
+**Authenticate:**
 
 ```bash
-# Derive your Base address from a raw key
-node scripts/wallet.mjs address
-
-# Check USDC balance
-node scripts/wallet.mjs balance <your-address>
-
-# Check via a custom RPC provider
-node scripts/wallet.mjs balance <your-address> --rpc <url> [--rpc-key <key>]
+npx awal@2.10.0 auth login you@example.com   # emails a 6-digit code, returns a flowId
+npx awal@2.10.0 auth verify <flowId> <otp>    # confirm
+npx awal@2.10.0 status                        # shows wallet address once authed
 ```
 
-If the balance is insufficient, fund it using the NEAR Intents flow in `references/near-intents-funding.md`.
+The login persists as a local session on this machine until it expires; re-run `auth login` if `status` shows you are signed out.
+
+**Recovery caveat — the wallet is tied to the email.** The email account *is* the recovery factor (there is no seed phrase). Use an email you control with strong 2FA; logging in with the same email from another machine reaches the same wallet and balance.
+
+**Address / balance / fund:**
+
+```bash
+npx awal@2.10.0 address                       # Base address
+npx awal@2.10.0 balance                       # USDC on Base
+npx awal@2.10.0 fund                           # top up USDC
+```
+
+**Pay** — always run `details` first to preview the price, then pay with a `--max-amount` cap so an unexpectedly high price **fails closed**:
+
+```bash
+npx awal@2.10.0 x402 details <url>                                              # price + schema, no payment
+npx awal@2.10.0 x402 pay <url> [-X <method>] [-d <json>] [-q <params>] [-h <json>] [--max-amount <atomic>]
+```
+
+| Flag | Meaning |
+| --- | --- |
+| `-X, --method` | HTTP method (default `GET`) |
+| `-d, --data` | request body as a JSON string |
+| `-q, --query` | query params as a JSON string |
+| `-h, --headers` | custom headers as a JSON string |
+| `--max-amount` | hard spend cap in **USDC atomic units** — `1000000` = $1.00, `100000` = $0.10, `10000` = $0.01 |
+
+```bash
+npx awal@2.10.0 x402 pay https://example.com/api/weather
+npx awal@2.10.0 x402 pay https://example.com/api/sentiment -X POST -d '{"text": "I love this product"}'
+npx awal@2.10.0 x402 pay https://example.com/api/data --max-amount 100000   # cap at $0.10
+```
+
+**Safety:** single-quote anything containing `$` (e.g. `-d '{"amt":"$1.00"}'`) so the shell does not expand it; validate user-supplied input before building the command (the `url` must start with `http(s)://` and contain no spaces or shell metacharacters; `--max-amount` must be a positive integer).
 
 ---
 
-## Pay
+## Managed signer wallets: CDP, Privy, Turnkey
 
-### If you have a raw private key
+These three are the most similar — each is a managed/MPC wallet that plugs into `@x402/fetch` through a small custom `signer`. The library performs the 402 → sign → retry handshake (including v2 extensions like `offer-receipt` and `sign-in-with-x`) — you only supply a `signTypedData` function. Same shape `scripts/pay.mjs` uses for raw keys.
 
-Use `pay.mjs` — it handles the full flow (fetch → 402 → sign → retry) in one command:
-
-```bash
-node scripts/pay.mjs --url <service-url> [--method GET|POST] [--body '{"key":"value"}']
-```
-
-### If you are using CDP / Privy / Turnkey / OWS
-
-These wallets plug into `@x402/fetch` via a small custom signer. The library performs the 402 → sign → retry handshake (including v2 extensions like `offer-receipt` and `sign-in-with-x`) — you only supply a `signTypedData` function. Same shape `scripts/pay.mjs` uses for raw keys.
-
-The wrapper boilerplate is identical for every wallet — only the body of `signTypedData` differs:
+- **Address:** read it from the wallet's env var — `CDP_WALLET_ADDRESS`, `PRIVY_WALLET_ADDRESS`, or `TURNKEY_SIGN_WITH` — or from the SDK.
+- **Balance:** use the common `node scripts/wallet.mjs balance <address>` command above.
+- **Pay:** the wrapper boilerplate is identical for every wallet — only the body of `signTypedData` differs:
 
 ```js
 import { x402Client, wrapFetchWithPayment } from '@x402/fetch';
@@ -89,7 +91,7 @@ const fetchWithPayment = wrapFetchWithPayment(fetch, client);
 const res = await fetchWithPayment('https://api.example.com/data');
 ```
 
-#### CDP SDK (`@coinbase/cdp-sdk`)
+### CDP SDK (`@coinbase/cdp-sdk`)
 
 Requires packages not included in this skill — install separately:
 ```bash
@@ -108,7 +110,7 @@ const { signature } = await cdp.evm.signTypedData({
 return signature;
 ```
 
-#### Privy server wallet (REST — no SDK needed)
+### Privy server wallet (REST — no SDK needed)
 
 ```js
 // signer.signTypedData body:
@@ -128,7 +130,7 @@ const { data: { signature } } = await res.json();
 return signature;
 ```
 
-#### Turnkey (`@turnkey/viem`)
+### Turnkey (`@turnkey/viem`)
 
 Requires packages not included in this skill — install separately:
 ```bash
@@ -158,9 +160,11 @@ const walletClient = createWalletClient({ account, chain: base, transport: http(
 return walletClient.signTypedData({ domain, types, primaryType, message });
 ```
 
-#### OWS (Open Wallet Standard)
+---
 
-OWS `signTypedData` is a top-level function, not a method on the account object. Three OWS-specific quirks to handle inside the signer body:
+## OWS (Open Wallet Standard)
+
+Uses the same `signer` + `wrapFetchWithPayment` boilerplate as the three above, but `signTypedData` is a top-level function, not a method on the account object. Get the address from `evmAccount.address`; check balance with the common `node scripts/wallet.mjs balance <address>` command. Three OWS-specific quirks to handle inside the signer body:
 
 1. Accounts use `eip155:1` chainId (not `eip155:8453`) — find any EVM account for the address
 2. `signTypedData` requires `EIP712Domain` to be explicit in the `types` object
@@ -193,4 +197,37 @@ const { signature } = owsSignTypedData(
   ),
 );
 return signature.startsWith('0x') ? signature : `0x${signature}`;
+```
+
+---
+
+## Raw private key
+
+Use this only if a private key is configured (see `references/detecting-wallets.md`). A raw secp256k1 key works across all agent stacks (OpenClaw, Eliza, custom bots, etc.).
+
+**Create one** (only if you specifically need a self-custodied key and no wallet is configured):
+
+```bash
+node scripts/wallet.mjs new
+```
+
+Immediately write the key to `.env` in the project root — do not just display it and move on:
+
+```
+X402_PRIVATE_KEY=<hex from above>
+```
+
+Use `X402_PRIVATE_KEY` (not the generic `PRIVATE_KEY`) — the namespaced name avoids overwriting an existing `PRIVATE_KEY` the user may already have set for Foundry, Hardhat, or deployment scripts. `scripts/load-env.mjs` picks it up automatically on every script invocation. Keep `.env` out of version control. The key must be persisted so it survives session restarts.
+
+**Address / balance:**
+
+```bash
+node scripts/wallet.mjs address                 # derive your Base address from the key
+node scripts/wallet.mjs balance <your-address>  # USDC balance (common command above)
+```
+
+**Pay** — `pay.mjs` handles the full flow (fetch → 402 → sign → retry) in one command:
+
+```bash
+node scripts/pay.mjs --url <service-url> [--method GET|POST] [--body '{"key":"value"}']
 ```
