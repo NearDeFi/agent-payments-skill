@@ -30,7 +30,8 @@ function getKey() {
     : process.env.X402_PRIVATE_KEY
     || process.env.PRIVATE_KEY
     || process.env.WALLET_PRIVATE_KEY
-    || process.env.ETH_PRIVATE_KEY;
+    || process.env.ETH_PRIVATE_KEY
+    || process.env.AGENT_PRIVATE_KEY;
 }
 
 function getRpcConfig() {

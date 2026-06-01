@@ -47,7 +47,7 @@ test('wallet address: derives correct address from known key', async () => {
 
 test('wallet address: errors with no key', async () => {
   const { code, stderr } = await run('wallet.mjs', ['address'], {
-    X402_PRIVATE_KEY: '', PRIVATE_KEY: '', WALLET_PRIVATE_KEY: '', ETH_PRIVATE_KEY: '',
+    X402_PRIVATE_KEY: '', PRIVATE_KEY: '', WALLET_PRIVATE_KEY: '', ETH_PRIVATE_KEY: '', AGENT_PRIVATE_KEY: '',
   });
   assert.equal(code, 1);
   assert.match(stderr, /No private key/i);

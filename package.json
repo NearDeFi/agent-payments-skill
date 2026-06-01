@@ -2,9 +2,9 @@
   "license": "Apache-2.0",
   "type": "module",
   "devDependencies": {
-    "@coinbase/cdp-sdk": "1.47.0",
+    "@coinbase/cdp-sdk": "1.51.0",
     "@turnkey/sdk-server": "5.3.0",
-    "@turnkey/viem": "0.14.28",
+    "@turnkey/viem": "0.13.1",
     "@x402/core": "2.10.0",
     "@x402/evm": "2.10.0",
     "@x402/fetch": "2.10.0",

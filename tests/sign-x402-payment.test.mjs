@@ -57,7 +57,7 @@ test('sign: errors on invalid base64', async () => {
 test('sign: errors with no key when key required', async () => {
   const { code, stderr } = await run('sign-x402-payment.mjs', [
     'sign', '--requirements', PAYMENT_REQUIRED_FIXTURE,
-  ], { X402_PRIVATE_KEY: '', PRIVATE_KEY: '', WALLET_PRIVATE_KEY: '', ETH_PRIVATE_KEY: '' });
+  ], { X402_PRIVATE_KEY: '', PRIVATE_KEY: '', WALLET_PRIVATE_KEY: '', ETH_PRIVATE_KEY: '', AGENT_PRIVATE_KEY: '' });
   assert.equal(code, 1);
   assert.match(stderr, /No private key/i);
 });

@@ -48,7 +48,7 @@ test('pay: errors with no --url', async () => {
 
 test('pay: errors with no key', async () => {
   const { code, stderr } = await run('pay.mjs', ['--url', 'http://localhost:1'],
-    { X402_PRIVATE_KEY: '', PRIVATE_KEY: '', WALLET_PRIVATE_KEY: '', ETH_PRIVATE_KEY: '' });
+    { X402_PRIVATE_KEY: '', PRIVATE_KEY: '', WALLET_PRIVATE_KEY: '', ETH_PRIVATE_KEY: '', AGENT_PRIVATE_KEY: '' });
   assert.equal(code, 1);
   assert.match(stderr, /No private key/i);
 });

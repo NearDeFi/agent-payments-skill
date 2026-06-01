@@ -29,7 +29,7 @@ if (cmd !== 'sign' && cmd !== 'payload') {
 }
 
 const requirementsB64 = getFlag('--requirements');
-const keyArg = getFlag('--key') || process.env.X402_PRIVATE_KEY || process.env.PRIVATE_KEY || process.env.WALLET_PRIVATE_KEY || process.env.ETH_PRIVATE_KEY;
+const keyArg = getFlag('--key') || process.env.X402_PRIVATE_KEY || process.env.PRIVATE_KEY || process.env.WALLET_PRIVATE_KEY || process.env.ETH_PRIVATE_KEY || process.env.AGENT_PRIVATE_KEY;
 
 if (!requirementsB64) {
   console.error('Usage:');
