@@ -26,3 +26,6 @@ evals/workspace/
 
 # License tool
 license-generator/
+
+# Local skill registration symlink
+.claude/skills/
