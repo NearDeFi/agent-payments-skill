@@ -1,0 +1,42 @@
+DISCLOSURES
+
+This software may interact with third-party hosted services. These services are not provided by the authors of this software and are subject to their own terms, fees, limitations, and compliance requirements.
+
+1. Coinbase Developer Platform (CDP) and Coinbase Agentic Wallet
+
+
+Used for optional wallet integration if selected by the user, ayment facilitation, settlement, service discovery, and related x402 functionality. Coinbase is a third-party wallet service and SDK provider subject to its own terms, fees, policies, and availability limitations.
+Pricing, availability, and service functionality may change.
+CDP terms of service: https://www.coinbase.com/legal/developer-platform/terms-of-service, Base Wallet terms of service: https://wallet.coinbase.com/terms-of-service.
+
+2. NEAR Intents / 1Click
+
+Used for optional cross-chain funding. Cross-chain funding may involve experimental infrastructure, solver availability, quote expiry, failed execution, delayed execution, refund risk, sanctions or geographic restrictions, and other risks. Users are responsible for confirming that their use complies with applicable law and service terms.
+NEAR Intents terms of service: https://docs.near-intents.org/near-intents/integration/distribution-channels/1click-terms-of-service.
+
+3. Privy
+
+Used for optional wallet integration if selected by the user. Privy is a third-party wallet service and SDK provider subject to its own terms, fees, policies, and availability limitations.
+Privy terms of service: https://www.privy.io/developer-terms-of-service, https://privy.io/user-terms-of-service.
+
+4. Turnkey
+
+Used for optional wallet integration if selected by the user. Turnkey is a third-party wallet service and SDK provider subject to its own terms, fees, policies, and availability limitations.
+Turnkey terms of service: https://www.turnkey.com/legal/terms.
+
+5. RPC providers
+
+This software may read balances, submit transactions, or otherwise interact with blockchain networks through public or user-configured RPC endpoints. Public RPC endpoints may be rate-limited, unavailable, unsuitable for production, or subject to separate terms. Users should configure a production-grade RPC provider before production deployment.
+
+6. Service catalogs
+
+This software may discover paid services through third-party service catalogs. Catalog entries may be inaccurate, outdated, unavailable, malicious, or subject to third-party terms. The authors of this software do not endorse, audit, vet, or guarantee any service catalog or catalog listing.
+Coinbase Bazaar terms of service: https://www.coinbase.com/legal/developer-platform/terms-of-service 
+
+7. Third-party paid APIs
+
+This software may allow an agent to pay third-party APIs selected by the user or the user's agent. Each third-party API is subject to its own terms, fees, limitations, and compliance requirements. Users are responsible for determining whether a paid API is lawful, secure, accurate, suitable, and authorized for their use case.
+
+8. Autonomous-agent payment risk
+
+This software may be used by autonomous or semi-autonomous agents. Users are responsible for configuring external safeguards, including wallet-level policies, spend limits, service allowlists, address allowlists, transaction previews, human approvals, monitoring, and incident-response procedures.

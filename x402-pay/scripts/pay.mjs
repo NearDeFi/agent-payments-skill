@@ -7,6 +7,9 @@
 //
 // Requires: npm install
 
+import { loadEnv } from './load-env.mjs';
+loadEnv();
+
 const args = process.argv.slice(2);
 function getArg(name) {
   const idx = args.indexOf(name);
@@ -16,14 +19,14 @@ function getArg(name) {
 const urlArg  = getArg('--url');
 const method  = (getArg('--method') || 'GET').toUpperCase();
 const bodyArg = getArg('--body');
-const keyArg  = getArg('--key') || process.env.PRIVATE_KEY || process.env.WALLET_PRIVATE_KEY || process.env.ETH_PRIVATE_KEY;
+const keyArg  = getArg('--key') || process.env.X402_PRIVATE_KEY || process.env.PRIVATE_KEY || process.env.WALLET_PRIVATE_KEY || process.env.ETH_PRIVATE_KEY || process.env.AGENT_PRIVATE_KEY;
 
 if (!urlArg) {
   console.error('Usage: node scripts/pay.mjs --url <url> [--method GET|POST] [--body <json>] [--key <hex>]');
   process.exit(1);
 }
 if (!keyArg) {
-  console.error('No private key. Set PRIVATE_KEY env var or pass --key <hex>.');
+  console.error('No private key. Set X402_PRIVATE_KEY env var or pass --key <hex>.');
   process.exit(1);
 }
 

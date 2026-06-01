@@ -1,6 +1,12 @@
 # x402-pay
 
-Skill for making HTTP 402 micropayments using USDC on Base and funding it from most chains.
+Skill for making HTTP 402 micropayments using USDC on Base and funding it from most chains. 
+
+Before using this skill please review the [DISCLOSURES.txt](./DISCLOSURES.txt) and [NOTICE.txt](./NOTICE.txt) files.
+
+## Recommended agent setup
+
+This skill moves real money. Configure your agent/harness so it **asks for approval before executing commands** rather than running them automatically. Keep wallet-level spend limits in place (`--max-amount` on `awal x402 pay`, or Agentic Wallet / CDP spend policies), and **review every transaction** — confirm the price, recipient, and amount before approving. 
 
 ## Install
 
@@ -27,130 +33,15 @@ Where `<skills-dir>` is `.agents/skills` (universal) or `.claude/skills` (Claude
 npm install
 ```
 
-## Running the tests
+## RPC provider (optional)
 
-Tests live in the `tests/` directory at the repo root (one level up). From the repo root:
-
-```bash
-npm install          # installs test dependencies
-node --test tests/*.test.mjs
-```
-
-The tests are integration tests — they run the scripts as child processes and make real network requests to:
-- x402-list.com (primary) and the Coinbase bazaar (`api.cdp.coinbase.com`) — for search-services tests
-- The NEAR Intents API (`1click.chaindefuser.com`) — for near-intents tests
-- Base mainnet RPC (`mainnet.base.org`) — for the wallet balance test
-
-### Wallet signing tests
-
-Three tests verify the signing flow against real wallet providers. **These tests will fail if the required env vars are not set.** Add them to a `.env` file in this directory (never commit it):
-
-**CDP** (`tests/signing-cdp.test.mjs`) — API keys from [portal.cdp.coinbase.com](https://portal.cdp.coinbase.com/). All three values (Key ID, Key Secret, Wallet Secret) are shown together when creating an API key — the Wallet Secret is only shown once. To get a wallet address, run `node -e "import('dotenv/config'); const {CdpClient} = await import('@coinbase/cdp-sdk'); const a = await new CdpClient().evm.createAccount(); console.log(a.address)"` once and copy the output:
-```
-CDP_API_KEY_ID=<your key id>
-CDP_API_KEY_SECRET=<your key secret>
-CDP_WALLET_SECRET=<your wallet secret>
-CDP_WALLET_ADDRESS=<0x address from createAccount()>
-```
-
-**Privy** (`tests/signing-privy.test.mjs`) — app credentials and server wallet from [dashboard.privy.io](https://dashboard.privy.io/):
-```
-PRIVY_APP_ID=<your app id>
-PRIVY_APP_SECRET=<your app secret>
-PRIVY_WALLET_ID=<server wallet id>
-PRIVY_WALLET_ADDRESS=<0x address of that wallet>
-```
-
-**Turnkey** (`tests/signing-turnkey.test.mjs`) — API keys and wallet from [app.turnkey.com](https://app.turnkey.com/):
-```
-TURNKEY_API_PUBLIC_KEY=<API public key>
-TURNKEY_API_PRIVATE_KEY=<API private key>
-TURNKEY_ORGANIZATION_ID=<organization id>
-TURNKEY_SIGN_WITH=<0x wallet address>
-```
-
-All other tests (OWS, pay, search-services, near-intents, wallet, sign) use a well-known Hardhat/Anvil test key and require no wallet setup.
-
-## Scripts
-
-| Script | Commands |
-|--------|----------|
-| `scripts/wallet.mjs` | `address`, `balance`, `new` |
-| `scripts/search-services.mjs` | `search`, `details` |
-| `scripts/near-intents.mjs` | `tokens`, `quote`, `status` |
-| `scripts/sign-x402-payment.mjs` | `sign`, `payload` |
-| `scripts/pay.mjs` | _(single operation)_ |
-
-Run any script without arguments to see its usage.
-
-## Evals
-
-Two types of evals verify the skill works correctly:
-
-### Description evals — does the skill trigger on the right queries?
-
-Tests whether Claude activates the skill for relevant queries and ignores it for unrelated ones. Each query is run 3 times in parallel; a query passes if at least 2/3 runs agree.
-
-**Prerequisites:** `claude` CLI, `jq`. No wallet credentials required.
-
-The repo includes `.claude/skills/x402-pay` as a symlink so Claude Code picks up the skill automatically when run from this directory. If you need it globally (e.g. for manual testing outside the repo), symlink it to your home skills directory:
-
-```bash
-ln -sf "$(pwd)/x402-pay" ~/.claude/skills/x402-pay
-```
-
-```bash
-# Training set (12 queries)
-bash evals/run-eval.sh evals/train_queries.json
-
-# Validation set (8 queries)
-bash evals/run-eval.sh evals/validation_queries.json
-```
-
-Query sets live in `evals/train_queries.json` and `evals/validation_queries.json`. The full combined set is in `evals/eval_queries.json`.
-
-### Output quality evals — does the skill complete real payment tasks correctly?
-
-Runs 6 end-to-end payment tasks using all four wallet types (raw private key, CDP, Privy, Turnkey) plus service discovery and a Bitcoin price lookup. Each funded eval bridges NEAR USDC → Base via NEAR Intents before making the x402 payment.
-
-All 6 evals run in parallel; grading is done by a second Claude call per assertion.
-
-**Prerequisites:** `claude` CLI, `jq`, wallet credentials in `x402-pay/.env`. The `.claude/skills/x402-pay` symlink in the repo means no manual skill setup is needed.
-
-**Environment variables** — add to `x402-pay/.env`:
+`scripts/wallet.mjs balance` defaults to the public Base RPC (`https://mainnet.base.org`), which is rate-limited. For production, point it at your own provider via env vars in `.env`:
 
 ```
-# NEAR source account (funds the Base wallets)
-NEAR_PRIVATE_KEY=<ed25519 private key for the NEAR account>
-
-# Raw private key wallet
-PRIVATE_KEY=<hex private key>
-
-# CDP wallet
-CDP_API_KEY_ID=<key id>
-CDP_API_KEY_SECRET=<key secret>
-CDP_WALLET_ADDRESS=<0x address>
-CDP_WALLET_SECRET=<wallet secret>
-
-# Privy wallet
-PRIVY_APP_ID=<app id>
-PRIVY_APP_SECRET=<app secret>
-PRIVY_WALLET_ID=<server wallet id>
-PRIVY_WALLET_ADDRESS=<0x address>
-
-# Turnkey wallet
-TURNKEY_API_PUBLIC_KEY=<API public key>
-TURNKEY_API_PRIVATE_KEY=<API private key>
-TURNKEY_ORGANIZATION_ID=<organization id>
-TURNKEY_SIGN_WITH=<0x wallet address>
+BASE_RPC_URL=https://your-provider.example/v2/<project>
+BASE_RPC_KEY=<bearer token>   # optional
 ```
 
-```bash
-# Run iteration 1 (results saved to evals/workspace/iteration-1/)
-bash evals/run-output-eval.sh 1
+Or per-invocation: `node scripts/wallet.mjs balance <address> --rpc <url> [--rpc-key <key>]`.
 
-# Run a second iteration
-bash evals/run-output-eval.sh 2
-```
-
-Results for each eval are written to `evals/workspace/iteration-<N>/<eval-id>/output.txt` (agent output) and `grading.json` (per-assertion grades with evidence).
+`--rpc-key` is sent as `Authorization: Bearer <key>`. Most providers (Alchemy, Infura, QuickNode) embed the key in the URL — for those, put the full URL with the key in `BASE_RPC_URL` and omit `BASE_RPC_KEY`.

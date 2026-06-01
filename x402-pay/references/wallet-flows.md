@@ -1,133 +1,122 @@
-# Non-MCP Wallet Flows
+# Wallet Flows — How to Use Each Wallet
 
-Use this file when `make_http_request_with_x402` is not available in your tools.
+How to perform wallet actions (get address, check balance, fund, pay) for each supported wallet. To decide *which* wallet to use, see `references/detecting-wallets.md` first.
+
+When writing one-off scripts, put them in this skill's `scripts/` directory (or `cd` into the skill dir before running) so they can resolve `@x402/fetch`, `viem`, and other deps from the skill's `node_modules`.
+
+**Common — check any Base address's USDC balance** (works for every wallet once you know its address):
+
+```bash
+node scripts/wallet.mjs balance <your-address> [--rpc <url>] [--rpc-key <key>]
+```
+
+Defaults to the public Base RPC; `--rpc-key` is sent as `Authorization: Bearer <key>`. If the balance is insufficient, fund via `references/near-intents-funding.md`.
+
+**Gas:** No ETH needed for any wallet — you sign off-chain only. The x402 facilitator submits the on-chain transaction and covers gas.
 
 ---
 
-## Detect your wallet
+## Coinbase Agentic Wallet (awal)
 
-**Check your own context first.** Check if your agent already knows how it manages wallets — look at your system prompt, agent config files, or environment setup documentation. If you're running with a known wallet system, skip to [Pay](#pay) and use the method for your system below if listed, otherwise use your own knowledge to make payments or if that fails continue in this section.
+Set up / authenticate first — see `references/detecting-wallets.md` (*Setting up the Agentic Wallet*). The commands below assume `npx awal@2.10.0 status` already shows an address.
 
-**Scan for a raw private key.** Check in order, stop at first match:
-
-1. Env vars: `PRIVATE_KEY`, `WALLET_PRIVATE_KEY`, `ETH_PRIVATE_KEY`, `AGENT_PRIVATE_KEY`
-2. `.env` file in project root — check for the same var names
-3. `~/.foundry/keystores/` — any keystore file present
-
-**Nothing found? Create a raw key (universal default).**
-
-A raw secp256k1 private key works across all agent stacks (OpenClaw, Eliza, custom bots, etc.):
+**Address / balance:**
 
 ```bash
-node scripts/wallet.mjs new
+npx awal@2.10.0 address --chain base          # Base (EVM) address (address returns EVM + Solana by default)
+npx awal@2.10.0 balance --chain base          # USDC on Base
 ```
 
-After running, immediately write the key to `.env` in the project root — do not just display it and move on:
+**Pay** — pay with a `--max-amount` cap so an unexpectedly high price **fails closed**. Note: `--chain` is **only** valid on `address`/`balance`; `x402 pay` does not accept it (payments settle on Base) — passing `--chain` errors with `unknown option '--chain'`.
 
-```
-PRIVATE_KEY=<hex from above>
+```bash
+npx awal@2.10.0 x402 pay <url> [-X <method>] [-d <json>] [-q <params>] [-h <json>] [--max-amount <atomic>]
 ```
 
-Keep `.env` out of version control (add to `.gitignore` if not already there). The key must be persisted so it survives session restarts.
+| Flag | Meaning |
+| --- | --- |
+| `-X, --method` | HTTP method (default `GET`) |
+| `-d, --data` | request body as a JSON string |
+| `-q, --query` | query params as a JSON string |
+| `-h, --headers` | custom headers as a JSON string |
+| `--max-amount` | hard spend cap in **USDC atomic units** — `1000000` = $1.00, `100000` = $0.10, `10000` = $0.01 |
+
+**Safety:** single-quote anything containing `$` (e.g. `-d '{"amt":"$1.00"}'`) so the shell does not expand it; validate user-supplied input before building the command (the `url` must start with `http(s)://` and contain no spaces or shell metacharacters; `--max-amount` must be a positive integer).
 
 ---
 
-## Check Balance
+## Managed signer wallets: CDP, Privy, Turnkey
 
-If you already know how to get your Base wallet address and check its USDC balance, do that. Otherwise use these scripts:
+These three are the most similar — each is a managed/MPC wallet that plugs into `@x402/fetch` through a small custom `signer`. The library performs the 402 → sign → retry handshake (including v2 extensions like `offer-receipt` and `sign-in-with-x`) — you only supply a `signTypedData` function. Same shape `scripts/pay.mjs` uses for raw keys.
 
-```bash
-# Derive your Base address from a raw key
-node scripts/wallet.mjs address
+- **Address:** read it from the wallet's env var — `CDP_WALLET_ADDRESS`, `PRIVY_WALLET_ADDRESS`, or `TURNKEY_SIGN_WITH` — or from the SDK.
+- **Balance:** use the common `node scripts/wallet.mjs balance <address>` command above.
+- **Pay:** there's no prebuilt CLI for these wallets — write a short one-off Node script (save it under `scripts/`, run it with `node`). The block below is the **template** for that script: it makes the paid request to the endpoint. It is identical for all three wallets — **fill in two things** to make it runnable: your wallet `address`, and the `signTypedData` body for your wallet (per-wallet bodies follow). `wrapFetchWithPayment` wraps `fetch` so that when the endpoint returns 402, it signs the payment authorization with your `signer` and retries automatically; `res` is the final paid response.
 
-# Check USDC balance
-node scripts/wallet.mjs balance <your-address>
+```js
+import { x402Client, wrapFetchWithPayment } from '@x402/fetch';
+import { registerExactEvmScheme } from '@x402/evm/exact/client';
 
-# Check via a custom RPC provider
-node scripts/wallet.mjs balance <your-address> --rpc <url> [--rpc-key <key>]
+const signer = {
+  address: '<your wallet address>',
+  signTypedData: async ({ domain, types, primaryType, message }) => {
+    // wallet-specific call — see per-wallet bodies below — returns hex signature
+  },
+};
+
+const client = new x402Client();
+registerExactEvmScheme(client, { signer });
+const fetchWithPayment = wrapFetchWithPayment(fetch, client);
+
+const res = await fetchWithPayment('https://api.example.com/data');
+console.log(await res.text());   // the paid response body
 ```
 
-If the balance is insufficient, fund it using the NEAR Intents flow in `references/near-intents-funding.md`.
+### CDP SDK (`@coinbase/cdp-sdk`)
 
----
-
-## Pay
-
-### If you have a raw private key
-
-Use `pay.mjs` — it handles the full flow (fetch → 402 → sign → retry) in one command:
-
+Requires packages not included in this skill — install separately:
 ```bash
-node scripts/pay.mjs --url <service-url> [--method GET|POST] [--body '{"key":"value"}']
+npm install @coinbase/cdp-sdk
 ```
-
-### If you are using another wallet system
-
-These systems don't expose raw signing via a simple script call. Get the EIP-712 payload from the script, sign it with your wallet, then retry with the signature.
-
-**Step A: Get payment requirements**
-
-Request the service URL. The 402 response will contain requirements in one of two places
-depending on the server's x402 version:
-
-- **v1** (newer): requirements are in the JSON response body
-- **v2** (older): requirements are in the `payment-required` response header (base64 JSON)
-
-Base64-encode whichever one contains the `accepts` array:
-
-```bash
-# v1 — body contains the JSON
-REQUIREMENTS=$(curl -s <service-url> | base64)
-
-# v2 — header contains the base64 JSON (already encoded, pass through as-is)
-REQUIREMENTS=$(curl -sI <service-url> | awk '/^[Pp]ayment-[Rr]equired:/{print $2}' | tr -d '\r\n')
-```
-
-**Step B: Get the EIP-712 payload to sign**
-
-```bash
-node scripts/sign-x402-payment.mjs payload --requirements "$REQUIREMENTS"
-```
-
-This prints `domain`, `types`, `primaryType`, and `message`. Sign with your wallet:
-
-#### CDP SDK (`@coinbase/cdp-sdk`)
 
 ```js
 import { CdpClient } from '@coinbase/cdp-sdk';
-const cdp = new CdpClient(); // reads CDP_API_KEY_ID + CDP_API_KEY_SECRET from env
+const cdp = new CdpClient(); // reads CDP_API_KEY_ID + CDP_API_KEY_SECRET + CDP_WALLET_SECRET from env
+
+// signer.signTypedData body:
 const { signature } = await cdp.evm.signTypedData({
-  address: '<your wallet address>',
-  ...payload, // spread domain, types, primaryType, message from above
+  address: signer.address,
+  domain, types, primaryType, message,
 });
+return signature;
 ```
 
-#### Privy server wallet (REST — no SDK needed)
+### Privy server wallet (REST — no SDK needed)
 
 ```js
-const res = await fetch(`https://auth.privy.io/api/v1/wallets/${walletId}/rpc`, {
+// signer.signTypedData body:
+const res = await fetch(`https://auth.privy.io/api/v1/wallets/${process.env.PRIVY_WALLET_ID}/rpc`, {
   method: 'POST',
   headers: {
     'privy-app-id': process.env.PRIVY_APP_ID,
     Authorization: `Basic ${Buffer.from(`${process.env.PRIVY_APP_ID}:${process.env.PRIVY_APP_SECRET}`).toString('base64')}`,
     'Content-Type': 'application/json',
   },
-  body: JSON.stringify({
-    method: 'eth_signTypedData_v4',
-    params: {
-      typed_data: {
-        domain:       payload.domain,
-        types:        payload.types,
-        primary_type: payload.primaryType,
-        message:      payload.message,
-      },
+  // @x402/fetch passes uint256 fields (value, validAfter, validBefore) as BigInt;
+  // JSON.stringify throws on BigInt, so stringify them via a replacer.
+  body: JSON.stringify(
+    {
+      method: 'eth_signTypedData_v4',
+      params: { typed_data: { domain, types, primary_type: primaryType, message } },
     },
-  }),
+    (_k, v) => (typeof v === 'bigint' ? v.toString() : v),
+  ),
 });
 const { data: { signature } } = await res.json();
+return signature;
 ```
 
-#### Turnkey (`@turnkey/viem`)
+### Turnkey (`@turnkey/viem`)
 
 Requires packages not included in this skill — install separately:
 ```bash
@@ -152,64 +141,40 @@ const account = await createAccount({
   signWith:       process.env.TURNKEY_SIGN_WITH,
 });
 const walletClient = createWalletClient({ account, chain: base, transport: http() });
-const signature = await walletClient.signTypedData({ ...payload });
+
+// signer.signTypedData body:
+return walletClient.signTypedData({ domain, types, primaryType, message });
 ```
 
-#### MoonPay / Open Wallet Standard (`@x402/fetch`)
+---
 
-OWS `signTypedData` is a top-level function, not a method on the account object. Use `wrapFetchWithPaymentFromConfig` from `@x402/fetch` with a custom signer wrapper.
+## Raw private key
 
-Three OWS quirks to handle:
-1. Accounts use `eip155:1` chainId (not `eip155:8453`) — find any EVM account for the address
-2. `signTypedData` requires `EIP712Domain` to be explicit in the `types` object
-3. The returned signature may have no `0x` prefix — add it if missing
+Use this only if a raw secp256k1 private key is configured (see `references/detecting-wallets.md`).
 
-```js
-import { wrapFetchWithPaymentFromConfig } from '@x402/fetch';
-import { ExactEvmSchemeV1 } from '@x402/evm/v1';
-import { getWallet, signTypedData as owsSignTypedData } from '@open-wallet-standard/core';
+**Create one** (only if you specifically need a self-custodied key and no wallet is configured):
 
-const wallet = getWallet('my-agent');
-// OWS accounts use eip155:1 — pick any EVM account (same address across all EVM chains)
-const evmAccount = wallet.accounts.find(a => a.chainId?.startsWith('eip155:'));
-
-const signer = {
-  address: evmAccount.address,
-  signTypedData: async ({ domain, types, primaryType, message }) => {
-    const typesWithDomain = {
-      EIP712Domain: [
-        { name: 'name',              type: 'string'  },
-        { name: 'version',           type: 'string'  },
-        { name: 'chainId',           type: 'uint256' },
-        { name: 'verifyingContract', type: 'address' },
-      ],
-      ...types,
-    };
-    const { signature } = owsSignTypedData(
-      'my-agent',
-      'base',
-      JSON.stringify(
-        { domain, types: typesWithDomain, primaryType, message },
-        (_, v) => typeof v === 'bigint' ? v.toString() : v,
-      ),
-    );
-    return signature.startsWith('0x') ? signature : `0x${signature}`;
-  },
-};
-
-const agentFetch = wrapFetchWithPaymentFromConfig(fetch, {
-  schemes: [{ x402Version: 1, network: 'base', client: new ExactEvmSchemeV1(signer) }],
-});
-
-// Use agentFetch exactly like fetch — payment is handled automatically
-const res = await agentFetch('https://api.example.com/data');
+```bash
+node scripts/wallet.mjs new
 ```
 
-This replaces the manual `pay.mjs` flow for OWS users. The `sign-x402-payment.mjs` steps above are not needed.
+Immediately write the key to `.env` in the project root so it is persisted — do not just display it and move on:
 
-### Step C: Retry with signature (CDP / Privy / Turnkey only)
-
-Re-send the original request with:
 ```
-PAYMENT-SIGNATURE: <base64-encoded payment JSON — see sign-x402-payment.mjs output format>
+X402_PRIVATE_KEY=<hex from above>
+```
+
+Use `X402_PRIVATE_KEY` (not the generic `PRIVATE_KEY`) — the namespaced name avoids overwriting an existing `PRIVATE_KEY` the user may already have set for Foundry, Hardhat, or deployment scripts. `scripts/load-env.mjs` picks it up automatically on every script invocation. Keep `.env` out of version control. The key must be persisted so it survives session restarts.
+
+**Address / balance:**
+
+```bash
+node scripts/wallet.mjs address                 # derive your Base address from the key
+node scripts/wallet.mjs balance <your-address>  # USDC balance (common command above)
+```
+
+**Pay** — `pay.mjs` handles the full flow (fetch → 402 → sign → retry) in one command:
+
+```bash
+node scripts/pay.mjs --url <service-url> [--method GET|POST] [--body '{"key":"value"}']
 ```

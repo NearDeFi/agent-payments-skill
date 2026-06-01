@@ -23,3 +23,9 @@ build/
 
 # Eval output
 evals/workspace/
+
+# License tool
+license-generator/
+
+# Claude
+.claude/

@@ -1,1 +1,40 @@
-This is a pre-release, experimental codebase published for review and collaboration. It is not production-ready and is not licensed for external use.
+========================================================================
+NOTICE
+Copyright (c) Proximity 2026 
+========================================================================
+
+Agent Payments Skill
+
+This software enables AI agents to discover and pay HTTP 402 / x402-enabled services using blockchain transactions, including payments on Base and optional cross-chain funding.
+
+IMPORTANT RISK NOTICE
+
+This software may cause an autonomous or semi-autonomous agent to initiate, sign, submit, or otherwise facilitate blockchain transactions. Blockchain transactions may be irreversible. Agents can misunderstand user instructions, select the wrong service, use the wrong network, transfer funds to an incorrect or unrecoverable address, overpay for a service, or interact with a malicious, unavailable, or defective endpoint.
+
+Users are solely responsible for implementing appropriate safeguards outside this software, including spend limits, service allowlists, address allowlists, network restrictions, transaction previews, human approvals, wallet policies, and monitoring. This software cannot guarantee that any agent harness, wallet provider, RPC endpoint, payment facilitator, bridge, solver, service catalog, or third-party API will enforce those controls.
+
+Loss of funds is possible and may be irreversible.
+
+THIRD-PARTY SOFTWARE
+
+This software depends on third-party software packages, each subject to its own license terms. Third-party license notices are provided in LICENSE-THIRD-PARTY.txt.
+
+Certain optional or transitive wallet-provider dependencies may include WalletConnect / Reown software. WalletConnect / Reown software is subject to the WalletConnect Community License Agreement and is not licensed under the primary license for this software. See LICENSE-THIRD-PARTY.txt for additional information.
+
+THIRD-PARTY HOSTED SERVICES
+
+Operation of this software may require or optionally use third-party hosted services, including payment facilitators, wallet providers, RPC providers, cross-chain funding services, service catalogs, and third-party paid APIs. These services are not provided by the authors of this software. Each service is subject to its own terms, fees, availability limits, acceptable-use rules, sanctions and geographic restrictions, disclaimers, and dispute-resolution provisions.
+
+Use of this software does not mean that any third-party service has been endorsed, audited, vetted, or approved by the authors of this software.
+
+NO ENDORSEMENT OF PAID APIs
+
+This software is generic and may allow an agent to pay any service that supports the relevant payment standard. The authors of this software do not endorse, monitor, audit, or guarantee any paid API, service listing, service catalog, or third-party endpoint. Users are responsible for reviewing the terms, legality, accuracy, security, and suitability of any service their agent pays for.
+
+NO LEGAL, FINANCIAL, OR COMPLIANCE ADVICE
+
+This software is provided as software only. It does not provide legal, financial, tax, sanctions, AML, consumer-protection, money-transmission, securities, commodities, data-protection, or other compliance advice. Users and redistributors are responsible for determining whether their use, distribution, integration, or operation of this software complies with applicable law.
+
+AUTHOR LIABILITY NOTICE
+
+The authors, contributors, and maintainers are **not liable** for any direct, indirect, incidental, special, exemplary, or consequential damages (including loss of assets or profits).

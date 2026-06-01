@@ -60,12 +60,25 @@ node scripts/foo.mjs <command> [--flag value]   ✓
 node scripts/foo.mjs --mode quote               ✗
 ```
 
-Examples from the x402-pay skill: `search-services.mjs search`, `search-services.mjs details`, `near-intents.mjs tokens`, `near-intents.mjs quote`, `near-intents.mjs status`, `sign-x402-payment.mjs sign`, `sign-x402-payment.mjs payload`.
+Examples from the x402-pay skill: `search-services.mjs search`, `search-services.mjs details`, `near-intents.mjs tokens`, `near-intents.mjs quote`, `near-intents.mjs status`.
 
 Single-operation scripts (e.g. `pay.mjs`) do not need a subcommand.
+
+### Loading `.env` in scripts
+
+Any script that reads `process.env.*` for user-supplied secrets or config must load `.env` via the shared loader, not by calling `dotenv.config()` directly. This keeps the lookup order consistent across scripts and harnesses (Claude Code, OpenClow, Cline, manual invocation).
+
+```js
+import { loadEnv } from './load-env.mjs';
+loadEnv();
+```
+
+`loadEnv()` checks the project root (`process.cwd()/.env`) first, then the skill directory (`x402-pay/.env`). `dotenv` never overrides existing `process.env` vars, so the effective runtime precedence is **shell-exported > project root > skill dir**. Document the project-root location to users — the skill-dir fallback is for developers running scripts manually from inside the skill directory.
+
+Scripts that don't read any env vars (e.g. `near-intents.mjs`, `search-services.mjs`) must not import the loader.
 
 ## Tests
 
 Whenever the scripts are updated the tests should be updated also.
 
-Whenever code snippets in `SKILL.md` or any `references/` file are updated, the corresponding test that exercises that snippet must be updated to match. The tests for wallet adapter signing (CDP, Privy, Turnkey, OWS) are the ground truth that the reference snippets are correct — if a snippet changes, the test changes with it.
+Whenever code snippets in `SKILL.md` or any `references/` file are updated, the corresponding test that exercises that snippet must be updated to match. The tests for wallet adapter signing (CDP, Privy, Turnkey) are the ground truth that the reference snippets are correct — if a snippet changes, the test changes with it.
