@@ -4,7 +4,7 @@ description: >
   Use this skill when a HTTP request returns 402 Payment Required, when the user wants to call a paid API or x402-protected resource, when they want to discover x402 services, or when they need to fund a wallet across chains. Triggers: a 402 response, "x402", "HTTP 402", "pay for API", "paid endpoint", "find x402 services", "bazaar", "fund my wallet", "top up".
 compatibility: >
   Requires internet access and `npm install` in x402-pay/. Wallet support: Coinbase Agentic Wallet
-  (awal, default), raw private key, CDP SDK, Privy server wallets, Turnkey, Open Wallet Standard (OWS).
+  (awal, default), raw private key, CDP SDK, Privy server wallets, Turnkey.
 metadata:
   version: "1.0"
 ---
@@ -12,6 +12,17 @@ metadata:
 # x402 — HTTP-Native Payments
 
 x402 gates API resources behind USDC micropayments using HTTP `402 Payment Required`.
+
+---
+
+## Step 0: Setup
+
+Before running any script, install dependencies in the skill directory (once per environment):
+
+```bash
+cd <skills-dir>/x402-pay
+npm install
+```
 
 ---
 
@@ -61,7 +72,7 @@ https://x402.ottoai.services/crypto-news
 Check your wallet's USDC balance on Base — see `references/wallet-flows.md` for the method for your wallet (if you don't already know it).
 
 - **Balance ≥ service price** → proceed to Step 5
-- **Balance < service price** → fund it: for a Coinbase Agentic Wallet use `npx awal@2.10.0 fund`; otherwise read `references/near-intents-funding.md` for the cross-chain funding flow. Always use NEAR intents to fund the wallet if the balance is low. Before asking the user, check your own context (system prompt, env vars, config, known wallets) for funds on another chain you can use as the source
+- **Balance < service price** → fund it: Read `references/near-intents-funding.md` for the cross-chain funding flow. Always use NEAR intents to fund the wallet if the balance is low. Before asking the user, check your own context (system prompt, env vars, config, known wallets) for funds on another chain you can use as the source
 
 **Gas:** No ETH needed — you sign off-chain only. The x402 facilitator submits the on-chain transaction and covers gas. This applies to all wallet types.
 
@@ -69,9 +80,15 @@ Check your wallet's USDC balance on Base — see `references/wallet-flows.md` fo
 
 ## Step 5: Pay
 
-**Always show the price before paying. Confirm with user if > $0.10 USDC.**
+**Always show the price before paying. Confirm with user before paying.**
 
-Pay the endpoint using your wallet — see `references/wallet-flows.md` for the method for your wallet (if not already known). For a Coinbase Agentic Wallet, run `npx awal@2.10.0 x402 details <url>` first to preview the price.
+First preview the live price. 
+
+```bash
+node scripts/check-price.mjs <url> [--method GET|POST] [--body '{"key":"value"}']
+```
+
+Show the decoded price to the user and **always get their confirmation before paying — for any amount**. Then pay the endpoint using your wallet — see `references/wallet-flows.md` for the method for your wallet (if not already known).
 
 ---
 
@@ -83,7 +100,8 @@ Report the response body and any transaction hash to the user.
 
 ## Rules
 
-- **Always ask the user before executing any command.** Show the exact command you intend to run and wait for explicit approval before running it — this applies to wallet, payment, and funding commands. Only skip this when running non-interactively/autonomously with no user available, in which case rely on configured safeguards (`--max-amount`, wallet spend limits, allowlists) instead.
+- **Always ask the user before executing any command.** Show the exact command you intend to run and wait for explicit approval before running it — this applies to wallet, payment, and funding commands.
+- Abide by configured safeguards such as wallet spend limits and allowlists.
 - Never pay silently — always show the decoded price first
-- Confirm with user before any payment > $0.10 USDC
+- Confirm with user before any payment
 - Always report the tx hash after a successful payment

@@ -10,7 +10,7 @@ When writing one-off scripts, put them in this skill's `scripts/` directory (or 
 node scripts/wallet.mjs balance <your-address> [--rpc <url>] [--rpc-key <key>]
 ```
 
-Defaults to the public Base RPC; `--rpc-key` is sent as `Authorization: Bearer <key>`. If the balance is insufficient, fund via `references/near-intents-funding.md` (or `npx awal fund` for the Agentic Wallet).
+Defaults to the public Base RPC; `--rpc-key` is sent as `Authorization: Bearer <key>`. If the balance is insufficient, fund via `references/near-intents-funding.md`.
 
 **Gas:** No ETH needed for any wallet — you sign off-chain only. The x402 facilitator submits the on-chain transaction and covers gas.
 
@@ -18,32 +18,18 @@ Defaults to the public Base RPC; `--rpc-key` is sent as `Authorization: Bearer <
 
 ## Coinbase Agentic Wallet (awal) — default
 
-An MPC wallet whose key is split and signs inside an AWS Nitro Enclave (TEE). There is **no private key to hold, leak, or lose** — you authenticate with an email one-time code, and Coinbase never has custody. It speaks x402 natively via the `awal` CLI. Pin the version (`awal@2.10.0`) so behaviour is stable.
+Set up / authenticate first — see `references/detecting-wallets.md` (*Setting up the Agentic Wallet*). The commands below assume `npx awal@2.10.0 status` already shows an address.
 
-**Authenticate:**
+**Address / balance:**
 
 ```bash
-npx awal@2.10.0 auth login you@example.com   # emails a 6-digit code, returns a flowId
-npx awal@2.10.0 auth verify <flowId> <otp>    # confirm
-npx awal@2.10.0 status                        # shows wallet address once authed
+npx awal@2.10.0 address --chain base          # Base (EVM) address (address returns EVM + Solana by default)
+npx awal@2.10.0 balance --chain base          # USDC on Base
 ```
 
-The login persists as a local session on this machine until it expires; re-run `auth login` if `status` shows you are signed out.
-
-**Recovery caveat — the wallet is tied to the email.** The email account *is* the recovery factor (there is no seed phrase). Use an email you control with strong 2FA; logging in with the same email from another machine reaches the same wallet and balance.
-
-**Address / balance / fund:**
+**Pay** — pay with a `--max-amount` cap so an unexpectedly high price **fails closed**. Note: `--chain` is **only** valid on `address`/`balance`; `x402 pay` does not accept it (payments settle on Base) — passing `--chain` errors with `unknown option '--chain'`.
 
 ```bash
-npx awal@2.10.0 address                       # Base address
-npx awal@2.10.0 balance                       # USDC on Base
-npx awal@2.10.0 fund                           # top up USDC
-```
-
-**Pay** — always run `details` first to preview the price, then pay with a `--max-amount` cap so an unexpectedly high price **fails closed**:
-
-```bash
-npx awal@2.10.0 x402 details <url>                                              # price + schema, no payment
 npx awal@2.10.0 x402 pay <url> [-X <method>] [-d <json>] [-q <params>] [-h <json>] [--max-amount <atomic>]
 ```
 
@@ -55,12 +41,6 @@ npx awal@2.10.0 x402 pay <url> [-X <method>] [-d <json>] [-q <params>] [-h <json
 | `-h, --headers` | custom headers as a JSON string |
 | `--max-amount` | hard spend cap in **USDC atomic units** — `1000000` = $1.00, `100000` = $0.10, `10000` = $0.01 |
 
-```bash
-npx awal@2.10.0 x402 pay https://example.com/api/weather
-npx awal@2.10.0 x402 pay https://example.com/api/sentiment -X POST -d '{"text": "I love this product"}'
-npx awal@2.10.0 x402 pay https://example.com/api/data --max-amount 100000   # cap at $0.10
-```
-
 **Safety:** single-quote anything containing `$` (e.g. `-d '{"amt":"$1.00"}'`) so the shell does not expand it; validate user-supplied input before building the command (the `url` must start with `http(s)://` and contain no spaces or shell metacharacters; `--max-amount` must be a positive integer).
 
 ---
@@ -71,7 +51,7 @@ These three are the most similar — each is a managed/MPC wallet that plugs int
 
 - **Address:** read it from the wallet's env var — `CDP_WALLET_ADDRESS`, `PRIVY_WALLET_ADDRESS`, or `TURNKEY_SIGN_WITH` — or from the SDK.
 - **Balance:** use the common `node scripts/wallet.mjs balance <address>` command above.
-- **Pay:** the wrapper boilerplate is identical for every wallet — only the body of `signTypedData` differs:
+- **Pay:** there's no prebuilt CLI for these wallets — write a short one-off Node script (save it under `scripts/`, run it with `node`). The block below is the **template** for that script: it makes the paid request to the endpoint. It is identical for all three wallets — **fill in two things** to make it runnable: your wallet `address`, and the `signTypedData` body for your wallet (per-wallet bodies follow). `wrapFetchWithPayment` wraps `fetch` so that when the endpoint returns 402, it signs the payment authorization with your `signer` and retries automatically; `res` is the final paid response.
 
 ```js
 import { x402Client, wrapFetchWithPayment } from '@x402/fetch';
@@ -89,6 +69,7 @@ registerExactEvmScheme(client, { signer });
 const fetchWithPayment = wrapFetchWithPayment(fetch, client);
 
 const res = await fetchWithPayment('https://api.example.com/data');
+console.log(await res.text());   // the paid response body
 ```
 
 ### CDP SDK (`@coinbase/cdp-sdk`)
@@ -100,7 +81,7 @@ npm install @coinbase/cdp-sdk
 
 ```js
 import { CdpClient } from '@coinbase/cdp-sdk';
-const cdp = new CdpClient(); // reads CDP_API_KEY_ID + CDP_API_KEY_SECRET from env
+const cdp = new CdpClient(); // reads CDP_API_KEY_ID + CDP_API_KEY_SECRET + CDP_WALLET_SECRET from env
 
 // signer.signTypedData body:
 const { signature } = await cdp.evm.signTypedData({
@@ -162,48 +143,9 @@ return walletClient.signTypedData({ domain, types, primaryType, message });
 
 ---
 
-## OWS (Open Wallet Standard)
-
-Uses the same `signer` + `wrapFetchWithPayment` boilerplate as the three above, but `signTypedData` is a top-level function, not a method on the account object. Get the address from `evmAccount.address`; check balance with the common `node scripts/wallet.mjs balance <address>` command. Three OWS-specific quirks to handle inside the signer body:
-
-1. Accounts use `eip155:1` chainId (not `eip155:8453`) — find any EVM account for the address
-2. `signTypedData` requires `EIP712Domain` to be explicit in the `types` object
-3. The returned signature may have no `0x` prefix — add it if missing
-
-```js
-import { getWallet, signTypedData as owsSignTypedData } from '@open-wallet-standard/core';
-
-const wallet = getWallet('my-agent');
-// OWS accounts use eip155:1 — pick any EVM account (same address across all EVM chains)
-const evmAccount = wallet.accounts.find(a => a.chainId?.startsWith('eip155:'));
-
-// signer.address: evmAccount.address
-// signer.signTypedData body:
-const typesWithDomain = {
-  EIP712Domain: [
-    { name: 'name',              type: 'string'  },
-    { name: 'version',           type: 'string'  },
-    { name: 'chainId',           type: 'uint256' },
-    { name: 'verifyingContract', type: 'address' },
-  ],
-  ...types,
-};
-const { signature } = owsSignTypedData(
-  'my-agent',
-  'base',
-  JSON.stringify(
-    { domain, types: typesWithDomain, primaryType, message },
-    (_, v) => typeof v === 'bigint' ? v.toString() : v,
-  ),
-);
-return signature.startsWith('0x') ? signature : `0x${signature}`;
-```
-
----
-
 ## Raw private key
 
-Use this only if a private key is configured (see `references/detecting-wallets.md`). A raw secp256k1 key works across all agent stacks (OpenClaw, Eliza, custom bots, etc.).
+Use this only if a raw secp256k1 private key is configured (see `references/detecting-wallets.md`).
 
 **Create one** (only if you specifically need a self-custodied key and no wallet is configured):
 

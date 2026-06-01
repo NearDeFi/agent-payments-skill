@@ -1,12 +1,12 @@
 # x402-pay
 
-Skill for making HTTP 402 micropayments using USDC on Base and funding it from most chains.
+Skill for making HTTP 402 micropayments using USDC on Base and funding it from most chains. 
 
 Before using this skill please review the [DISCLOSURES.txt](./DISCLOSURES.txt) and [NOTICE.txt](./NOTICE.txt) files.
 
 ## Recommended agent setup
 
-This skill moves real money. Configure your agent/harness so it **asks for approval before executing commands** rather than running them automatically — in Claude Code, keep permission prompts on (do not use `bypassPermissions` for live payments). Keep wallet-level spend limits in place (`--max-amount` on `awal x402 pay`, or Agentic Wallet / CDP spend policies), and **review every transaction** — confirm the price, recipient, and amount before approving, and verify the reported tx hash afterward. Treat autonomous, unattended payments as opt-in, and gate them behind spend caps and allowlists (see [DISCLOSURES.txt](./DISCLOSURES.txt), item 8).
+This skill moves real money. Configure your agent/harness so it **asks for approval before executing commands** rather than running them automatically. Keep wallet-level spend limits in place (`--max-amount` on `awal x402 pay`, or Agentic Wallet / CDP spend policies), and **review every transaction** — confirm the price, recipient, and amount before approving. 
 
 ## Install
 
@@ -125,7 +125,7 @@ TURNKEY_ORGANIZATION_ID=<organization id>
 TURNKEY_SIGN_WITH=<0x wallet address>
 ```
 
-All other tests (OWS, pay, search-services, near-intents, wallet, sign) use a well-known Hardhat/Anvil test key and require no wallet setup.
+All other tests (pay, check-price, search-services, near-intents, wallet, sign) use a well-known Hardhat/Anvil test key and require no wallet setup.
 
 ## Scripts
 
@@ -136,6 +136,7 @@ All other tests (OWS, pay, search-services, near-intents, wallet, sign) use a we
 | `scripts/near-intents.mjs` | `tokens`, `quote`, `status` |
 | `scripts/sign-x402-payment.mjs` | `sign`, `payload` |
 | `scripts/pay.mjs` | _(single operation)_ |
+| `scripts/check-price.mjs` | _(single operation)_ — wallet-independent live price preview |
 
 Run any script without arguments to see its usage.
 

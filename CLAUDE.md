@@ -81,4 +81,4 @@ Scripts that don't read any env vars (e.g. `near-intents.mjs`, `search-services.
 
 Whenever the scripts are updated the tests should be updated also.
 
-Whenever code snippets in `SKILL.md` or any `references/` file are updated, the corresponding test that exercises that snippet must be updated to match. The tests for wallet adapter signing (CDP, Privy, Turnkey, OWS) are the ground truth that the reference snippets are correct — if a snippet changes, the test changes with it.
+Whenever code snippets in `SKILL.md` or any `references/` file are updated, the corresponding test that exercises that snippet must be updated to match. The tests for wallet adapter signing (CDP, Privy, Turnkey) are the ground truth that the reference snippets are correct — if a snippet changes, the test changes with it.

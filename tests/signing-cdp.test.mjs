@@ -5,7 +5,7 @@
 //   1. Fails immediately with a list of missing env vars if credentials are not set
 //   2. Runs sign-x402-payment.mjs payload to get an EIP-712 signing payload from the fixture requirements
 //   3. Builds the signer object exactly as documented in references/wallet-flows.md
-//      (CDP sub-section under "If you are using CDP / Privy / Turnkey / OWS")
+//      (CDP sub-section under "Managed signer wallets: CDP, Privy, Turnkey")
 //   4. Calls signer.signTypedData(payload) — this is the path @x402/fetch will exercise
 //      via wrapFetchWithPayment at runtime
 //   5. Asserts the returned signature is a valid 65-byte hex string (0x + 130 chars)
