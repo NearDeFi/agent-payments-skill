@@ -60,7 +60,7 @@ node scripts/foo.mjs <command> [--flag value]   ✓
 node scripts/foo.mjs --mode quote               ✗
 ```
 
-Examples from the x402-pay skill: `search-services.mjs search`, `search-services.mjs details`, `near-intents.mjs tokens`, `near-intents.mjs quote`, `near-intents.mjs status`, `sign-x402-payment.mjs sign`, `sign-x402-payment.mjs payload`.
+Examples from the x402-pay skill: `search-services.mjs search`, `search-services.mjs details`, `near-intents.mjs tokens`, `near-intents.mjs quote`, `near-intents.mjs status`.
 
 Single-operation scripts (e.g. `pay.mjs`) do not need a subcommand.
 

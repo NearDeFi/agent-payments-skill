@@ -28,7 +28,7 @@ npm install
 
 ## Step 1: Detect your wallet
 
-Read `references/detecting-wallets.md` to choose which wallet to use — it scans your context and environment and, with no clear signal, defaults to a Coinbase Agentic Wallet. Once you've picked one, return here and continue from Step 2. For *how* to perform any wallet action (address, balance, fund, pay), see `references/wallet-flows.md`.
+Read `references/detecting-wallets.md` to choose which wallet to use. Once you've picked one, return here and continue from Step 2.
 
 ---
 

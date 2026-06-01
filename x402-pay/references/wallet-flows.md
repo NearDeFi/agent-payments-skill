@@ -16,7 +16,7 @@ Defaults to the public Base RPC; `--rpc-key` is sent as `Authorization: Bearer <
 
 ---
 
-## Coinbase Agentic Wallet (awal) — default
+## Coinbase Agentic Wallet (awal)
 
 Set up / authenticate first — see `references/detecting-wallets.md` (*Setting up the Agentic Wallet*). The commands below assume `npx awal@2.10.0 status` already shows an address.
 
@@ -102,10 +102,15 @@ const res = await fetch(`https://auth.privy.io/api/v1/wallets/${process.env.PRIV
     Authorization: `Basic ${Buffer.from(`${process.env.PRIVY_APP_ID}:${process.env.PRIVY_APP_SECRET}`).toString('base64')}`,
     'Content-Type': 'application/json',
   },
-  body: JSON.stringify({
-    method: 'eth_signTypedData_v4',
-    params: { typed_data: { domain, types, primary_type: primaryType, message } },
-  }),
+  // @x402/fetch passes uint256 fields (value, validAfter, validBefore) as BigInt;
+  // JSON.stringify throws on BigInt, so stringify them via a replacer.
+  body: JSON.stringify(
+    {
+      method: 'eth_signTypedData_v4',
+      params: { typed_data: { domain, types, primary_type: primaryType, message } },
+    },
+    (_k, v) => (typeof v === 'bigint' ? v.toString() : v),
+  ),
 });
 const { data: { signature } } = await res.json();
 return signature;
@@ -153,7 +158,7 @@ Use this only if a raw secp256k1 private key is configured (see `references/dete
 node scripts/wallet.mjs new
 ```
 
-Immediately write the key to `.env` in the project root — do not just display it and move on:
+Immediately write the key to `.env` in the project root so it is persisted — do not just display it and move on:
 
 ```
 X402_PRIVATE_KEY=<hex from above>

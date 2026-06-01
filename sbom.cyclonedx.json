@@ -3,9 +3,9 @@
   "bomFormat": "CycloneDX",
   "specVersion": "1.6",
   "version": 1,
-  "serialNumber": "urn:uuid:89e2fe96-06cc-4cb6-aede-4d67d38b595c",
+  "serialNumber": "urn:uuid:529c9144-3178-4345-a560-ccdb9c60f83c",
   "metadata": {
-    "timestamp": "2026-05-26T04:22:23.456Z",
+    "timestamp": "2026-06-01T17:47:33.294Z",
     "tools": {
       "components": [
         {
@@ -91,8 +91,8 @@
       "type": "library",
       "name": "cdp-sdk",
       "group": "@coinbase",
-      "version": "1.47.0",
-      "bom-ref": "skills-test|@coinbase/cdp-sdk@1.47.0",
+      "version": "1.51.0",
+      "bom-ref": "skills-test|@coinbase/cdp-sdk@1.51.0",
       "author": "Coinbase Inc.",
       "description": "SDK for interacting with the Coinbase Developer Platform Wallet API",
       "licenses": [
@@ -103,7 +103,7 @@
           }
         }
       ],
-      "purl": "pkg:npm/%40coinbase/cdp-sdk@1.47.0",
+      "purl": "pkg:npm/%40coinbase/cdp-sdk@1.51.0",
       "externalReferences": [
         {
           "url": "git+https://github.com/coinbase/cdp-sdk.git",
@@ -121,12 +121,12 @@
           "comment": "as detected from PackageJson property \"bugs.url\""
         },
         {
-          "url": "https://registry.npmjs.org/@coinbase/cdp-sdk/-/cdp-sdk-1.47.0.tgz",
+          "url": "https://registry.npmjs.org/@coinbase/cdp-sdk/-/cdp-sdk-1.51.0.tgz",
           "type": "distribution",
           "hashes": [
             {
               "alg": "SHA-512",
-              "content": "5cf35272e385c6f35578d3cf5059d39e0db8ef9c4564dd805081756f14fdaf3790ab647ab456945cfb857c071892f738f79d82da8b60a3048798989b82a9360a"
+              "content": "5caf3e3970c44758e2ad8a6e88e72de228fae4e0d0df52ec9b246b662fc9ef3178181f3dab1599d0a3df01db2a24c3fb56f1389e8f90fbe30a910b40254068ca"
             }
           ],
           "comment": "as detected from npm-ls property \"resolved\" and property \"integrity\""
@@ -145,50 +145,10 @@
     },
     {
       "type": "library",
-      "name": "core",
-      "group": "@open-wallet-standard",
-      "version": "1.3.2",
-      "bom-ref": "skills-test|@open-wallet-standard/core@1.3.2",
-      "description": "Node.js native bindings for the Open Wallet Standard",
-      "licenses": [
-        {
-          "license": {
-            "id": "MIT",
-            "acknowledgement": "declared"
-          }
-        }
-      ],
-      "purl": "pkg:npm/%40open-wallet-standard/core@1.3.2",
-      "externalReferences": [
-        {
-          "url": "https://registry.npmjs.org/@open-wallet-standard/core/-/core-1.3.2.tgz",
-          "type": "distribution",
-          "hashes": [
-            {
-              "alg": "SHA-512",
-              "content": "0e4f1b07d1b93e325f37302a25df564fd39faabad25d1737800f7e042698daa8ab94dac2908019087683204d0b9c63806a84998b347aaa73856ee923f834f326"
-            }
-          ],
-          "comment": "as detected from npm-ls property \"resolved\" and property \"integrity\""
-        }
-      ],
-      "properties": [
-        {
-          "name": "cdx:npm:package:development",
-          "value": "true"
-        },
-        {
-          "name": "cdx:npm:package:path",
-          "value": "node_modules/@open-wallet-standard/core"
-        }
-      ]
-    },
-    {
-      "type": "library",
       "name": "sdk-server",
       "group": "@turnkey",
-      "version": "5.3.0",
-      "bom-ref": "skills-test|@turnkey/sdk-server@5.3.0",
+      "version": "6.0.0",
+      "bom-ref": "skills-test|@turnkey/sdk-server@6.0.0",
       "author": "Turnkey",
       "description": "JavaScript Server SDK",
       "licenses": [
@@ -199,7 +159,7 @@
           }
         }
       ],
-      "purl": "pkg:npm/%40turnkey/sdk-server@5.3.0#packages/sdk-server",
+      "purl": "pkg:npm/%40turnkey/sdk-server@6.0.0#packages/sdk-server",
       "externalReferences": [
         {
           "url": "git+https://github.com/tkhq/sdk.git#packages/sdk-server",
@@ -217,12 +177,12 @@
           "comment": "as detected from PackageJson property \"bugs.url\""
         },
         {
-          "url": "https://registry.npmjs.org/@turnkey/sdk-server/-/sdk-server-5.3.0.tgz",
+          "url": "https://registry.npmjs.org/@turnkey/sdk-server/-/sdk-server-6.0.0.tgz",
           "type": "distribution",
           "hashes": [
             {
               "alg": "SHA-512",
-              "content": "5fe0a91b1abe2063b098d2696fc752713f51ebba26f5acccf83c50fb6447ecbe46e5ac520559505aca122a7312c113ab737d7e1797bab7830c77dad47eb8d8c3"
+              "content": "acfa39106ee8dfc2f9ea49a2d85717508bd50e5a62a64ee0f7c928578098545715af2db121a187965911ab2c9c34c7ff28c09de9a0a2d3e04cf1d344140dacab"
             }
           ],
           "comment": "as detected from npm-ls property \"resolved\" and property \"integrity\""
@@ -243,8 +203,8 @@
       "type": "library",
       "name": "viem",
       "group": "@turnkey",
-      "version": "0.14.28",
-      "bom-ref": "skills-test|@turnkey/viem@0.14.28",
+      "version": "0.14.29",
+      "bom-ref": "skills-test|@turnkey/viem@0.14.29",
       "author": "Turnkey",
       "description": "Turnkey Helpers to work with Viem",
       "licenses": [
@@ -255,7 +215,7 @@
           }
         }
       ],
-      "purl": "pkg:npm/%40turnkey/viem@0.14.28#packages/viem",
+      "purl": "pkg:npm/%40turnkey/viem@0.14.29#packages/viem",
       "externalReferences": [
         {
           "url": "git+https://github.com/tkhq/sdk.git#packages/viem",
@@ -273,12 +233,12 @@
           "comment": "as detected from PackageJson property \"bugs.url\""
         },
         {
-          "url": "https://registry.npmjs.org/@turnkey/viem/-/viem-0.14.28.tgz",
+          "url": "https://registry.npmjs.org/@turnkey/viem/-/viem-0.14.29.tgz",
           "type": "distribution",
           "hashes": [
             {
               "alg": "SHA-512",
-              "content": "5150aa7b7dc48dc275062a1e0203314a97d940bd2e7821e35fd531dd5f6ceb8d7c15bc7576e78ba33864ba020a365351609f129e937ef4113d117dda8daf66db"
+              "content": "07113c8529d54787e644f49dfaa917c84c31e3a3349e1d9167c24d76580cb91fea0cb314217657b21ddab6a5f4b07c4b36b6fa9c8eccd5104064c92cf1071ec4"
             }
           ],
           "comment": "as detected from npm-ls property \"resolved\" and property \"integrity\""
@@ -300,7 +260,7 @@
           "name": "curves",
           "group": "@noble",
           "version": "1.8.0",
-          "bom-ref": "skills-test|@turnkey/viem@0.14.28|@noble/curves@1.8.0",
+          "bom-ref": "skills-test|@turnkey/viem@0.14.29|@noble/curves@1.8.0",
           "author": "Paul Miller",
           "description": "Audited & minimal JS implementation of elliptic curve cryptography",
           "licenses": [
@@ -355,7 +315,7 @@
           "type": "library",
           "name": "cross-fetch",
           "version": "4.1.0",
-          "bom-ref": "skills-test|@turnkey/viem@0.14.28|cross-fetch@4.1.0",
+          "bom-ref": "skills-test|@turnkey/viem@0.14.29|cross-fetch@4.1.0",
           "author": "Leonardo Quixada",
           "description": "Universal WHATWG Fetch API for Node, Browsers and React Native",
           "licenses": [
@@ -411,7 +371,7 @@
           "name": "hashes",
           "group": "@noble",
           "version": "1.7.0",
-          "bom-ref": "skills-test|@turnkey/viem@0.14.28|@noble/hashes@1.7.0",
+          "bom-ref": "skills-test|@turnkey/viem@0.14.29|@noble/hashes@1.7.0",
           "author": "Paul Miller",
           "description": "Audited & minimal 0-dependency JS implementation of SHA, RIPEMD, BLAKE, HMAC, HKDF, PBKDF & Scrypt",
           "licenses": [
@@ -964,8 +924,8 @@
     {
       "type": "library",
       "name": "axios",
-      "version": "1.13.6",
-      "bom-ref": "skills-test|axios@1.13.6",
+      "version": "1.16.0",
+      "bom-ref": "skills-test|axios@1.16.0",
       "author": "Matt Zabriskie",
       "description": "Promise based HTTP client for the browser and node.js",
       "licenses": [
@@ -976,7 +936,7 @@
           }
         }
       ],
-      "purl": "pkg:npm/axios@1.13.6",
+      "purl": "pkg:npm/axios@1.16.0",
       "externalReferences": [
         {
           "url": "git+https://github.com/axios/axios.git",
@@ -994,12 +954,12 @@
           "comment": "as detected from PackageJson property \"bugs.url\""
         },
         {
-          "url": "https://registry.npmjs.org/axios/-/axios-1.13.6.tgz",
+          "url": "https://registry.npmjs.org/axios/-/axios-1.16.0.tgz",
           "type": "distribution",
           "hashes": [
             {
               "alg": "SHA-512",
-              "content": "0a14c21cca2e11eda49fbd775876d019cb98aebe9f5d3062bb8eb4393c16ad6a1bd7a8356d79f8bedcf4ecea5eedec0ca332409c4aae2e4e655905ad06283d0d"
+              "content": "ea1a790b0bd33e5376037d60e5dc67c005f4a2bcccee99824432e76525fbef69aff160ea202c058e8c07b8fb34e0c73c75e225775f9e8e1b5a327e6fa7a6fed7"
             }
           ],
           "comment": "as detected from npm-ls property \"resolved\" and property \"integrity\""
@@ -1018,9 +978,63 @@
     },
     {
       "type": "library",
+      "name": "bs58",
+      "version": "6.0.0",
+      "bom-ref": "skills-test|bs58@6.0.0",
+      "description": "Base 58 encoding / decoding",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT",
+            "acknowledgement": "declared"
+          }
+        }
+      ],
+      "purl": "pkg:npm/bs58@6.0.0",
+      "externalReferences": [
+        {
+          "url": "git+https://github.com/cryptocoinjs/bs58.git",
+          "type": "vcs",
+          "comment": "as detected from PackageJson property \"repository.url\""
+        },
+        {
+          "url": "https://github.com/cryptocoinjs/bs58#readme",
+          "type": "website",
+          "comment": "as detected from PackageJson property \"homepage\""
+        },
+        {
+          "url": "https://github.com/cryptocoinjs/bs58/issues",
+          "type": "issue-tracker",
+          "comment": "as detected from PackageJson property \"bugs.url\""
+        },
+        {
+          "url": "https://registry.npmjs.org/bs58/-/bs58-6.0.0.tgz",
+          "type": "distribution",
+          "hashes": [
+            {
+              "alg": "SHA-512",
+              "content": "3c3d3012711883a8a3b33c3fbbcb3e888dc7d7b713ca696bc242a10e13d9abe4a8925dc053886dc811538c078d0250829a0d1fe7783a8a1de3013c8229fb537f"
+            }
+          ],
+          "comment": "as detected from npm-ls property \"resolved\" and property \"integrity\""
+        }
+      ],
+      "properties": [
+        {
+          "name": "cdx:npm:package:development",
+          "value": "true"
+        },
+        {
+          "name": "cdx:npm:package:path",
+          "value": "node_modules/bs58"
+        }
+      ]
+    },
+    {
+      "type": "library",
       "name": "jose",
-      "version": "6.2.2",
-      "bom-ref": "skills-test|jose@6.2.2",
+      "version": "6.2.3",
+      "bom-ref": "skills-test|jose@6.2.3",
       "author": "Filip Skokan",
       "description": "JWA, JWS, JWE, JWT, JWK, JWKS for Node.js, Browser, Cloudflare Workers, Deno, Bun, and other Web-interoperable runtimes",
       "licenses": [
@@ -1031,7 +1045,7 @@
           }
         }
       ],
-      "purl": "pkg:npm/jose@6.2.2",
+      "purl": "pkg:npm/jose@6.2.3",
       "externalReferences": [
         {
           "url": "git+https://github.com/panva/jose.git",
@@ -1049,12 +1063,12 @@
           "comment": "as detected from PackageJson property \"bugs.url\""
         },
         {
-          "url": "https://registry.npmjs.org/jose/-/jose-6.2.2.tgz",
+          "url": "https://registry.npmjs.org/jose/-/jose-6.2.3.tgz",
           "type": "distribution",
           "hashes": [
             {
               "alg": "SHA-512",
-              "content": "77b90f0dddf828efd89f36833a58a41a93aeadf1740720b6b04578700342b5da8b9537c1970da9d783bfe5dff3bf8d2024f6c84317c44b79d2c75fe860dcae65"
+              "content": "61854322740a1497d1ff16b7a2351397c7362a84f088bd51e5683d602c9dc07d31d01f60adbce58391c2ee63230ad5098db43f627184648848e6d0a07d36f81f"
             }
           ],
           "comment": "as detected from npm-ls property \"resolved\" and property \"integrity\""
@@ -1183,8 +1197,8 @@
     {
       "type": "library",
       "name": "viem",
-      "version": "2.48.0",
-      "bom-ref": "skills-test|viem@2.48.0",
+      "version": "2.51.3",
+      "bom-ref": "skills-test|viem@2.51.3",
       "description": "TypeScript Interface for Ethereum",
       "licenses": [
         {
@@ -1194,7 +1208,7 @@
           }
         }
       ],
-      "purl": "pkg:npm/viem@2.48.0",
+      "purl": "pkg:npm/viem@2.51.3",
       "externalReferences": [
         {
           "url": "git+https://github.com/wevm/viem.git",
@@ -1212,12 +1226,12 @@
           "comment": "as detected from PackageJson property \"bugs.url\""
         },
         {
-          "url": "https://registry.npmjs.org/viem/-/viem-2.48.0.tgz",
+          "url": "https://registry.npmjs.org/viem/-/viem-2.51.3.tgz",
           "type": "distribution",
           "hashes": [
             {
               "alg": "SHA-512",
-              "content": "d2e2f34c050d28fa58f427f738108f7700a55f1f42107024a15627c4c3dd1ededc448d43a1b32ca3ea4766f53b8ad0fe845c04e21b66a7d41f3fee656fe927d2"
+              "content": "0c0e046ebb2f6adcf32e8e8cc1c5968afea423a748af723d1c7f41eaab0968294dfecd008c80d4cf9448c65f95986ae8bc8502708bc6f3be38cae187edddfbcf"
             }
           ],
           "comment": "as detected from npm-ls property \"resolved\" and property \"integrity\""
@@ -1239,7 +1253,7 @@
           "name": "curves",
           "group": "@noble",
           "version": "1.9.1",
-          "bom-ref": "skills-test|viem@2.48.0|@noble/curves@1.9.1",
+          "bom-ref": "skills-test|viem@2.51.3|@noble/curves@1.9.1",
           "author": "Paul Miller",
           "description": "Audited & minimal JS implementation of elliptic curve cryptography",
           "licenses": [
@@ -1294,7 +1308,7 @@
           "type": "library",
           "name": "abitype",
           "version": "1.2.3",
-          "bom-ref": "skills-test|viem@2.48.0|abitype@1.2.3",
+          "bom-ref": "skills-test|viem@2.51.3|abitype@1.2.3",
           "description": "Strict TypeScript types for Ethereum ABIs",
           "licenses": [
             {
@@ -1346,63 +1360,9 @@
         },
         {
           "type": "library",
-          "name": "ox",
-          "version": "0.14.17",
-          "bom-ref": "skills-test|viem@2.48.0|ox@0.14.17",
-          "description": "Ethereum Standard Library",
-          "licenses": [
-            {
-              "license": {
-                "id": "MIT",
-                "acknowledgement": "declared"
-              }
-            }
-          ],
-          "purl": "pkg:npm/ox@0.14.17",
-          "externalReferences": [
-            {
-              "url": "git+https://github.com/wevm/ox.git",
-              "type": "vcs",
-              "comment": "as detected from PackageJson property \"repository.url\""
-            },
-            {
-              "url": "https://wevm.dev",
-              "type": "website",
-              "comment": "as detected from PackageJson property \"homepage\""
-            },
-            {
-              "url": "https://github.com/wevm/ox/issues",
-              "type": "issue-tracker",
-              "comment": "as detected from PackageJson property \"bugs.url\""
-            },
-            {
-              "url": "https://registry.npmjs.org/ox/-/ox-0.14.17.tgz",
-              "type": "distribution",
-              "hashes": [
-                {
-                  "alg": "SHA-512",
-                  "content": "8ceccd6f65a57f3b2bf33fc6a02b5dd5b7fa39246e5aecacbdb8671c60feedf5755916dc051e81d116287b7c569d479d17bce9e25e403e64bb0b302152893f94"
-                }
-              ],
-              "comment": "as detected from npm-ls property \"resolved\" and property \"integrity\""
-            }
-          ],
-          "properties": [
-            {
-              "name": "cdx:npm:package:development",
-              "value": "true"
-            },
-            {
-              "name": "cdx:npm:package:path",
-              "value": "node_modules/viem/node_modules/ox"
-            }
-          ]
-        },
-        {
-          "type": "library",
           "name": "ws",
-          "version": "8.18.3",
-          "bom-ref": "skills-test|viem@2.48.0|ws@8.18.3",
+          "version": "8.20.1",
+          "bom-ref": "skills-test|viem@2.51.3|ws@8.20.1",
           "author": "Einar Otto Stangvik",
           "description": "Simple to use, blazing fast and thoroughly tested websocket client and server for Node.js",
           "licenses": [
@@ -1413,7 +1373,7 @@
               }
             }
           ],
-          "purl": "pkg:npm/ws@8.18.3",
+          "purl": "pkg:npm/ws@8.20.1",
           "externalReferences": [
             {
               "url": "git+https://github.com/websockets/ws.git",
@@ -1431,12 +1391,12 @@
               "comment": "as detected from PackageJson property \"bugs.url\""
             },
             {
-              "url": "https://registry.npmjs.org/ws/-/ws-8.18.3.tgz",
+              "url": "https://registry.npmjs.org/ws/-/ws-8.20.1.tgz",
               "type": "distribution",
               "hashes": [
                 {
                   "alg": "SHA-512",
-                  "content": "3c4206098e6d4a552de7472ac8c5df0b35fea0e3ea374bee1aa5b36dc276c6f9e4ce4ab8ea83a9cfb7506930c175f2026f8375e3e1804540f0d97576378b6fce"
+                  "content": "22de1d3b42b9bfffc9b535ee3e47c439a237b9437cee260f9eaa3f673a82a06de0f2e840eba41432cfd2accd182bbfcd02efabe0b321ffd76ad80ee4fab1ecfb"
                 }
               ],
               "comment": "as detected from npm-ls property \"resolved\" and property \"integrity\""
@@ -1450,62 +1410,6 @@
             {
               "name": "cdx:npm:package:path",
               "value": "node_modules/viem/node_modules/ws"
-            }
-          ]
-        },
-        {
-          "type": "library",
-          "name": "ens-normalize",
-          "group": "@adraffy",
-          "version": "1.11.1",
-          "bom-ref": "skills-test|viem@2.48.0|@adraffy/ens-normalize@1.11.1",
-          "author": "raffy.eth",
-          "description": "Ethereum Name Service (ENS) Name Normalizer",
-          "licenses": [
-            {
-              "license": {
-                "id": "MIT",
-                "acknowledgement": "declared"
-              }
-            }
-          ],
-          "purl": "pkg:npm/%40adraffy/ens-normalize@1.11.1",
-          "externalReferences": [
-            {
-              "url": "git+https://github.com/adraffy/ens-normalize.js.git",
-              "type": "vcs",
-              "comment": "as detected from PackageJson property \"repository.url\""
-            },
-            {
-              "url": "https://github.com/adraffy/ens-normalize.js#readme",
-              "type": "website",
-              "comment": "as detected from PackageJson property \"homepage\""
-            },
-            {
-              "url": "https://github.com/adraffy/ens-normalize.js/issues",
-              "type": "issue-tracker",
-              "comment": "as detected from PackageJson property \"bugs.url\""
-            },
-            {
-              "url": "https://registry.npmjs.org/@adraffy/ens-normalize/-/ens-normalize-1.11.1.tgz",
-              "type": "distribution",
-              "hashes": [
-                {
-                  "alg": "SHA-512",
-                  "content": "9e1081577aae1207acb9fedceca61fa5eaea492d784fc6d8baf27c3dc2c9a7ace7919a4573402e5b8a81b6bf1e295c8f3deffc452afbb2094258f53979ac7029"
-                }
-              ],
-              "comment": "as detected from npm-ls property \"resolved\" and property \"integrity\""
-            }
-          ],
-          "properties": [
-            {
-              "name": "cdx:npm:package:development",
-              "value": "true"
-            },
-            {
-              "name": "cdx:npm:package:path",
-              "value": "node_modules/viem/node_modules/@adraffy/ens-normalize"
             }
           ]
         }
@@ -1568,50 +1472,10 @@
     },
     {
       "type": "library",
-      "name": "core-darwin-arm64",
-      "group": "@open-wallet-standard",
-      "version": "1.3.2",
-      "bom-ref": "skills-test|@open-wallet-standard/core-darwin-arm64@1.3.2",
-      "scope": "optional",
-      "licenses": [
-        {
-          "license": {
-            "id": "MIT",
-            "acknowledgement": "declared"
-          }
-        }
-      ],
-      "purl": "pkg:npm/%40open-wallet-standard/core-darwin-arm64@1.3.2",
-      "externalReferences": [
-        {
-          "url": "https://registry.npmjs.org/@open-wallet-standard/core-darwin-arm64/-/core-darwin-arm64-1.3.2.tgz",
-          "type": "distribution",
-          "hashes": [
-            {
-              "alg": "SHA-512",
-              "content": "aef52c194f1e66d20c605274e3b9c5292efd6a325e602c9dbef87607a6d7d145067f6349678c149f11aa8a3c4f89f973db1ab3bdb1d7619373cb73083b8f9f0d"
-            }
-          ],
-          "comment": "as detected from npm-ls property \"resolved\" and property \"integrity\""
-        }
-      ],
-      "properties": [
-        {
-          "name": "cdx:npm:package:development",
-          "value": "true"
-        },
-        {
-          "name": "cdx:npm:package:path",
-          "value": "node_modules/@open-wallet-standard/core-darwin-arm64"
-        }
-      ]
-    },
-    {
-      "type": "library",
       "name": "api-key-stamper",
       "group": "@turnkey",
-      "version": "0.6.5",
-      "bom-ref": "skills-test|@turnkey/api-key-stamper@0.6.5",
+      "version": "0.6.6",
+      "bom-ref": "skills-test|@turnkey/api-key-stamper@0.6.6",
       "author": "Turnkey",
       "description": "API key stamper for @turnkey/http",
       "licenses": [
@@ -1622,7 +1486,7 @@
           }
         }
       ],
-      "purl": "pkg:npm/%40turnkey/api-key-stamper@0.6.5#packages/api-key-stamper",
+      "purl": "pkg:npm/%40turnkey/api-key-stamper@0.6.6#packages/api-key-stamper",
       "externalReferences": [
         {
           "url": "git+https://github.com/tkhq/sdk.git#packages/api-key-stamper",
@@ -1640,12 +1504,12 @@
           "comment": "as detected from PackageJson property \"bugs.url\""
         },
         {
-          "url": "https://registry.npmjs.org/@turnkey/api-key-stamper/-/api-key-stamper-0.6.5.tgz",
+          "url": "https://registry.npmjs.org/@turnkey/api-key-stamper/-/api-key-stamper-0.6.6.tgz",
           "type": "distribution",
           "hashes": [
             {
               "alg": "SHA-512",
-              "content": "75220d1cb233615c3e64d2f08ccd709c46059181cf8d00d28b8de8a42521be8c3fc2ce85b27ea05a4629cdb1fee848f7aef4894ee693c2c95df9db131bfdc79c"
+              "content": "140f9c7eb187c7e7fd5ce12f7544e51cfabad2c0616386d36fc19e882e9d18fb4b677da2f9d86a21074113ddcf35110d43e41219b85cb27d0e27d3e3f22529c5"
             }
           ],
           "comment": "as detected from npm-ls property \"resolved\" and property \"integrity\""
@@ -1666,8 +1530,8 @@
       "type": "library",
       "name": "http",
       "group": "@turnkey",
-      "version": "3.18.1",
-      "bom-ref": "skills-test|@turnkey/http@3.18.1",
+      "version": "4.0.0",
+      "bom-ref": "skills-test|@turnkey/http@4.0.0",
       "author": "Turnkey",
       "description": "Typed HTTP client for interacting with Turnkey API",
       "licenses": [
@@ -1678,7 +1542,7 @@
           }
         }
       ],
-      "purl": "pkg:npm/%40turnkey/http@3.18.1#packages/http",
+      "purl": "pkg:npm/%40turnkey/http@4.0.0#packages/http",
       "externalReferences": [
         {
           "url": "git+https://github.com/tkhq/sdk.git#packages/http",
@@ -1696,12 +1560,12 @@
           "comment": "as detected from PackageJson property \"bugs.url\""
         },
         {
-          "url": "https://registry.npmjs.org/@turnkey/http/-/http-3.18.1.tgz",
+          "url": "https://registry.npmjs.org/@turnkey/http/-/http-4.0.0.tgz",
           "type": "distribution",
           "hashes": [
             {
               "alg": "SHA-512",
-              "content": "29784302da21c773cf46281d534aa3760493ba8983d3197798e365cb9867f3f8e0ae9d06b3b04a5efd0e1a2c3fdd28f4d883e69736b7491581286b56c86c0d9a"
+              "content": "d2dbfb7951bcc2e012b619ad5cc87c990d7438d21098670f0d3b98a36a444322b4f4b75b5b2b4361bb9ea57adaae5a354abbc4b7364af52e173c8840cefa210b"
             }
           ],
           "comment": "as detected from npm-ls property \"resolved\" and property \"integrity\""
@@ -1722,8 +1586,8 @@
       "type": "library",
       "name": "sdk-types",
       "group": "@turnkey",
-      "version": "0.14.0",
-      "bom-ref": "skills-test|@turnkey/sdk-types@0.14.0",
+      "version": "1.0.0",
+      "bom-ref": "skills-test|@turnkey/sdk-types@1.0.0",
       "author": "Turnkey",
       "description": "Turnkey SDK Types",
       "licenses": [
@@ -1734,7 +1598,7 @@
           }
         }
       ],
-      "purl": "pkg:npm/%40turnkey/sdk-types@0.14.0#packages/sdk-types",
+      "purl": "pkg:npm/%40turnkey/sdk-types@1.0.0#packages/sdk-types",
       "externalReferences": [
         {
           "url": "git+https://github.com/tkhq/sdk.git#packages/sdk-types",
@@ -1752,12 +1616,12 @@
           "comment": "as detected from PackageJson property \"bugs.url\""
         },
         {
-          "url": "https://registry.npmjs.org/@turnkey/sdk-types/-/sdk-types-0.14.0.tgz",
+          "url": "https://registry.npmjs.org/@turnkey/sdk-types/-/sdk-types-1.0.0.tgz",
           "type": "distribution",
           "hashes": [
             {
               "alg": "SHA-512",
-              "content": "14b378a7725cdeb04cbccd7bb6016b3b8569aa440dd11816b4b927a9caa92ee3604c9ee8aa0bf39b8d9822bcef0655ba0cfb27163559333738c827da44decb9a"
+              "content": "fcfbac04fdf955f43a8db85ba66a22e4c05cbde6966c2fe0286d67a70914806c2865591f54d941055362ab38d891776ce8a37fa598a8e19b6eae6a64181dd900"
             }
           ],
           "comment": "as detected from npm-ls property \"resolved\" and property \"integrity\""
@@ -1778,8 +1642,8 @@
       "type": "library",
       "name": "wallet-stamper",
       "group": "@turnkey",
-      "version": "1.1.16",
-      "bom-ref": "skills-test|@turnkey/wallet-stamper@1.1.16",
+      "version": "1.1.17",
+      "bom-ref": "skills-test|@turnkey/wallet-stamper@1.1.17",
       "author": "Turnkey",
       "description": "Wallet stamper for @turnkey/http",
       "licenses": [
@@ -1790,7 +1654,7 @@
           }
         }
       ],
-      "purl": "pkg:npm/%40turnkey/wallet-stamper@1.1.16#packages/wallet-stamper",
+      "purl": "pkg:npm/%40turnkey/wallet-stamper@1.1.17#packages/wallet-stamper",
       "externalReferences": [
         {
           "url": "git+https://github.com/tkhq/sdk.git#packages/wallet-stamper",
@@ -1808,12 +1672,12 @@
           "comment": "as detected from PackageJson property \"bugs.url\""
         },
         {
-          "url": "https://registry.npmjs.org/@turnkey/wallet-stamper/-/wallet-stamper-1.1.16.tgz",
+          "url": "https://registry.npmjs.org/@turnkey/wallet-stamper/-/wallet-stamper-1.1.17.tgz",
           "type": "distribution",
           "hashes": [
             {
               "alg": "SHA-512",
-              "content": "21d82821142be51a221c03e755a83643269883a7269a4650b35ace8a0e7bfed43f7d774fb02d7edbaeb4462b0802fbfaf5916b02b1bc67cc076864903244ad97"
+              "content": "7465d090cf4d313b929df797d71f4706c798d489fb8b7456bcf0333e7bd6cbe8985099e84ef6ad77cef4ee9ab8541f4afd93052201e674d6ae12bf9650208e1c"
             }
           ],
           "comment": "as detected from npm-ls property \"resolved\" and property \"integrity\""
@@ -2000,8 +1864,8 @@
       "type": "library",
       "name": "core",
       "group": "@turnkey",
-      "version": "1.14.1",
-      "bom-ref": "skills-test|@turnkey/core@1.14.1",
+      "version": "2.0.0",
+      "bom-ref": "skills-test|@turnkey/core@2.0.0",
       "author": "Turnkey",
       "description": "A core JavaScript web and React Native package for interfacing with Turnkey's infrastructure.",
       "licenses": [
@@ -2012,7 +1876,7 @@
           }
         }
       ],
-      "purl": "pkg:npm/%40turnkey/core@1.14.1#packages/core",
+      "purl": "pkg:npm/%40turnkey/core@2.0.0#packages/core",
       "externalReferences": [
         {
           "url": "git+https://github.com/tkhq/sdk.git#packages/core",
@@ -2030,12 +1894,12 @@
           "comment": "as detected from PackageJson property \"bugs.url\""
         },
         {
-          "url": "https://registry.npmjs.org/@turnkey/core/-/core-1.14.1.tgz",
+          "url": "https://registry.npmjs.org/@turnkey/core/-/core-2.0.0.tgz",
           "type": "distribution",
           "hashes": [
             {
               "alg": "SHA-512",
-              "content": "25aa298abed7a35423424f73211d27f2dab3372b479f290d42fec357e8be34fedc5ba9d2cec3dbc90167e29db77eeba7c6e712572d74d124cb13314728f22e14"
+              "content": "5289539fbed0c0b9eae68c164aabe1f699ee6bc85bbaf20e1138946088d3a711495214ef583a8dc759d4b4a8839b96aaa874e9feb418ded4bc95b10fa7d45e1c"
             }
           ],
           "comment": "as detected from npm-ls property \"resolved\" and property \"integrity\""
@@ -2056,8 +1920,8 @@
       "type": "library",
       "name": "sdk-browser",
       "group": "@turnkey",
-      "version": "5.16.1",
-      "bom-ref": "skills-test|@turnkey/sdk-browser@5.16.1",
+      "version": "6.0.0",
+      "bom-ref": "skills-test|@turnkey/sdk-browser@6.0.0",
       "author": "Turnkey",
       "description": "JavaScript Browser SDK",
       "licenses": [
@@ -2068,7 +1932,7 @@
           }
         }
       ],
-      "purl": "pkg:npm/%40turnkey/sdk-browser@5.16.1#packages/sdk-browser",
+      "purl": "pkg:npm/%40turnkey/sdk-browser@6.0.0#packages/sdk-browser",
       "externalReferences": [
         {
           "url": "git+https://github.com/tkhq/sdk.git#packages/sdk-browser",
@@ -2086,12 +1950,12 @@
           "comment": "as detected from PackageJson property \"bugs.url\""
         },
         {
-          "url": "https://registry.npmjs.org/@turnkey/sdk-browser/-/sdk-browser-5.16.1.tgz",
+          "url": "https://registry.npmjs.org/@turnkey/sdk-browser/-/sdk-browser-6.0.0.tgz",
           "type": "distribution",
           "hashes": [
             {
               "alg": "SHA-512",
-              "content": "0170542555bcde764a9d254d507db7e5d6ecbb84be6b81744b0a36e459bf80758a3d58789efa53fcfaf672be8f561dd4475e69efcec05549313bd660b4d7253f"
+              "content": "42c234f0d6b8dc31f65464f8420a814d18e751018347986afbd2ce8b38d9e51e0f9579a2ebdb87394c15cf86a8fb258ee7651294002d90257981bf9e56cc64d5"
             }
           ],
           "comment": "as detected from npm-ls property \"resolved\" and property \"integrity\""
@@ -3508,8 +3372,8 @@
     {
       "type": "library",
       "name": "proxy-from-env",
-      "version": "1.1.0",
-      "bom-ref": "skills-test|proxy-from-env@1.1.0",
+      "version": "2.1.0",
+      "bom-ref": "skills-test|proxy-from-env@2.1.0",
       "author": "Rob Wu",
       "description": "Offers getProxyForUrl to get the proxy URL for a URL, respecting the *_PROXY (e.g. HTTP_PROXY) and NO_PROXY environment variables.",
       "licenses": [
@@ -3520,7 +3384,7 @@
           }
         }
       ],
-      "purl": "pkg:npm/proxy-from-env@1.1.0",
+      "purl": "pkg:npm/proxy-from-env@2.1.0",
       "externalReferences": [
         {
           "url": "git+https://github.com/Rob--W/proxy-from-env.git",
@@ -3538,12 +3402,12 @@
           "comment": "as detected from PackageJson property \"bugs.url\""
         },
         {
-          "url": "https://registry.npmjs.org/proxy-from-env/-/proxy-from-env-1.1.0.tgz",
+          "url": "https://registry.npmjs.org/proxy-from-env/-/proxy-from-env-2.1.0.tgz",
           "type": "distribution",
           "hashes": [
             {
               "alg": "SHA-512",
-              "content": "0fece439109b03d7f5b5d5912b445a091dc63efe7470cc5caf3e17f24e4b4d2503d43930e3b98a24465036e9c8b514e45b082d6944a8d515454481bd65788562"
+              "content": "709fa81d35b554011af1c26c96099466b73eb2344a8002a5dd9cac7baf8f577f2165efd5e99d784db0ae5dc6a7f45f60865cf842b16bd9cf764cd17cd949181c"
             }
           ],
           "comment": "as detected from npm-ls property \"resolved\" and property \"integrity\""
@@ -3557,6 +3421,61 @@
         {
           "name": "cdx:npm:package:path",
           "value": "node_modules/proxy-from-env"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "base-x",
+      "version": "5.0.1",
+      "bom-ref": "skills-test|base-x@5.0.1",
+      "author": "Daniel Cousens",
+      "description": "Fast base encoding / decoding of any given alphabet",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT",
+            "acknowledgement": "declared"
+          }
+        }
+      ],
+      "purl": "pkg:npm/base-x@5.0.1",
+      "externalReferences": [
+        {
+          "url": "git+https://github.com/cryptocoinjs/base-x.git",
+          "type": "vcs",
+          "comment": "as detected from PackageJson property \"repository.url\""
+        },
+        {
+          "url": "https://github.com/cryptocoinjs/base-x",
+          "type": "website",
+          "comment": "as detected from PackageJson property \"homepage\""
+        },
+        {
+          "url": "https://github.com/cryptocoinjs/base-x/issues",
+          "type": "issue-tracker",
+          "comment": "as detected from PackageJson property \"bugs.url\""
+        },
+        {
+          "url": "https://registry.npmjs.org/base-x/-/base-x-5.0.1.tgz",
+          "type": "distribution",
+          "hashes": [
+            {
+              "alg": "SHA-512",
+              "content": "33bba2a3c66dfbe7a0de33e3fab1cc7c20be22eca04071c2394f8862c56d8a4e855a3b98a55b7ff8c44a720b0030787c98c140c2707e06cfa64eb1625e33332a"
+            }
+          ],
+          "comment": "as detected from npm-ls property \"resolved\" and property \"integrity\""
+        }
+      ],
+      "properties": [
+        {
+          "name": "cdx:npm:package:development",
+          "value": "true"
+        },
+        {
+          "name": "cdx:npm:package:path",
+          "value": "node_modules/base-x"
         }
       ]
     },
@@ -3949,6 +3868,172 @@
     },
     {
       "type": "library",
+      "name": "ox",
+      "version": "0.14.25",
+      "bom-ref": "skills-test|ox@0.14.25",
+      "description": "Ethereum Standard Library",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT",
+            "acknowledgement": "declared"
+          }
+        }
+      ],
+      "purl": "pkg:npm/ox@0.14.25",
+      "externalReferences": [
+        {
+          "url": "git+https://github.com/wevm/ox.git",
+          "type": "vcs",
+          "comment": "as detected from PackageJson property \"repository.url\""
+        },
+        {
+          "url": "https://wevm.dev",
+          "type": "website",
+          "comment": "as detected from PackageJson property \"homepage\""
+        },
+        {
+          "url": "https://github.com/wevm/ox/issues",
+          "type": "issue-tracker",
+          "comment": "as detected from PackageJson property \"bugs.url\""
+        },
+        {
+          "url": "https://registry.npmjs.org/ox/-/ox-0.14.25.tgz",
+          "type": "distribution",
+          "hashes": [
+            {
+              "alg": "SHA-512",
+              "content": "f03a226cab7113ccb0eb76368e332195b8da5117afe960b1e104783162eeb25dbfa8869e4f330930121820397528e178e7ef07d54afa78b4dd3e55283bc3e547"
+            }
+          ],
+          "comment": "as detected from npm-ls property \"resolved\" and property \"integrity\""
+        }
+      ],
+      "properties": [
+        {
+          "name": "cdx:npm:package:development",
+          "value": "true"
+        },
+        {
+          "name": "cdx:npm:package:path",
+          "value": "node_modules/ox"
+        }
+      ],
+      "components": [
+        {
+          "type": "library",
+          "name": "curves",
+          "group": "@noble",
+          "version": "1.9.1",
+          "bom-ref": "skills-test|ox@0.14.25|@noble/curves@1.9.1",
+          "author": "Paul Miller",
+          "description": "Audited & minimal JS implementation of elliptic curve cryptography",
+          "licenses": [
+            {
+              "license": {
+                "id": "MIT",
+                "acknowledgement": "declared"
+              }
+            }
+          ],
+          "purl": "pkg:npm/%40noble/curves@1.9.1",
+          "externalReferences": [
+            {
+              "url": "git+https://github.com/paulmillr/noble-curves.git",
+              "type": "vcs",
+              "comment": "as detected from PackageJson property \"repository.url\""
+            },
+            {
+              "url": "https://paulmillr.com/noble/",
+              "type": "website",
+              "comment": "as detected from PackageJson property \"homepage\""
+            },
+            {
+              "url": "https://github.com/paulmillr/noble-curves/issues",
+              "type": "issue-tracker",
+              "comment": "as detected from PackageJson property \"bugs.url\""
+            },
+            {
+              "url": "https://registry.npmjs.org/@noble/curves/-/curves-1.9.1.tgz",
+              "type": "distribution",
+              "hashes": [
+                {
+                  "alg": "SHA-512",
+                  "content": "935d72671660fadfa05af05b22cc16d32a0996ef1c1ce0bb761ba7c0ece8587fe65c6062632478618ea10042bfdc452ce14a41f256b545f751a5e1ac147916b0"
+                }
+              ],
+              "comment": "as detected from npm-ls property \"resolved\" and property \"integrity\""
+            }
+          ],
+          "properties": [
+            {
+              "name": "cdx:npm:package:development",
+              "value": "true"
+            },
+            {
+              "name": "cdx:npm:package:path",
+              "value": "node_modules/ox/node_modules/@noble/curves"
+            }
+          ]
+        },
+        {
+          "type": "library",
+          "name": "abitype",
+          "version": "1.2.4",
+          "bom-ref": "skills-test|ox@0.14.25|abitype@1.2.4",
+          "description": "Strict TypeScript types for Ethereum ABIs",
+          "licenses": [
+            {
+              "license": {
+                "id": "MIT",
+                "acknowledgement": "declared"
+              }
+            }
+          ],
+          "purl": "pkg:npm/abitype@1.2.4",
+          "externalReferences": [
+            {
+              "url": "git+https://github.com/wevm/abitype.git",
+              "type": "vcs",
+              "comment": "as detected from PackageJson property \"repository.url\""
+            },
+            {
+              "url": "https://github.com/wevm/abitype#readme",
+              "type": "website",
+              "comment": "as detected from PackageJson property \"homepage\""
+            },
+            {
+              "url": "https://github.com/wevm/abitype/issues",
+              "type": "issue-tracker",
+              "comment": "as detected from PackageJson property \"bugs.url\""
+            },
+            {
+              "url": "https://registry.npmjs.org/abitype/-/abitype-1.2.4.tgz",
+              "type": "distribution",
+              "hashes": [
+                {
+                  "alg": "SHA-512",
+                  "content": "769287f8ddbbbd18daacc55314591e638e3955329fb73196a4bd05893ef19959b341129acd97b1cc2e6e1c6d1fe972ac54b02e5259dd9db19abba9517a30a5c6"
+                }
+              ],
+              "comment": "as detected from npm-ls property \"resolved\" and property \"integrity\""
+            }
+          ],
+          "properties": [
+            {
+              "name": "cdx:npm:package:development",
+              "value": "true"
+            },
+            {
+              "name": "cdx:npm:package:path",
+              "value": "node_modules/ox/node_modules/abitype"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "library",
       "name": "curves",
       "group": "@noble",
       "version": "1.9.7",
@@ -4007,8 +4092,8 @@
       "type": "library",
       "name": "crypto",
       "group": "@turnkey",
-      "version": "2.8.14",
-      "bom-ref": "skills-test|@turnkey/crypto@2.8.14",
+      "version": "2.9.0",
+      "bom-ref": "skills-test|@turnkey/crypto@2.9.0",
       "author": "Turnkey",
       "description": "Encryption, decryption, and key related utility functions",
       "licenses": [
@@ -4019,7 +4104,7 @@
           }
         }
       ],
-      "purl": "pkg:npm/%40turnkey/crypto@2.8.14#packages/crypto",
+      "purl": "pkg:npm/%40turnkey/crypto@2.9.0#packages/crypto",
       "externalReferences": [
         {
           "url": "git+https://github.com/tkhq/sdk.git#packages/crypto",
@@ -4037,12 +4122,12 @@
           "comment": "as detected from PackageJson property \"bugs.url\""
         },
         {
-          "url": "https://registry.npmjs.org/@turnkey/crypto/-/crypto-2.8.14.tgz",
+          "url": "https://registry.npmjs.org/@turnkey/crypto/-/crypto-2.9.0.tgz",
           "type": "distribution",
           "hashes": [
             {
               "alg": "SHA-512",
-              "content": "51953e0c4c21494cb23070bd5596e9e5abfc358fc826c7c9fa0d44e1d9dd42331200977934f2864bbb08b65072d627cdeb005bf493f901cbe671f09d09f8fd6f"
+              "content": "ea02ddcbec8e374088571896f2ac8a0218ef3b9e9e138bae4fb5d5896bc60744ae299100c1f71956f09cf069e3ccbd21bb4feeabcdcfc56dcb6cea7fdfa59d46"
             }
           ],
           "comment": "as detected from npm-ls property \"resolved\" and property \"integrity\""
@@ -4064,7 +4149,7 @@
           "name": "curves",
           "group": "@noble",
           "version": "1.9.0",
-          "bom-ref": "skills-test|@turnkey/crypto@2.8.14|@noble/curves@1.9.0",
+          "bom-ref": "skills-test|@turnkey/crypto@2.9.0|@noble/curves@1.9.0",
           "author": "Paul Miller",
           "description": "Audited & minimal JS implementation of elliptic curve cryptography",
           "licenses": [
@@ -4728,6 +4813,62 @@
       "components": [
         {
           "type": "library",
+          "name": "ens-normalize",
+          "group": "@adraffy",
+          "version": "1.10.1",
+          "bom-ref": "skills-test|ethers@6.16.0|@adraffy/ens-normalize@1.10.1",
+          "author": "raffy.eth",
+          "description": "Ethereum Name Service (ENS) Name Normalizer",
+          "licenses": [
+            {
+              "license": {
+                "id": "MIT",
+                "acknowledgement": "declared"
+              }
+            }
+          ],
+          "purl": "pkg:npm/%40adraffy/ens-normalize@1.10.1",
+          "externalReferences": [
+            {
+              "url": "git+https://github.com/adraffy/ens-normalize.js.git",
+              "type": "vcs",
+              "comment": "as detected from PackageJson property \"repository.url\""
+            },
+            {
+              "url": "https://github.com/adraffy/ens-normalize.js#readme",
+              "type": "website",
+              "comment": "as detected from PackageJson property \"homepage\""
+            },
+            {
+              "url": "https://github.com/adraffy/ens-normalize.js/issues",
+              "type": "issue-tracker",
+              "comment": "as detected from PackageJson property \"bugs.url\""
+            },
+            {
+              "url": "https://registry.npmjs.org/@adraffy/ens-normalize/-/ens-normalize-1.10.1.tgz",
+              "type": "distribution",
+              "hashes": [
+                {
+                  "alg": "SHA-512",
+                  "content": "f7a67620fde66261755e0d9c0e6f1fd605867ff1d455e750dc53227d5e241bf3d0e3210fe75c43b510047e154db797ffbb3a4d9191f0590b9472ee83e8af8493"
+                }
+              ],
+              "comment": "as detected from npm-ls property \"resolved\" and property \"integrity\""
+            }
+          ],
+          "properties": [
+            {
+              "name": "cdx:npm:package:development",
+              "value": "true"
+            },
+            {
+              "name": "cdx:npm:package:path",
+              "value": "node_modules/ethers/node_modules/@adraffy/ens-normalize"
+            }
+          ]
+        },
+        {
+          "type": "library",
           "name": "curves",
           "group": "@noble",
           "version": "1.2.0",
@@ -5008,8 +5149,8 @@
     {
       "type": "library",
       "name": "uuid",
-      "version": "11.1.0",
-      "bom-ref": "skills-test|uuid@11.1.0",
+      "version": "11.1.1",
+      "bom-ref": "skills-test|uuid@11.1.1",
       "description": "RFC9562 UUIDs",
       "licenses": [
         {
@@ -5019,7 +5160,7 @@
           }
         }
       ],
-      "purl": "pkg:npm/uuid@11.1.0",
+      "purl": "pkg:npm/uuid@11.1.1",
       "externalReferences": [
         {
           "url": "git+https://github.com/uuidjs/uuid.git",
@@ -5037,12 +5178,12 @@
           "comment": "as detected from PackageJson property \"bugs.url\""
         },
         {
-          "url": "https://registry.npmjs.org/uuid/-/uuid-11.1.0.tgz",
+          "url": "https://registry.npmjs.org/uuid/-/uuid-11.1.1.tgz",
           "type": "distribution",
           "hashes": [
             {
               "alg": "SHA-512",
-              "content": "d3f03dac3cbd3fb709fbcc3573d583f55ffff568f5e427b630fcfc462eb4df6baccfe35f78fc71e4070dddb37eafa64bea3128d3aebfc8d601ded9f8a50131f8"
+              "content": "bc8631ac1082fcdfcaf89b37a9237cf20a3b9087cd3ecb2bfe11c27ac28240d0239a0bd84b6a2aafaf6422e7c41be3b8f8f7decce1f811b21e1c27c5a2ff1981"
             }
           ],
           "comment": "as detected from npm-ls property \"resolved\" and property \"integrity\""
@@ -5119,8 +5260,8 @@
       "type": "library",
       "name": "indexed-db-stamper",
       "group": "@turnkey",
-      "version": "1.2.6",
-      "bom-ref": "skills-test|@turnkey/indexed-db-stamper@1.2.6",
+      "version": "1.3.0",
+      "bom-ref": "skills-test|@turnkey/indexed-db-stamper@1.3.0",
       "author": "Turnkey",
       "description": "IndexedDB-based stamper for @turnkey/http",
       "licenses": [
@@ -5131,7 +5272,7 @@
           }
         }
       ],
-      "purl": "pkg:npm/%40turnkey/indexed-db-stamper@1.2.6#packages/indexed-db-stamper",
+      "purl": "pkg:npm/%40turnkey/indexed-db-stamper@1.3.0#packages/indexed-db-stamper",
       "externalReferences": [
         {
           "url": "git+https://github.com/tkhq/sdk.git#packages/indexed-db-stamper",
@@ -5149,12 +5290,12 @@
           "comment": "as detected from PackageJson property \"bugs.url\""
         },
         {
-          "url": "https://registry.npmjs.org/@turnkey/indexed-db-stamper/-/indexed-db-stamper-1.2.6.tgz",
+          "url": "https://registry.npmjs.org/@turnkey/indexed-db-stamper/-/indexed-db-stamper-1.3.0.tgz",
           "type": "distribution",
           "hashes": [
             {
               "alg": "SHA-512",
-              "content": "452942a47f7a7b8e8f620734dbdfd32b79c4fc7396e1080aa3d6d72188e8511f09efec64abed19d308c7ae9dbb627dcf6d6f3be37844a69a8af63c6c61cf29b4"
+              "content": "691a9a8aab7d34a2716da9ddeb1d8b81b7ab993e96e20ade0e27b37fcda8d8775c7c709f66c6d4014ba1262010a15ca5a3474048aea34686652fdc389bdb8119"
             }
           ],
           "comment": "as detected from npm-ls property \"resolved\" and property \"integrity\""
@@ -6399,8 +6540,8 @@
     {
       "type": "library",
       "name": "hasown",
-      "version": "2.0.2",
-      "bom-ref": "skills-test|hasown@2.0.2",
+      "version": "2.0.4",
+      "bom-ref": "skills-test|hasown@2.0.4",
       "author": "Jordan Harband",
       "description": "A robust, ES3 compatible, \"has own property\" predicate.",
       "licenses": [
@@ -6411,7 +6552,7 @@
           }
         }
       ],
-      "purl": "pkg:npm/hasown@2.0.2",
+      "purl": "pkg:npm/hasown@2.0.4",
       "externalReferences": [
         {
           "url": "git+https://github.com/inspect-js/hasOwn.git",
@@ -6429,12 +6570,12 @@
           "comment": "as detected from PackageJson property \"bugs.url\""
         },
         {
-          "url": "https://registry.npmjs.org/hasown/-/hasown-2.0.2.tgz",
+          "url": "https://registry.npmjs.org/hasown/-/hasown-2.0.4.tgz",
           "type": "distribution",
           "hashes": [
             {
               "alg": "SHA-512",
-              "content": "d21254f5208fbe633320175916a34f5d66ba76a87b59d1f470823dcbe0b24bcac6de72f8f01725adaf4798a8555541f23d6347e58ef10f0001edb7e04a391431"
+              "content": "4f651b7db044177db089ea5722c3254d6f7e743602eb0321fedfef600e2db8e30aa96cff9f7bebd4d152c508b23fece4da65eca0c03f8bfeea57a2cabadd6dd4"
             }
           ],
           "comment": "as detected from npm-ls property \"resolved\" and property \"integrity\""
@@ -6564,8 +6705,8 @@
     {
       "type": "library",
       "name": "ws",
-      "version": "8.20.0",
-      "bom-ref": "skills-test|ws@8.20.0",
+      "version": "8.21.0",
+      "bom-ref": "skills-test|ws@8.21.0",
       "author": "Einar Otto Stangvik",
       "description": "Simple to use, blazing fast and thoroughly tested websocket client and server for Node.js",
       "licenses": [
@@ -6576,7 +6717,7 @@
           }
         }
       ],
-      "purl": "pkg:npm/ws@8.20.0",
+      "purl": "pkg:npm/ws@8.21.0",
       "externalReferences": [
         {
           "url": "git+https://github.com/websockets/ws.git",
@@ -6594,12 +6735,12 @@
           "comment": "as detected from PackageJson property \"bugs.url\""
         },
         {
-          "url": "https://registry.npmjs.org/ws/-/ws-8.20.0.tgz",
+          "url": "https://registry.npmjs.org/ws/-/ws-8.21.0.tgz",
           "type": "distribution",
           "hashes": [
             {
               "alg": "SHA-512",
-              "content": "b00b7c06180d6f30ad8066edd8ec66a6eaf23badd9a0393fb2a681ff39d09bde13e1f084b32ff257eec2742d64261394f656e800453b47792abaec9c0e889b54"
+              "content": "56ca76f1bec345c8a6150bebaaed967a4df3d626310c25aa1d807c42c9e4fd2e117da090ccf18fc8136e563255ddc77a5222ad52da7ab0d33bee05afcdc087fa"
             }
           ],
           "comment": "as detected from npm-ls property \"resolved\" and property \"integrity\""
@@ -6613,6 +6754,62 @@
         {
           "name": "cdx:npm:package:path",
           "value": "node_modules/ws"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "ens-normalize",
+      "group": "@adraffy",
+      "version": "1.11.1",
+      "bom-ref": "skills-test|@adraffy/ens-normalize@1.11.1",
+      "author": "raffy.eth",
+      "description": "Ethereum Name Service (ENS) Name Normalizer",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT",
+            "acknowledgement": "declared"
+          }
+        }
+      ],
+      "purl": "pkg:npm/%40adraffy/ens-normalize@1.11.1",
+      "externalReferences": [
+        {
+          "url": "git+https://github.com/adraffy/ens-normalize.js.git",
+          "type": "vcs",
+          "comment": "as detected from PackageJson property \"repository.url\""
+        },
+        {
+          "url": "https://github.com/adraffy/ens-normalize.js#readme",
+          "type": "website",
+          "comment": "as detected from PackageJson property \"homepage\""
+        },
+        {
+          "url": "https://github.com/adraffy/ens-normalize.js/issues",
+          "type": "issue-tracker",
+          "comment": "as detected from PackageJson property \"bugs.url\""
+        },
+        {
+          "url": "https://registry.npmjs.org/@adraffy/ens-normalize/-/ens-normalize-1.11.1.tgz",
+          "type": "distribution",
+          "hashes": [
+            {
+              "alg": "SHA-512",
+              "content": "9e1081577aae1207acb9fedceca61fa5eaea492d784fc6d8baf27c3dc2c9a7ace7919a4573402e5b8a81b6bf1e295c8f3deffc452afbb2094258f53979ac7029"
+            }
+          ],
+          "comment": "as detected from npm-ls property \"resolved\" and property \"integrity\""
+        }
+      ],
+      "properties": [
+        {
+          "name": "cdx:npm:package:development",
+          "value": "true"
+        },
+        {
+          "name": "cdx:npm:package:path",
+          "value": "node_modules/@adraffy/ens-normalize"
         }
       ]
     },
@@ -6890,60 +7087,6 @@
         {
           "name": "cdx:npm:package:path",
           "value": "node_modules/cbor-js"
-        }
-      ]
-    },
-    {
-      "type": "library",
-      "name": "bs58",
-      "version": "6.0.0",
-      "bom-ref": "skills-test|bs58@6.0.0",
-      "description": "Base 58 encoding / decoding",
-      "licenses": [
-        {
-          "license": {
-            "id": "MIT",
-            "acknowledgement": "declared"
-          }
-        }
-      ],
-      "purl": "pkg:npm/bs58@6.0.0",
-      "externalReferences": [
-        {
-          "url": "git+https://github.com/cryptocoinjs/bs58.git",
-          "type": "vcs",
-          "comment": "as detected from PackageJson property \"repository.url\""
-        },
-        {
-          "url": "https://github.com/cryptocoinjs/bs58#readme",
-          "type": "website",
-          "comment": "as detected from PackageJson property \"homepage\""
-        },
-        {
-          "url": "https://github.com/cryptocoinjs/bs58/issues",
-          "type": "issue-tracker",
-          "comment": "as detected from PackageJson property \"bugs.url\""
-        },
-        {
-          "url": "https://registry.npmjs.org/bs58/-/bs58-6.0.0.tgz",
-          "type": "distribution",
-          "hashes": [
-            {
-              "alg": "SHA-512",
-              "content": "3c3d3012711883a8a3b33c3fbbcb3e888dc7d7b713ca696bc242a10e13d9abe4a8925dc053886dc811538c078d0250829a0d1fe7783a8a1de3013c8229fb537f"
-            }
-          ],
-          "comment": "as detected from npm-ls property \"resolved\" and property \"integrity\""
-        }
-      ],
-      "properties": [
-        {
-          "name": "cdx:npm:package:development",
-          "value": "true"
-        },
-        {
-          "name": "cdx:npm:package:path",
-          "value": "node_modules/bs58"
         }
       ]
     },
@@ -7618,6 +7761,174 @@
           "name": "cdx:npm:package:path",
           "value": "node_modules/@walletconnect/utils"
         }
+      ],
+      "components": [
+        {
+          "type": "library",
+          "name": "ox",
+          "version": "0.9.3",
+          "bom-ref": "skills-test|@walletconnect/utils@2.23.9|ox@0.9.3",
+          "description": "Ethereum Standard Library",
+          "licenses": [
+            {
+              "license": {
+                "id": "MIT",
+                "acknowledgement": "declared"
+              }
+            }
+          ],
+          "purl": "pkg:npm/ox@0.9.3",
+          "externalReferences": [
+            {
+              "url": "git+https://github.com/wevm/ox.git",
+              "type": "vcs",
+              "comment": "as detected from PackageJson property \"repository.url\""
+            },
+            {
+              "url": "https://wevm.dev",
+              "type": "website",
+              "comment": "as detected from PackageJson property \"homepage\""
+            },
+            {
+              "url": "https://github.com/wevm/ox/issues",
+              "type": "issue-tracker",
+              "comment": "as detected from PackageJson property \"bugs.url\""
+            },
+            {
+              "url": "https://registry.npmjs.org/ox/-/ox-0.9.3.tgz",
+              "type": "distribution",
+              "hashes": [
+                {
+                  "alg": "SHA-512",
+                  "content": "2b3c893fe7cf578ba1baeaab4d9ca89380c2eef1738bb1cb5058943449a96f2879f61b4a5a4382f7c20e342d7381724f6c7021420aace81d19e92b421a1990be"
+                }
+              ],
+              "comment": "as detected from npm-ls property \"resolved\" and property \"integrity\""
+            }
+          ],
+          "properties": [
+            {
+              "name": "cdx:npm:package:development",
+              "value": "true"
+            },
+            {
+              "name": "cdx:npm:package:path",
+              "value": "node_modules/@walletconnect/utils/node_modules/ox"
+            }
+          ],
+          "components": [
+            {
+              "type": "library",
+              "name": "curves",
+              "group": "@noble",
+              "version": "1.9.1",
+              "bom-ref": "skills-test|@walletconnect/utils@2.23.9|ox@0.9.3|@noble/curves@1.9.1",
+              "author": "Paul Miller",
+              "description": "Audited & minimal JS implementation of elliptic curve cryptography",
+              "licenses": [
+                {
+                  "license": {
+                    "id": "MIT",
+                    "acknowledgement": "declared"
+                  }
+                }
+              ],
+              "purl": "pkg:npm/%40noble/curves@1.9.1",
+              "externalReferences": [
+                {
+                  "url": "git+https://github.com/paulmillr/noble-curves.git",
+                  "type": "vcs",
+                  "comment": "as detected from PackageJson property \"repository.url\""
+                },
+                {
+                  "url": "https://paulmillr.com/noble/",
+                  "type": "website",
+                  "comment": "as detected from PackageJson property \"homepage\""
+                },
+                {
+                  "url": "https://github.com/paulmillr/noble-curves/issues",
+                  "type": "issue-tracker",
+                  "comment": "as detected from PackageJson property \"bugs.url\""
+                },
+                {
+                  "url": "https://registry.npmjs.org/@noble/curves/-/curves-1.9.1.tgz",
+                  "type": "distribution",
+                  "hashes": [
+                    {
+                      "alg": "SHA-512",
+                      "content": "935d72671660fadfa05af05b22cc16d32a0996ef1c1ce0bb761ba7c0ece8587fe65c6062632478618ea10042bfdc452ce14a41f256b545f751a5e1ac147916b0"
+                    }
+                  ],
+                  "comment": "as detected from npm-ls property \"resolved\" and property \"integrity\""
+                }
+              ],
+              "properties": [
+                {
+                  "name": "cdx:npm:package:development",
+                  "value": "true"
+                },
+                {
+                  "name": "cdx:npm:package:path",
+                  "value": "node_modules/@walletconnect/utils/node_modules/ox/node_modules/@noble/curves"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "library",
+          "name": "abitype",
+          "version": "1.2.4",
+          "bom-ref": "skills-test|@walletconnect/utils@2.23.9|abitype@1.2.4",
+          "description": "Strict TypeScript types for Ethereum ABIs",
+          "licenses": [
+            {
+              "license": {
+                "id": "MIT",
+                "acknowledgement": "declared"
+              }
+            }
+          ],
+          "purl": "pkg:npm/abitype@1.2.4",
+          "externalReferences": [
+            {
+              "url": "git+https://github.com/wevm/abitype.git",
+              "type": "vcs",
+              "comment": "as detected from PackageJson property \"repository.url\""
+            },
+            {
+              "url": "https://github.com/wevm/abitype#readme",
+              "type": "website",
+              "comment": "as detected from PackageJson property \"homepage\""
+            },
+            {
+              "url": "https://github.com/wevm/abitype/issues",
+              "type": "issue-tracker",
+              "comment": "as detected from PackageJson property \"bugs.url\""
+            },
+            {
+              "url": "https://registry.npmjs.org/abitype/-/abitype-1.2.4.tgz",
+              "type": "distribution",
+              "hashes": [
+                {
+                  "alg": "SHA-512",
+                  "content": "769287f8ddbbbd18daacc55314591e638e3955329fb73196a4bd05893ef19959b341129acd97b1cc2e6e1c6d1fe972ac54b02e5259dd9db19abba9517a30a5c6"
+                }
+              ],
+              "comment": "as detected from npm-ls property \"resolved\" and property \"integrity\""
+            }
+          ],
+          "properties": [
+            {
+              "name": "cdx:npm:package:development",
+              "value": "true"
+            },
+            {
+              "name": "cdx:npm:package:path",
+              "value": "node_modules/@walletconnect/utils/node_modules/abitype"
+            }
+          ]
+        }
       ]
     },
     {
@@ -7784,62 +8095,6 @@
         {
           "name": "cdx:npm:package:path",
           "value": "node_modules/@walletconnect/keyvaluestorage"
-        }
-      ]
-    },
-    {
-      "type": "library",
-      "name": "ens-normalize",
-      "group": "@adraffy",
-      "version": "1.10.1",
-      "bom-ref": "skills-test|@adraffy/ens-normalize@1.10.1",
-      "author": "raffy.eth",
-      "description": "Ethereum Name Service (ENS) Name Normalizer",
-      "licenses": [
-        {
-          "license": {
-            "id": "MIT",
-            "acknowledgement": "declared"
-          }
-        }
-      ],
-      "purl": "pkg:npm/%40adraffy/ens-normalize@1.10.1",
-      "externalReferences": [
-        {
-          "url": "git+https://github.com/adraffy/ens-normalize.js.git",
-          "type": "vcs",
-          "comment": "as detected from PackageJson property \"repository.url\""
-        },
-        {
-          "url": "https://github.com/adraffy/ens-normalize.js#readme",
-          "type": "website",
-          "comment": "as detected from PackageJson property \"homepage\""
-        },
-        {
-          "url": "https://github.com/adraffy/ens-normalize.js/issues",
-          "type": "issue-tracker",
-          "comment": "as detected from PackageJson property \"bugs.url\""
-        },
-        {
-          "url": "https://registry.npmjs.org/@adraffy/ens-normalize/-/ens-normalize-1.10.1.tgz",
-          "type": "distribution",
-          "hashes": [
-            {
-              "alg": "SHA-512",
-              "content": "f7a67620fde66261755e0d9c0e6f1fd605867ff1d455e750dc53227d5e241bf3d0e3210fe75c43b510047e154db797ffbb3a4d9191f0590b9472ee83e8af8493"
-            }
-          ],
-          "comment": "as detected from npm-ls property \"resolved\" and property \"integrity\""
-        }
-      ],
-      "properties": [
-        {
-          "name": "cdx:npm:package:development",
-          "value": "true"
-        },
-        {
-          "name": "cdx:npm:package:path",
-          "value": "node_modules/@adraffy/ens-normalize"
         }
       ]
     },
@@ -8292,8 +8547,8 @@
     {
       "type": "library",
       "name": "undici-types",
-      "version": "7.25.0",
-      "bom-ref": "skills-test|undici-types@7.25.0",
+      "version": "7.26.0",
+      "bom-ref": "skills-test|undici-types@7.26.0",
       "description": "A stand-alone types package for Undici",
       "licenses": [
         {
@@ -8303,7 +8558,7 @@
           }
         }
       ],
-      "purl": "pkg:npm/undici-types@7.25.0",
+      "purl": "pkg:npm/undici-types@7.26.0",
       "externalReferences": [
         {
           "url": "git+https://github.com/nodejs/undici.git",
@@ -8321,12 +8576,12 @@
           "comment": "as detected from PackageJson property \"bugs.url\""
         },
         {
-          "url": "https://registry.npmjs.org/undici-types/-/undici-types-7.25.0.tgz",
+          "url": "https://registry.npmjs.org/undici-types/-/undici-types-7.26.0.tgz",
           "type": "distribution",
           "hashes": [
             {
               "alg": "SHA-512",
-              "content": "0173604b5072af6edf4c8fb66ec3c4915f42c644fc1fac4dc9123af1bdd36ad959a37464ce5a9004b2fec3b4a618f569a248c76dcb8d55051613b1514e0f8b44"
+              "content": "398eea5988384ec3e9aa0fe42f615f367180f1c98084fa4bb78e574368ddf29f54a1b610ed0d3d2de882ab943066194a34b063d224d4941361b38336015166c4"
             }
           ],
           "comment": "as detected from npm-ls property \"resolved\" and property \"integrity\""
@@ -8676,10 +8931,10 @@
       "type": "library",
       "name": "asn1-cms",
       "group": "@peculiar",
-      "version": "2.6.1",
-      "bom-ref": "skills-test|@peculiar/asn1-cms@2.6.1",
+      "version": "2.7.0",
+      "bom-ref": "skills-test|@peculiar/asn1-cms@2.7.0",
       "author": "PeculiarVentures, LLC",
-      "description": "ASN.1 schema of `Cryptographic Message Syntax (CMS)` (RFC5652)",
+      "description": "ASN.1 schema for Cryptographic Message Syntax (CMS) defined in RFC 5652.",
       "licenses": [
         {
           "license": {
@@ -8688,8 +8943,13 @@
           }
         }
       ],
-      "purl": "pkg:npm/%40peculiar/asn1-cms@2.6.1",
+      "purl": "pkg:npm/%40peculiar/asn1-cms@2.7.0#packages/cms",
       "externalReferences": [
+        {
+          "url": "git+https://github.com/PeculiarVentures/asn1-schema.git#packages/cms",
+          "type": "vcs",
+          "comment": "as detected from PackageJson property \"repository.url\" and \"repository.directory\""
+        },
         {
           "url": "https://github.com/PeculiarVentures/asn1-schema/tree/master/packages/cms#readme",
           "type": "website",
@@ -8701,12 +8961,12 @@
           "comment": "as detected from PackageJson property \"bugs.url\""
         },
         {
-          "url": "https://registry.npmjs.org/@peculiar/asn1-cms/-/asn1-cms-2.6.1.tgz",
+          "url": "https://registry.npmjs.org/@peculiar/asn1-cms/-/asn1-cms-2.7.0.tgz",
           "type": "distribution",
           "hashes": [
             {
               "alg": "SHA-512",
-              "content": "bdd1b87c117a2e48ab91c979deae9e39d9f75d82adfa42531b9f5e760459391960ff76ad5961117910b1e6b604d59cd34d7eaf2cae730cc8c787bbdbadc5c6b7"
+              "content": "85ec3adec86dcf3bc17121db866f9cc8098a7ba0087e29d3f61cc4a923e30c2ea8a534cc2a64e4434807b8dd8ab1696faa22b0d52fdf4bde1f85a83f149922a1"
             }
           ],
           "comment": "as detected from npm-ls property \"resolved\" and property \"integrity\""
@@ -8727,10 +8987,10 @@
       "type": "library",
       "name": "asn1-csr",
       "group": "@peculiar",
-      "version": "2.6.1",
-      "bom-ref": "skills-test|@peculiar/asn1-csr@2.6.1",
+      "version": "2.7.0",
+      "bom-ref": "skills-test|@peculiar/asn1-csr@2.7.0",
       "author": "PeculiarVentures, LLC",
-      "description": "ASN.1 schema of `PKCS #10: Certification Request Syntax Specification Version 1.7` (RFC2986)",
+      "description": "ASN.1 schema for PKCS #10 certificate signing requests defined in RFC 2986.",
       "licenses": [
         {
           "license": {
@@ -8739,8 +8999,13 @@
           }
         }
       ],
-      "purl": "pkg:npm/%40peculiar/asn1-csr@2.6.1",
+      "purl": "pkg:npm/%40peculiar/asn1-csr@2.7.0#packages/csr",
       "externalReferences": [
+        {
+          "url": "git+https://github.com/PeculiarVentures/asn1-schema.git#packages/csr",
+          "type": "vcs",
+          "comment": "as detected from PackageJson property \"repository.url\" and \"repository.directory\""
+        },
         {
           "url": "https://github.com/PeculiarVentures/asn1-schema/tree/master/packages/csr#readme",
           "type": "website",
@@ -8752,12 +9017,12 @@
           "comment": "as detected from PackageJson property \"bugs.url\""
         },
         {
-          "url": "https://registry.npmjs.org/@peculiar/asn1-csr/-/asn1-csr-2.6.1.tgz",
+          "url": "https://registry.npmjs.org/@peculiar/asn1-csr/-/asn1-csr-2.7.0.tgz",
           "type": "distribution",
           "hashes": [
             {
               "alg": "SHA-512",
-              "content": "5915a729f228707cb315841391af0efed5c2881aae00f4ab4635db3a41db3b8a9d992ea5a1f7c2106b3eadbcba5b1c467490aeba79e14b676e1d44618f28a8eb"
+              "content": "555b00c86a84ad3f43d52638684aa8cd385731523eb2c5518afd830de62ebe904a2c8819de162cdc0cb7bbf552a0aaba112162f5c7faadfdc838ecdfc21ee830"
             }
           ],
           "comment": "as detected from npm-ls property \"resolved\" and property \"integrity\""
@@ -8778,10 +9043,10 @@
       "type": "library",
       "name": "asn1-ecc",
       "group": "@peculiar",
-      "version": "2.6.1",
-      "bom-ref": "skills-test|@peculiar/asn1-ecc@2.6.1",
+      "version": "2.7.0",
+      "bom-ref": "skills-test|@peculiar/asn1-ecc@2.7.0",
       "author": "PeculiarVentures, LLC",
-      "description": "ASN.1 schema of `Elliptic Curve Private Key Structure` (RFC5915)",
+      "description": "ASN.1 schema for elliptic-curve private keys and related identifiers defined in RFC 5915, RFC 5480, and RFC 3279.",
       "licenses": [
         {
           "license": {
@@ -8790,8 +9055,13 @@
           }
         }
       ],
-      "purl": "pkg:npm/%40peculiar/asn1-ecc@2.6.1",
+      "purl": "pkg:npm/%40peculiar/asn1-ecc@2.7.0#packages/ecc",
       "externalReferences": [
+        {
+          "url": "git+https://github.com/PeculiarVentures/asn1-schema.git#packages/ecc",
+          "type": "vcs",
+          "comment": "as detected from PackageJson property \"repository.url\" and \"repository.directory\""
+        },
         {
           "url": "https://github.com/PeculiarVentures/asn1-schema/tree/master/packages/ecc#readme",
           "type": "website",
@@ -8803,12 +9073,12 @@
           "comment": "as detected from PackageJson property \"bugs.url\""
         },
         {
-          "url": "https://registry.npmjs.org/@peculiar/asn1-ecc/-/asn1-ecc-2.6.1.tgz",
+          "url": "https://registry.npmjs.org/@peculiar/asn1-ecc/-/asn1-ecc-2.7.0.tgz",
           "type": "distribution",
           "hashes": [
             {
               "alg": "SHA-512",
-              "content": "f95ab0f16171aed0c83797a151dbe53769bbddec52d89546d140327d5077d6021fa2bdf35840103c3f8af72742c5a8f730b7a7f64d0984aa6ef4baaf8ae084d6"
+              "content": "9fb284b3f43fc2b078d79731cb87c738185e829e0d749d797e424fc1c07fdfff22341402d8bfcded20a124f28324f646607d230f84e0e3fd2f9c79b08219db2b"
             }
           ],
           "comment": "as detected from npm-ls property \"resolved\" and property \"integrity\""
@@ -8829,10 +9099,10 @@
       "type": "library",
       "name": "asn1-pkcs9",
       "group": "@peculiar",
-      "version": "2.6.1",
-      "bom-ref": "skills-test|@peculiar/asn1-pkcs9@2.6.1",
+      "version": "2.7.0",
+      "bom-ref": "skills-test|@peculiar/asn1-pkcs9@2.7.0",
       "author": "PeculiarVentures, LLC",
-      "description": "ASN.1 schema based on PKCS#9 (RFC 2985)",
+      "description": "ASN.1 schema for PKCS #9 selected attribute types defined in RFC 2985.",
       "licenses": [
         {
           "license": {
@@ -8841,15 +9111,15 @@
           }
         }
       ],
-      "purl": "pkg:npm/%40peculiar/asn1-pkcs9@2.6.1",
+      "purl": "pkg:npm/%40peculiar/asn1-pkcs9@2.7.0#packages/pkcs9",
       "externalReferences": [
         {
-          "url": "git+https://github.com/PeculiarVentures/asn1-schema.git",
+          "url": "git+https://github.com/PeculiarVentures/asn1-schema.git#packages/pkcs9",
           "type": "vcs",
-          "comment": "as detected from PackageJson property \"repository.url\""
+          "comment": "as detected from PackageJson property \"repository.url\" and \"repository.directory\""
         },
         {
-          "url": "https://github.com/PeculiarVentures/asn1-schema#readme",
+          "url": "https://github.com/PeculiarVentures/asn1-schema/tree/master/packages/pkcs9#readme",
           "type": "website",
           "comment": "as detected from PackageJson property \"homepage\""
         },
@@ -8859,12 +9129,12 @@
           "comment": "as detected from PackageJson property \"bugs.url\""
         },
         {
-          "url": "https://registry.npmjs.org/@peculiar/asn1-pkcs9/-/asn1-pkcs9-2.6.1.tgz",
+          "url": "https://registry.npmjs.org/@peculiar/asn1-pkcs9/-/asn1-pkcs9-2.7.0.tgz",
           "type": "distribution",
           "hashes": [
             {
               "alg": "SHA-512",
-              "content": "e4457c9d9a0c4b179699cc569a6728960db6a2365180983e63d317d9f9c4d9b191a392902ea57920bf64752403671947cfde6d1ef22af45fff6ef2f539e3482f"
+              "content": "061ee6f8eb8869212594f41c49df4e4a9f7717844e587eec6c84d657c308fbc770b23139d75d7ff3b57189656f6052b2c30defa77f6078bbfd10daa1c161dc7b"
             }
           ],
           "comment": "as detected from npm-ls property \"resolved\" and property \"integrity\""
@@ -8885,10 +9155,10 @@
       "type": "library",
       "name": "asn1-rsa",
       "group": "@peculiar",
-      "version": "2.6.1",
-      "bom-ref": "skills-test|@peculiar/asn1-rsa@2.6.1",
+      "version": "2.7.0",
+      "bom-ref": "skills-test|@peculiar/asn1-rsa@2.7.0",
       "author": "PeculiarVentures, LLC",
-      "description": "ASN.1 schema of `RSA Cryptography Specifications Version 2.2` (RFC8017)",
+      "description": "ASN.1 schema for RSA keys and algorithms defined in RFC 8017.",
       "licenses": [
         {
           "license": {
@@ -8897,8 +9167,13 @@
           }
         }
       ],
-      "purl": "pkg:npm/%40peculiar/asn1-rsa@2.6.1",
+      "purl": "pkg:npm/%40peculiar/asn1-rsa@2.7.0#packages/rsa",
       "externalReferences": [
+        {
+          "url": "git+https://github.com/PeculiarVentures/asn1-schema.git#packages/rsa",
+          "type": "vcs",
+          "comment": "as detected from PackageJson property \"repository.url\" and \"repository.directory\""
+        },
         {
           "url": "https://github.com/PeculiarVentures/asn1-schema/tree/master/packages/rsa#readme",
           "type": "website",
@@ -8910,12 +9185,12 @@
           "comment": "as detected from PackageJson property \"bugs.url\""
         },
         {
-          "url": "https://registry.npmjs.org/@peculiar/asn1-rsa/-/asn1-rsa-2.6.1.tgz",
+          "url": "https://registry.npmjs.org/@peculiar/asn1-rsa/-/asn1-rsa-2.7.0.tgz",
           "type": "distribution",
           "hashes": [
             {
               "alg": "SHA-512",
-              "content": "d6754c121e3a484954b79081dd1513578106ff3ee261cec4a1a0d8e440b081a9e26d03e467f63678cb13281fcb7b2ad427e5bfb4aa03f5652a232f2f07e08474"
+              "content": "feabc4350ad7c9365446332a49ea1f1ee974249b76b0d4b34b0937ea9976a259076da8a831082b0120d90251d7974c5496755b1e3d2e1a03ab04c4dbe71d9a25"
             }
           ],
           "comment": "as detected from npm-ls property \"resolved\" and property \"integrity\""
@@ -8936,10 +9211,10 @@
       "type": "library",
       "name": "asn1-schema",
       "group": "@peculiar",
-      "version": "2.6.0",
-      "bom-ref": "skills-test|@peculiar/asn1-schema@2.6.0",
+      "version": "2.7.0",
+      "bom-ref": "skills-test|@peculiar/asn1-schema@2.7.0",
       "author": "PeculiarVentures, LLC",
-      "description": "Decorators for ASN.1 schemas building",
+      "description": "Decorators and helper APIs for declaring ASN.1 schemas in TypeScript.",
       "licenses": [
         {
           "license": {
@@ -8948,8 +9223,13 @@
           }
         }
       ],
-      "purl": "pkg:npm/%40peculiar/asn1-schema@2.6.0",
+      "purl": "pkg:npm/%40peculiar/asn1-schema@2.7.0#packages/schema",
       "externalReferences": [
+        {
+          "url": "git+https://github.com/PeculiarVentures/asn1-schema.git#packages/schema",
+          "type": "vcs",
+          "comment": "as detected from PackageJson property \"repository.url\" and \"repository.directory\""
+        },
         {
           "url": "https://github.com/PeculiarVentures/asn1-schema/tree/master/packages/schema#readme",
           "type": "website",
@@ -8961,12 +9241,12 @@
           "comment": "as detected from PackageJson property \"bugs.url\""
         },
         {
-          "url": "https://registry.npmjs.org/@peculiar/asn1-schema/-/asn1-schema-2.6.0.tgz",
+          "url": "https://registry.npmjs.org/@peculiar/asn1-schema/-/asn1-schema-2.7.0.tgz",
           "type": "distribution",
           "hashes": [
             {
               "alg": "SHA-512",
-              "content": "c4d2d82c115304a902cc4648c3ce36071cad41001342ffa50d3084319f02d7dea225c249301519c6b8524f12daa2133228af1097344d4d191499a9ee7270d2aa"
+              "content": "5bc65f5b32e6427adc932f9e877b678b8228ccc76a043887594d0dfafbdefd41a331a52cf1cd0bec0da811d9015d2f2b4e9583a4afdaa08dc31bf2ff8719b13e"
             }
           ],
           "comment": "as detected from npm-ls property \"resolved\" and property \"integrity\""
@@ -8987,10 +9267,10 @@
       "type": "library",
       "name": "asn1-x509",
       "group": "@peculiar",
-      "version": "2.6.1",
-      "bom-ref": "skills-test|@peculiar/asn1-x509@2.6.1",
+      "version": "2.7.0",
+      "bom-ref": "skills-test|@peculiar/asn1-x509@2.7.0",
       "author": "PeculiarVentures, LLC",
-      "description": "ASN.1 schema of `Internet X.509 Public Key Infrastructure Certificate and Certificate Revocation List (CRL) Profile` (RFC5280)",
+      "description": "ASN.1 schema for X.509 certificates, certificate revocation lists, and related profile structures defined in RFC 5280.",
       "licenses": [
         {
           "license": {
@@ -8999,8 +9279,13 @@
           }
         }
       ],
-      "purl": "pkg:npm/%40peculiar/asn1-x509@2.6.1",
+      "purl": "pkg:npm/%40peculiar/asn1-x509@2.7.0#packages/x509",
       "externalReferences": [
+        {
+          "url": "git+https://github.com/PeculiarVentures/asn1-schema.git#packages/x509",
+          "type": "vcs",
+          "comment": "as detected from PackageJson property \"repository.url\" and \"repository.directory\""
+        },
         {
           "url": "https://github.com/PeculiarVentures/asn1-schema/tree/master/packages/x509#readme",
           "type": "website",
@@ -9012,12 +9297,12 @@
           "comment": "as detected from PackageJson property \"bugs.url\""
         },
         {
-          "url": "https://registry.npmjs.org/@peculiar/asn1-x509/-/asn1-x509-2.6.1.tgz",
+          "url": "https://registry.npmjs.org/@peculiar/asn1-x509/-/asn1-x509-2.7.0.tgz",
           "type": "distribution",
           "hashes": [
             {
               "alg": "SHA-512",
-              "content": "3bd8d3e45d40dbeb77afb0b8553ecb6065ea9062caeca8f5c45a73ed4d22b0faee6f05393db0e8c98b71e8c886b2ddbdcaaee95cde6f65b40529108ffa52d994"
+              "content": "9949fd451ae41839c6e002dfba70e6cf2456e5d83eb160a3fe97e7082a841d86e41b1129bd4b7a89526ff18c35732a7a496676e99139a12988e52a8469e9f5e6"
             }
           ],
           "comment": "as detected from npm-ls property \"resolved\" and property \"integrity\""
@@ -9313,61 +9598,6 @@
     },
     {
       "type": "library",
-      "name": "base-x",
-      "version": "5.0.1",
-      "bom-ref": "skills-test|base-x@5.0.1",
-      "author": "Daniel Cousens",
-      "description": "Fast base encoding / decoding of any given alphabet",
-      "licenses": [
-        {
-          "license": {
-            "id": "MIT",
-            "acknowledgement": "declared"
-          }
-        }
-      ],
-      "purl": "pkg:npm/base-x@5.0.1",
-      "externalReferences": [
-        {
-          "url": "git+https://github.com/cryptocoinjs/base-x.git",
-          "type": "vcs",
-          "comment": "as detected from PackageJson property \"repository.url\""
-        },
-        {
-          "url": "https://github.com/cryptocoinjs/base-x",
-          "type": "website",
-          "comment": "as detected from PackageJson property \"homepage\""
-        },
-        {
-          "url": "https://github.com/cryptocoinjs/base-x/issues",
-          "type": "issue-tracker",
-          "comment": "as detected from PackageJson property \"bugs.url\""
-        },
-        {
-          "url": "https://registry.npmjs.org/base-x/-/base-x-5.0.1.tgz",
-          "type": "distribution",
-          "hashes": [
-            {
-              "alg": "SHA-512",
-              "content": "33bba2a3c66dfbe7a0de33e3fab1cc7c20be22eca04071c2394f8862c56d8a4e855a3b98a55b7ff8c44a720b0030787c98c140c2707e06cfa64eb1625e33332a"
-            }
-          ],
-          "comment": "as detected from npm-ls property \"resolved\" and property \"integrity\""
-        }
-      ],
-      "properties": [
-        {
-          "name": "cdx:npm:package:development",
-          "value": "true"
-        },
-        {
-          "name": "cdx:npm:package:path",
-          "value": "node_modules/base-x"
-        }
-      ]
-    },
-    {
-      "type": "library",
       "name": "tr46",
       "version": "0.0.3",
       "bom-ref": "skills-test|tr46@0.0.3",
@@ -9591,8 +9821,8 @@
         {
           "type": "library",
           "name": "ws",
-          "version": "7.5.10",
-          "bom-ref": "skills-test|@walletconnect/jsonrpc-ws-connection@1.0.16|ws@7.5.10",
+          "version": "7.5.11",
+          "bom-ref": "skills-test|@walletconnect/jsonrpc-ws-connection@1.0.16|ws@7.5.11",
           "author": "Einar Otto Stangvik",
           "description": "Simple to use, blazing fast and thoroughly tested websocket client and server for Node.js",
           "licenses": [
@@ -9603,7 +9833,7 @@
               }
             }
           ],
-          "purl": "pkg:npm/ws@7.5.10",
+          "purl": "pkg:npm/ws@7.5.11",
           "externalReferences": [
             {
               "url": "git+https://github.com/websockets/ws.git",
@@ -9621,12 +9851,12 @@
               "comment": "as detected from PackageJson property \"bugs.url\""
             },
             {
-              "url": "https://registry.npmjs.org/ws/-/ws-7.5.10.tgz",
+              "url": "https://registry.npmjs.org/ws/-/ws-7.5.11.tgz",
               "type": "distribution",
               "hashes": [
                 {
                   "alg": "SHA-512",
-                  "content": "f9d6c5d6d1f06695dc6ce25d54e9332c3c593f56a296f4b133a6707974de83294f9f2f34ddb16103ebea058c38b37d4d4809384b6433f802972bd6b8c2476371"
+                  "content": "cd2e7839e9fd6c84eda7b929d9733703276b088ab50fe1f024eb87f9cf9ee0b7e92ff968b4fe68b228ddf94a0c9f1c006a6d4637c4782ad2c0c88ac870136988"
                 }
               ],
               "comment": "as detected from npm-ls property \"resolved\" and property \"integrity\""
@@ -10709,231 +10939,9 @@
     },
     {
       "type": "library",
-      "name": "ox",
-      "version": "0.9.3",
-      "bom-ref": "skills-test|ox@0.9.3",
-      "description": "Ethereum Standard Library",
-      "licenses": [
-        {
-          "license": {
-            "id": "MIT",
-            "acknowledgement": "declared"
-          }
-        }
-      ],
-      "purl": "pkg:npm/ox@0.9.3",
-      "externalReferences": [
-        {
-          "url": "git+https://github.com/wevm/ox.git",
-          "type": "vcs",
-          "comment": "as detected from PackageJson property \"repository.url\""
-        },
-        {
-          "url": "https://wevm.dev",
-          "type": "website",
-          "comment": "as detected from PackageJson property \"homepage\""
-        },
-        {
-          "url": "https://github.com/wevm/ox/issues",
-          "type": "issue-tracker",
-          "comment": "as detected from PackageJson property \"bugs.url\""
-        },
-        {
-          "url": "https://registry.npmjs.org/ox/-/ox-0.9.3.tgz",
-          "type": "distribution",
-          "hashes": [
-            {
-              "alg": "SHA-512",
-              "content": "2b3c893fe7cf578ba1baeaab4d9ca89380c2eef1738bb1cb5058943449a96f2879f61b4a5a4382f7c20e342d7381724f6c7021420aace81d19e92b421a1990be"
-            }
-          ],
-          "comment": "as detected from npm-ls property \"resolved\" and property \"integrity\""
-        }
-      ],
-      "properties": [
-        {
-          "name": "cdx:npm:package:development",
-          "value": "true"
-        },
-        {
-          "name": "cdx:npm:package:path",
-          "value": "node_modules/ox"
-        }
-      ],
-      "components": [
-        {
-          "type": "library",
-          "name": "ens-normalize",
-          "group": "@adraffy",
-          "version": "1.11.1",
-          "bom-ref": "skills-test|ox@0.9.3|@adraffy/ens-normalize@1.11.1",
-          "author": "raffy.eth",
-          "description": "Ethereum Name Service (ENS) Name Normalizer",
-          "licenses": [
-            {
-              "license": {
-                "id": "MIT",
-                "acknowledgement": "declared"
-              }
-            }
-          ],
-          "purl": "pkg:npm/%40adraffy/ens-normalize@1.11.1",
-          "externalReferences": [
-            {
-              "url": "git+https://github.com/adraffy/ens-normalize.js.git",
-              "type": "vcs",
-              "comment": "as detected from PackageJson property \"repository.url\""
-            },
-            {
-              "url": "https://github.com/adraffy/ens-normalize.js#readme",
-              "type": "website",
-              "comment": "as detected from PackageJson property \"homepage\""
-            },
-            {
-              "url": "https://github.com/adraffy/ens-normalize.js/issues",
-              "type": "issue-tracker",
-              "comment": "as detected from PackageJson property \"bugs.url\""
-            },
-            {
-              "url": "https://registry.npmjs.org/@adraffy/ens-normalize/-/ens-normalize-1.11.1.tgz",
-              "type": "distribution",
-              "hashes": [
-                {
-                  "alg": "SHA-512",
-                  "content": "9e1081577aae1207acb9fedceca61fa5eaea492d784fc6d8baf27c3dc2c9a7ace7919a4573402e5b8a81b6bf1e295c8f3deffc452afbb2094258f53979ac7029"
-                }
-              ],
-              "comment": "as detected from npm-ls property \"resolved\" and property \"integrity\""
-            }
-          ],
-          "properties": [
-            {
-              "name": "cdx:npm:package:development",
-              "value": "true"
-            },
-            {
-              "name": "cdx:npm:package:path",
-              "value": "node_modules/ox/node_modules/@adraffy/ens-normalize"
-            }
-          ]
-        },
-        {
-          "type": "library",
-          "name": "curves",
-          "group": "@noble",
-          "version": "1.9.1",
-          "bom-ref": "skills-test|ox@0.9.3|@noble/curves@1.9.1",
-          "author": "Paul Miller",
-          "description": "Audited & minimal JS implementation of elliptic curve cryptography",
-          "licenses": [
-            {
-              "license": {
-                "id": "MIT",
-                "acknowledgement": "declared"
-              }
-            }
-          ],
-          "purl": "pkg:npm/%40noble/curves@1.9.1",
-          "externalReferences": [
-            {
-              "url": "git+https://github.com/paulmillr/noble-curves.git",
-              "type": "vcs",
-              "comment": "as detected from PackageJson property \"repository.url\""
-            },
-            {
-              "url": "https://paulmillr.com/noble/",
-              "type": "website",
-              "comment": "as detected from PackageJson property \"homepage\""
-            },
-            {
-              "url": "https://github.com/paulmillr/noble-curves/issues",
-              "type": "issue-tracker",
-              "comment": "as detected from PackageJson property \"bugs.url\""
-            },
-            {
-              "url": "https://registry.npmjs.org/@noble/curves/-/curves-1.9.1.tgz",
-              "type": "distribution",
-              "hashes": [
-                {
-                  "alg": "SHA-512",
-                  "content": "935d72671660fadfa05af05b22cc16d32a0996ef1c1ce0bb761ba7c0ece8587fe65c6062632478618ea10042bfdc452ce14a41f256b545f751a5e1ac147916b0"
-                }
-              ],
-              "comment": "as detected from npm-ls property \"resolved\" and property \"integrity\""
-            }
-          ],
-          "properties": [
-            {
-              "name": "cdx:npm:package:development",
-              "value": "true"
-            },
-            {
-              "name": "cdx:npm:package:path",
-              "value": "node_modules/ox/node_modules/@noble/curves"
-            }
-          ]
-        },
-        {
-          "type": "library",
-          "name": "abitype",
-          "version": "1.2.3",
-          "bom-ref": "skills-test|ox@0.9.3|abitype@1.2.3",
-          "description": "Strict TypeScript types for Ethereum ABIs",
-          "licenses": [
-            {
-              "license": {
-                "id": "MIT",
-                "acknowledgement": "declared"
-              }
-            }
-          ],
-          "purl": "pkg:npm/abitype@1.2.3",
-          "externalReferences": [
-            {
-              "url": "git+https://github.com/wevm/abitype.git",
-              "type": "vcs",
-              "comment": "as detected from PackageJson property \"repository.url\""
-            },
-            {
-              "url": "https://github.com/wevm/abitype#readme",
-              "type": "website",
-              "comment": "as detected from PackageJson property \"homepage\""
-            },
-            {
-              "url": "https://github.com/wevm/abitype/issues",
-              "type": "issue-tracker",
-              "comment": "as detected from PackageJson property \"bugs.url\""
-            },
-            {
-              "url": "https://registry.npmjs.org/abitype/-/abitype-1.2.3.tgz",
-              "type": "distribution",
-              "hashes": [
-                {
-                  "alg": "SHA-512",
-                  "content": "39f7abe50527b9475316c051c0044ca1628e1f5343e5e870621277389fc140ef92b64c108c7c345f2561e2f0edb731c1ed038584f1dafe8e35dcf27cda053f4e"
-                }
-              ],
-              "comment": "as detected from npm-ls property \"resolved\" and property \"integrity\""
-            }
-          ],
-          "properties": [
-            {
-              "name": "cdx:npm:package:development",
-              "value": "true"
-            },
-            {
-              "name": "cdx:npm:package:path",
-              "value": "node_modules/ox/node_modules/abitype"
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "type": "library",
       "name": "idb-keyval",
-      "version": "6.2.2",
-      "bom-ref": "skills-test|idb-keyval@6.2.2",
+      "version": "6.2.4",
+      "bom-ref": "skills-test|idb-keyval@6.2.4",
       "author": "Jake Archibald",
       "description": "A super-simple-small keyval store built on top of IndexedDB",
       "licenses": [
@@ -10944,7 +10952,7 @@
           }
         }
       ],
-      "purl": "pkg:npm/idb-keyval@6.2.2",
+      "purl": "pkg:npm/idb-keyval@6.2.4",
       "externalReferences": [
         {
           "url": "git+https://github.com/jakearchibald/idb-keyval.git",
@@ -10962,12 +10970,12 @@
           "comment": "as detected from PackageJson property \"bugs.url\""
         },
         {
-          "url": "https://registry.npmjs.org/idb-keyval/-/idb-keyval-6.2.2.tgz",
+          "url": "https://registry.npmjs.org/idb-keyval/-/idb-keyval-6.2.4.tgz",
           "type": "distribution",
           "hashes": [
             {
               "alg": "SHA-512",
-              "content": "ca30fd9c0449fe36f583e0af0f4b658541ceac9f52cb43fc4fd305dd868b9479d2469c0f7e94d7d1722fa66c37800254984bb71622022c10cf5d5c3212fae57a"
+              "content": "0ff3731d65266091978befb3ebb68c4ab9e2b1bf40dfadb50b244ae46f3d2724e5375dc2f317f4834e032f150a32e7cf7a6ddedcbd8901747a674d0e5b2d7cdd"
             }
           ],
           "comment": "as detected from npm-ls property \"resolved\" and property \"integrity\""
@@ -11151,8 +11159,8 @@
     {
       "type": "library",
       "name": "es-object-atoms",
-      "version": "1.1.1",
-      "bom-ref": "skills-test|es-object-atoms@1.1.1",
+      "version": "1.1.2",
+      "bom-ref": "skills-test|es-object-atoms@1.1.2",
       "author": "Jordan Harband",
       "description": "ES Object-related atoms: Object, ToObject, RequireObjectCoercible",
       "licenses": [
@@ -11163,7 +11171,7 @@
           }
         }
       ],
-      "purl": "pkg:npm/es-object-atoms@1.1.1",
+      "purl": "pkg:npm/es-object-atoms@1.1.2",
       "externalReferences": [
         {
           "url": "git+https://github.com/ljharb/es-object-atoms.git",
@@ -11181,12 +11189,12 @@
           "comment": "as detected from PackageJson property \"bugs.url\""
         },
         {
-          "url": "https://registry.npmjs.org/es-object-atoms/-/es-object-atoms-1.1.1.tgz",
+          "url": "https://registry.npmjs.org/es-object-atoms/-/es-object-atoms-1.1.2.tgz",
           "type": "distribution",
           "hashes": [
             {
               "alg": "SHA-512",
-              "content": "146807da1f3328d8a6f658e3edd6a79053dc20220af42a796e6f9cda041261e3e1a5a1b9f9eb2b2ce0e2848a2b9fe3dee85189cd6857428b4fbfbde34da95d5c"
+              "content": "1d6701a0de8d8a57aab52c9d2b616a1db4bf2e80ddda9aab9d01cbc89cc18f890ea7f932d8c58c37af78c4e7e42bcfd29d4b16d831fb11fc9597274a0ac9b567"
             }
           ],
           "comment": "as detected from npm-ls property \"resolved\" and property \"integrity\""
@@ -11427,10 +11435,10 @@
       "type": "library",
       "name": "asn1-x509-attr",
       "group": "@peculiar",
-      "version": "2.6.1",
-      "bom-ref": "skills-test|@peculiar/asn1-x509-attr@2.6.1",
+      "version": "2.7.0",
+      "bom-ref": "skills-test|@peculiar/asn1-x509-attr@2.7.0",
       "author": "PeculiarVentures, LLC",
-      "description": "ASN.1 schema of `An Internet Attribute Certificate` (RFC3281)",
+      "description": "ASN.1 schema for X.509 attribute certificates defined in RFC 5755.",
       "licenses": [
         {
           "license": {
@@ -11439,8 +11447,13 @@
           }
         }
       ],
-      "purl": "pkg:npm/%40peculiar/asn1-x509-attr@2.6.1",
+      "purl": "pkg:npm/%40peculiar/asn1-x509-attr@2.7.0#packages/x509-attr",
       "externalReferences": [
+        {
+          "url": "git+https://github.com/PeculiarVentures/asn1-schema.git#packages/x509-attr",
+          "type": "vcs",
+          "comment": "as detected from PackageJson property \"repository.url\" and \"repository.directory\""
+        },
         {
           "url": "https://github.com/PeculiarVentures/asn1-schema/tree/master/packages/x509-attr#readme",
           "type": "website",
@@ -11452,12 +11465,12 @@
           "comment": "as detected from PackageJson property \"bugs.url\""
         },
         {
-          "url": "https://registry.npmjs.org/@peculiar/asn1-x509-attr/-/asn1-x509-attr-2.6.1.tgz",
+          "url": "https://registry.npmjs.org/@peculiar/asn1-x509-attr/-/asn1-x509-attr-2.7.0.tgz",
           "type": "distribution",
           "hashes": [
             {
               "alg": "SHA-512",
-              "content": "b655ba731a07c207108219c9c2fdd84bef4e3b5ef7ef380fa2067e0a059150ae2ba04c083f3447e091221bbef4c5ee475f60137c2a665fad20bab7d6205f5d71"
+              "content": "352f1eed23a05e2a64cd43cb17fb1c7bbba4a4ca568e1c58b07d27e98f9b1d8a384d3c4e6fde59bfb86ac12b8bdb5da68f9631a2f8dd38a40e807d40b3713de3"
             }
           ],
           "comment": "as detected from npm-ls property \"resolved\" and property \"integrity\""
@@ -11477,8 +11490,8 @@
     {
       "type": "library",
       "name": "asn1js",
-      "version": "3.0.7",
-      "bom-ref": "skills-test|asn1js@3.0.7",
+      "version": "3.0.10",
+      "bom-ref": "skills-test|asn1js@3.0.10",
       "author": "Yury Strozhevsky",
       "description": "asn1js is a pure JavaScript library implementing this standard. ASN.1 is the basis of all X.509 related data structures and numerous other protocols used on the web",
       "licenses": [
@@ -11489,30 +11502,30 @@
           }
         }
       ],
-      "purl": "pkg:npm/asn1js@3.0.7",
+      "purl": "pkg:npm/asn1js@3.0.10",
       "externalReferences": [
         {
-          "url": "git://github.com/PeculiarVentures/asn1.js.git",
+          "url": "git+https://github.com/PeculiarVentures/ASN1.js.git",
           "type": "vcs",
           "comment": "as detected from PackageJson property \"repository.url\""
         },
         {
-          "url": "https://github.com/PeculiarVentures/asn1.js#readme",
+          "url": "https://github.com/PeculiarVentures/ASN1.js#readme",
           "type": "website",
           "comment": "as detected from PackageJson property \"homepage\""
         },
         {
-          "url": "https://github.com/PeculiarVentures/asn1.js/issues",
+          "url": "https://github.com/PeculiarVentures/ASN1.js/issues",
           "type": "issue-tracker",
           "comment": "as detected from PackageJson property \"bugs.url\""
         },
         {
-          "url": "https://registry.npmjs.org/asn1js/-/asn1js-3.0.7.tgz",
+          "url": "https://registry.npmjs.org/asn1js/-/asn1js-3.0.10.tgz",
           "type": "distribution",
           "hashes": [
             {
               "alg": "SHA-512",
-              "content": "b8bbeae8a26ed38aa840cea0bc17ca163961e86974bce290b91e5c24c0c74249b07cc39078ddc5dd21c2bfd48d6122fe091a07bce1857e5943955cf4dc6423bd"
+              "content": "4b6b3768ecad88a74545dba5c36a8f139d4cce3cd53a2b29a5c56fee354547e2b0d24c70bc5ac371803487b35da9b9a3d0790c2176166a88fb7e58bc920c757a"
             }
           ],
           "comment": "as detected from npm-ls property \"resolved\" and property \"integrity\""
@@ -11533,10 +11546,10 @@
       "type": "library",
       "name": "asn1-pfx",
       "group": "@peculiar",
-      "version": "2.6.1",
-      "bom-ref": "skills-test|@peculiar/asn1-pfx@2.6.1",
+      "version": "2.7.0",
+      "bom-ref": "skills-test|@peculiar/asn1-pfx@2.7.0",
       "author": "PeculiarVentures, LLC",
-      "description": "ASN.1 schema of `PKCS #12: Personal Information Exchange Syntax v1.1` (RFC7292)",
+      "description": "ASN.1 schema for PKCS #12 personal information exchange structures defined in RFC 7292.",
       "licenses": [
         {
           "license": {
@@ -11545,8 +11558,13 @@
           }
         }
       ],
-      "purl": "pkg:npm/%40peculiar/asn1-pfx@2.6.1",
+      "purl": "pkg:npm/%40peculiar/asn1-pfx@2.7.0#packages/pfx",
       "externalReferences": [
+        {
+          "url": "git+https://github.com/PeculiarVentures/asn1-schema.git#packages/pfx",
+          "type": "vcs",
+          "comment": "as detected from PackageJson property \"repository.url\" and \"repository.directory\""
+        },
         {
           "url": "https://github.com/PeculiarVentures/asn1-schema/tree/master/packages/pfx#readme",
           "type": "website",
@@ -11558,12 +11576,12 @@
           "comment": "as detected from PackageJson property \"bugs.url\""
         },
         {
-          "url": "https://registry.npmjs.org/@peculiar/asn1-pfx/-/asn1-pfx-2.6.1.tgz",
+          "url": "https://registry.npmjs.org/@peculiar/asn1-pfx/-/asn1-pfx-2.7.0.tgz",
           "type": "distribution",
           "hashes": [
             {
               "alg": "SHA-512",
-              "content": "9c1e63550cb7300016bead0a634476254646f1b3bf6d32e99f0c8ecd7c8487f7b9e329c64dab4047e72c3a75e49150fd005676b8bf19ec457dd7cfaa075a83bf"
+              "content": "57f9eb950566860ee5600b0cec4d775032f97ab03016fea4088545a8d68c2074958bb76781c4fcdfd26445391006ace7306f7c9765e3c5893be19ced028859cc"
             }
           ],
           "comment": "as detected from npm-ls property \"resolved\" and property \"integrity\""
@@ -11584,10 +11602,10 @@
       "type": "library",
       "name": "asn1-pkcs8",
       "group": "@peculiar",
-      "version": "2.6.1",
-      "bom-ref": "skills-test|@peculiar/asn1-pkcs8@2.6.1",
+      "version": "2.7.0",
+      "bom-ref": "skills-test|@peculiar/asn1-pkcs8@2.7.0",
       "author": "PeculiarVentures, LLC",
-      "description": "ASN.1 schema of `Public-Key Cryptography Standards (PKCS) #8: Private-Key Information Syntax Specification Version 1.2` (RFC5208)",
+      "description": "ASN.1 schema for PKCS #8 private key information structures defined in RFC 5208.",
       "licenses": [
         {
           "license": {
@@ -11596,8 +11614,13 @@
           }
         }
       ],
-      "purl": "pkg:npm/%40peculiar/asn1-pkcs8@2.6.1",
+      "purl": "pkg:npm/%40peculiar/asn1-pkcs8@2.7.0#packages/pkcs8",
       "externalReferences": [
+        {
+          "url": "git+https://github.com/PeculiarVentures/asn1-schema.git#packages/pkcs8",
+          "type": "vcs",
+          "comment": "as detected from PackageJson property \"repository.url\" and \"repository.directory\""
+        },
         {
           "url": "https://github.com/PeculiarVentures/asn1-schema/tree/master/packages/pkcs8#readme",
           "type": "website",
@@ -11609,12 +11632,12 @@
           "comment": "as detected from PackageJson property \"bugs.url\""
         },
         {
-          "url": "https://registry.npmjs.org/@peculiar/asn1-pkcs8/-/asn1-pkcs8-2.6.1.tgz",
+          "url": "https://registry.npmjs.org/@peculiar/asn1-pkcs8/-/asn1-pkcs8-2.7.0.tgz",
           "type": "distribution",
           "hashes": [
             {
               "alg": "SHA-512",
-              "content": "241e6243d2339f9c86330dd91b8370dd79ff85bfc6dfc19817795fed69896fc2595327615461232bf6651525a19e507b2bfe28a84b3c1e77c520a925851e7c4f"
+              "content": "f464e5d6713c331d644d9fbb43261ab43c8ab26df841c591045918d623ef582dd7e03a276b9b3fb652e242cc795b355d66a88c0593584f46eecb0e3fbdb8678f"
             }
           ],
           "comment": "as detected from npm-ls property \"resolved\" and property \"integrity\""
@@ -11628,6 +11651,62 @@
         {
           "name": "cdx:npm:package:path",
           "value": "node_modules/@peculiar/asn1-pkcs8"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "utils",
+      "group": "@peculiar",
+      "version": "2.0.3",
+      "bom-ref": "skills-test|@peculiar/utils@2.0.3",
+      "author": "PeculiarVentures",
+      "description": "Modern byte, encoding, converter registry, and PEM utilities for TypeScript projects.",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT",
+            "acknowledgement": "declared"
+          }
+        }
+      ],
+      "purl": "pkg:npm/%40peculiar/utils@2.0.3",
+      "externalReferences": [
+        {
+          "url": "git+https://github.com/PeculiarVentures/pvtsutils.git",
+          "type": "vcs",
+          "comment": "as detected from PackageJson property \"repository.url\""
+        },
+        {
+          "url": "https://github.com/PeculiarVentures/pvtsutils#readme",
+          "type": "website",
+          "comment": "as detected from PackageJson property \"homepage\""
+        },
+        {
+          "url": "https://github.com/PeculiarVentures/pvtsutils/issues",
+          "type": "issue-tracker",
+          "comment": "as detected from PackageJson property \"bugs.url\""
+        },
+        {
+          "url": "https://registry.npmjs.org/@peculiar/utils/-/utils-2.0.3.tgz",
+          "type": "distribution",
+          "hashes": [
+            {
+              "alg": "SHA-512",
+              "content": "fa82f71cf151219d52b762b9d255825e28a82204a8c73cfb475277b85ea778edb2975b209a9818e975c91f805da680e4316ce741379817aa1634364b09d43879"
+            }
+          ],
+          "comment": "as detected from npm-ls property \"resolved\" and property \"integrity\""
+        }
+      ],
+      "properties": [
+        {
+          "name": "cdx:npm:package:development",
+          "value": "true"
+        },
+        {
+          "name": "cdx:npm:package:path",
+          "value": "node_modules/@peculiar/utils"
         }
       ]
     },
@@ -12510,8 +12589,8 @@
     {
       "type": "library",
       "name": "lru-cache",
-      "version": "11.3.5",
-      "bom-ref": "skills-test|lru-cache@11.3.5",
+      "version": "11.5.1",
+      "bom-ref": "skills-test|lru-cache@11.5.1",
       "author": "Isaac Z. Schlueter",
       "description": "A cache object that deletes the least-recently-used items.",
       "licenses": [
@@ -12522,7 +12601,7 @@
           }
         }
       ],
-      "purl": "pkg:npm/lru-cache@11.3.5",
+      "purl": "pkg:npm/lru-cache@11.5.1",
       "externalReferences": [
         {
           "url": "git+ssh://git@github.com/isaacs/node-lru-cache.git",
@@ -12540,12 +12619,12 @@
           "comment": "as detected from PackageJson property \"bugs.url\""
         },
         {
-          "url": "https://registry.npmjs.org/lru-cache/-/lru-cache-11.3.5.tgz",
+          "url": "https://registry.npmjs.org/lru-cache/-/lru-cache-11.5.1.tgz",
           "type": "distribution",
           "hashes": [
             {
               "alg": "SHA-512",
-              "content": "371545c0b027addf62eca501c42e03ad4866823cceb3ed509b9d03de8175fe82feaf5369678800ef1bc6d3fcc9f1ebd1ef320a9f8bcb7fba9335db9616d0ab47"
+              "content": "44f8a6c3feda31dbf6a2a46bc4ac2f65770f7f006b9ff259db161c63d1eeb3fe8b692dd538029558a5a034b0854a23a6d444978a78ec0e589d554ec996708dd8"
             }
           ],
           "comment": "as detected from npm-ls property \"resolved\" and property \"integrity\""
@@ -12673,8 +12752,8 @@
     {
       "type": "library",
       "name": "ufo",
-      "version": "1.6.3",
-      "bom-ref": "skills-test|ufo@1.6.3",
+      "version": "1.6.4",
+      "bom-ref": "skills-test|ufo@1.6.4",
       "description": "URL utils for humans",
       "licenses": [
         {
@@ -12684,7 +12763,7 @@
           }
         }
       ],
-      "purl": "pkg:npm/ufo@1.6.3",
+      "purl": "pkg:npm/ufo@1.6.4",
       "externalReferences": [
         {
           "url": "git+https://github.com/unjs/ufo.git",
@@ -12702,12 +12781,12 @@
           "comment": "as detected from PackageJson property \"bugs.url\""
         },
         {
-          "url": "https://registry.npmjs.org/ufo/-/ufo-1.6.3.tgz",
+          "url": "https://registry.npmjs.org/ufo/-/ufo-1.6.4.tgz",
           "type": "distribution",
           "hashes": [
             {
               "alg": "SHA-512",
-              "content": "c832539a1c9dbe5e65273066cbf87238003477e6aa081bb097cd7c85a55d60246b595f38a3b6327959b84255474ada8daeb2524dbea32ae14056a005b2bf8add"
+              "content": "24535b903d52bf07b42af1a2f0639e2dc3f8900590eb4f6dc2f09d707c6ad6848bf2cbefdfd66e4af6a3703f01fb90f478be3eb3522cd83fcee8a377a9c4de44"
             }
           ],
           "comment": "as detected from npm-ls property \"resolved\" and property \"integrity\""
@@ -13379,56 +13458,6 @@
     },
     {
       "type": "library",
-      "name": "viem",
-      "version": "2.47.18",
-      "bom-ref": "x402-pay|viem@2.47.18",
-      "description": "TypeScript Interface for Ethereum",
-      "licenses": [
-        {
-          "license": {
-            "id": "MIT",
-            "acknowledgement": "declared"
-          }
-        }
-      ],
-      "purl": "pkg:npm/viem@2.47.18",
-      "externalReferences": [
-        {
-          "url": "git+https://github.com/wevm/viem.git",
-          "type": "vcs",
-          "comment": "as detected from PackageJson property \"repository.url\""
-        },
-        {
-          "url": "https://viem.sh",
-          "type": "website",
-          "comment": "as detected from PackageJson property \"homepage\""
-        },
-        {
-          "url": "https://github.com/wevm/viem/issues",
-          "type": "issue-tracker",
-          "comment": "as detected from PackageJson property \"bugs.url\""
-        },
-        {
-          "url": "https://registry.npmjs.org/viem/-/viem-2.47.18.tgz",
-          "type": "distribution",
-          "hashes": [
-            {
-              "alg": "SHA-512",
-              "content": "9b792bfbf8bc31d75e6397e6076cb6bf9074bc32f4c7c478bfff206a2e0b8788e1f0a396950aa697b3c52ed8a53689a80e6de620dc5d03426760125f92736812"
-            }
-          ],
-          "comment": "as detected from npm-ls property \"resolved\" and property \"integrity\""
-        }
-      ],
-      "properties": [
-        {
-          "name": "cdx:npm:package:path",
-          "value": "node_modules/viem"
-        }
-      ]
-    },
-    {
-      "type": "library",
       "name": "curves",
       "group": "@noble",
       "version": "1.9.1",
@@ -13531,59 +13560,9 @@
     },
     {
       "type": "library",
-      "name": "ox",
-      "version": "0.14.15",
-      "bom-ref": "x402-pay|ox@0.14.15",
-      "description": "Ethereum Standard Library",
-      "licenses": [
-        {
-          "license": {
-            "id": "MIT",
-            "acknowledgement": "declared"
-          }
-        }
-      ],
-      "purl": "pkg:npm/ox@0.14.15",
-      "externalReferences": [
-        {
-          "url": "git+https://github.com/wevm/ox.git",
-          "type": "vcs",
-          "comment": "as detected from PackageJson property \"repository.url\""
-        },
-        {
-          "url": "https://wevm.dev",
-          "type": "website",
-          "comment": "as detected from PackageJson property \"homepage\""
-        },
-        {
-          "url": "https://github.com/wevm/ox/issues",
-          "type": "issue-tracker",
-          "comment": "as detected from PackageJson property \"bugs.url\""
-        },
-        {
-          "url": "https://registry.npmjs.org/ox/-/ox-0.14.15.tgz",
-          "type": "distribution",
-          "hashes": [
-            {
-              "alg": "SHA-512",
-              "content": "dd3b9b0a66ca7a7fdcb994335f4a836ce4b99688e375267dd25a8ac5620359de6c8ae27420905a4d7318b3c78c3cb72b6aa9cec0665acf3ddaa473c68910a419"
-            }
-          ],
-          "comment": "as detected from npm-ls property \"resolved\" and property \"integrity\""
-        }
-      ],
-      "properties": [
-        {
-          "name": "cdx:npm:package:path",
-          "value": "node_modules/ox"
-        }
-      ]
-    },
-    {
-      "type": "library",
       "name": "ws",
-      "version": "8.18.3",
-      "bom-ref": "x402-pay|ws@8.18.3",
+      "version": "8.20.1",
+      "bom-ref": "x402-pay|ws@8.20.1",
       "author": "Einar Otto Stangvik",
       "description": "Simple to use, blazing fast and thoroughly tested websocket client and server for Node.js",
       "licenses": [
@@ -13594,7 +13573,7 @@
           }
         }
       ],
-      "purl": "pkg:npm/ws@8.18.3",
+      "purl": "pkg:npm/ws@8.20.1",
       "externalReferences": [
         {
           "url": "git+https://github.com/websockets/ws.git",
@@ -13612,12 +13591,12 @@
           "comment": "as detected from PackageJson property \"bugs.url\""
         },
         {
-          "url": "https://registry.npmjs.org/ws/-/ws-8.18.3.tgz",
+          "url": "https://registry.npmjs.org/ws/-/ws-8.20.1.tgz",
           "type": "distribution",
           "hashes": [
             {
               "alg": "SHA-512",
-              "content": "3c4206098e6d4a552de7472ac8c5df0b35fea0e3ea374bee1aa5b36dc276c6f9e4ce4ab8ea83a9cfb7506930c175f2026f8375e3e1804540f0d97576378b6fce"
+              "content": "22de1d3b42b9bfffc9b535ee3e47c439a237b9437cee260f9eaa3f673a82a06de0f2e840eba41432cfd2accd182bbfcd02efabe0b321ffd76ad80ee4fab1ecfb"
             }
           ],
           "comment": "as detected from npm-ls property \"resolved\" and property \"integrity\""
@@ -13629,68 +13608,15 @@
           "value": "node_modules/ws"
         }
       ]
-    },
-    {
-      "type": "library",
-      "name": "ens-normalize",
-      "group": "@adraffy",
-      "version": "1.11.1",
-      "bom-ref": "x402-pay|@adraffy/ens-normalize@1.11.1",
-      "author": "raffy.eth",
-      "description": "Ethereum Name Service (ENS) Name Normalizer",
-      "licenses": [
-        {
-          "license": {
-            "id": "MIT",
-            "acknowledgement": "declared"
-          }
-        }
-      ],
-      "purl": "pkg:npm/%40adraffy/ens-normalize@1.11.1",
-      "externalReferences": [
-        {
-          "url": "git+https://github.com/adraffy/ens-normalize.js.git",
-          "type": "vcs",
-          "comment": "as detected from PackageJson property \"repository.url\""
-        },
-        {
-          "url": "https://github.com/adraffy/ens-normalize.js#readme",
-          "type": "website",
-          "comment": "as detected from PackageJson property \"homepage\""
-        },
-        {
-          "url": "https://github.com/adraffy/ens-normalize.js/issues",
-          "type": "issue-tracker",
-          "comment": "as detected from PackageJson property \"bugs.url\""
-        },
-        {
-          "url": "https://registry.npmjs.org/@adraffy/ens-normalize/-/ens-normalize-1.11.1.tgz",
-          "type": "distribution",
-          "hashes": [
-            {
-              "alg": "SHA-512",
-              "content": "9e1081577aae1207acb9fedceca61fa5eaea492d784fc6d8baf27c3dc2c9a7ace7919a4573402e5b8a81b6bf1e295c8f3deffc452afbb2094258f53979ac7029"
-            }
-          ],
-          "comment": "as detected from npm-ls property \"resolved\" and property \"integrity\""
-        }
-      ],
-      "properties": [
-        {
-          "name": "cdx:npm:package:path",
-          "value": "node_modules/@adraffy/ens-normalize"
-        }
-      ]
     }
   ],
   "dependencies": [
     {
       "ref": "skills-test",
       "dependsOn": [
-        "skills-test|@coinbase/cdp-sdk@1.47.0",
-        "skills-test|@open-wallet-standard/core@1.3.2",
-        "skills-test|@turnkey/sdk-server@5.3.0",
-        "skills-test|@turnkey/viem@0.14.28",
+        "skills-test|@coinbase/cdp-sdk@1.51.0",
+        "skills-test|@turnkey/sdk-server@6.0.0",
+        "skills-test|@turnkey/viem@0.14.29",
         "skills-test|@x402/core@2.10.0",
         "skills-test|@x402/evm@2.10.0",
         "skills-test|@x402/fetch@2.10.0",
@@ -13698,66 +13624,61 @@
       ]
     },
     {
-      "ref": "skills-test|@coinbase/cdp-sdk@1.47.0",
+      "ref": "skills-test|@coinbase/cdp-sdk@1.51.0",
       "dependsOn": [
         "skills-test|@solana-program/system@0.10.0",
         "skills-test|@solana-program/token@0.9.0",
         "skills-test|@solana/kit@5.5.1",
         "skills-test|abitype@1.0.6",
         "skills-test|axios-retry@4.5.0",
-        "skills-test|axios@1.13.6",
-        "skills-test|jose@6.2.2",
+        "skills-test|axios@1.16.0",
+        "skills-test|bs58@6.0.0",
+        "skills-test|jose@6.2.3",
         "skills-test|md5@2.3.0",
         "skills-test|uncrypto@0.1.3",
-        "skills-test|viem@2.48.0",
+        "skills-test|viem@2.51.3",
         "skills-test|zod@3.25.76"
       ]
     },
     {
-      "ref": "skills-test|@open-wallet-standard/core@1.3.2",
+      "ref": "skills-test|@turnkey/sdk-server@6.0.0",
       "dependsOn": [
-        "skills-test|@open-wallet-standard/core-darwin-arm64@1.3.2"
-      ]
-    },
-    {
-      "ref": "skills-test|@turnkey/sdk-server@5.3.0",
-      "dependsOn": [
-        "skills-test|@turnkey/api-key-stamper@0.6.5",
-        "skills-test|@turnkey/http@3.18.1",
-        "skills-test|@turnkey/sdk-types@0.14.0",
-        "skills-test|@turnkey/wallet-stamper@1.1.16",
+        "skills-test|@turnkey/api-key-stamper@0.6.6",
+        "skills-test|@turnkey/http@4.0.0",
+        "skills-test|@turnkey/sdk-types@1.0.0",
+        "skills-test|@turnkey/wallet-stamper@1.1.17",
         "skills-test|buffer@6.0.3",
         "skills-test|cross-fetch@3.2.0"
       ]
     },
     {
-      "ref": "skills-test|@turnkey/viem@0.14.28",
+      "ref": "skills-test|@turnkey/viem@0.14.29",
       "dependsOn": [
-        "skills-test|@turnkey/viem@0.14.28|@noble/curves@1.8.0",
+        "skills-test|@turnkey/viem@0.14.29|@noble/curves@1.8.0",
         "skills-test|@openzeppelin/contracts@5.6.1",
-        "skills-test|@turnkey/api-key-stamper@0.6.5",
-        "skills-test|@turnkey/core@1.14.1",
-        "skills-test|@turnkey/http@3.18.1",
-        "skills-test|@turnkey/sdk-browser@5.16.1",
-        "skills-test|@turnkey/sdk-server@5.3.0",
-        "skills-test|@turnkey/viem@0.14.28|cross-fetch@4.1.0",
-        "skills-test|viem@2.48.0"
+        "skills-test|@turnkey/api-key-stamper@0.6.6",
+        "skills-test|@turnkey/core@2.0.0",
+        "skills-test|@turnkey/http@4.0.0",
+        "skills-test|@turnkey/sdk-browser@6.0.0",
+        "skills-test|@turnkey/sdk-server@6.0.0",
+        "skills-test|@turnkey/viem@0.14.29|cross-fetch@4.1.0",
+        "skills-test|viem@2.51.3"
       ]
     },
     {
-      "ref": "skills-test|@turnkey/viem@0.14.28|@noble/curves@1.8.0",
+      "ref": "skills-test|@turnkey/viem@0.14.29|@noble/curves@1.8.0",
       "dependsOn": [
-        "skills-test|@turnkey/viem@0.14.28|@noble/hashes@1.7.0"
+        "skills-test|@turnkey/viem@0.14.29|@noble/hashes@1.7.0"
       ]
     },
     {
-      "ref": "skills-test|@turnkey/viem@0.14.28|cross-fetch@4.1.0",
+      "ref": "skills-test|@turnkey/viem@0.14.29|cross-fetch@4.1.0",
       "dependsOn": [
         "skills-test|node-fetch@2.7.0"
       ]
     },
     {
-      "ref": "skills-test|@turnkey/viem@0.14.28|@noble/hashes@1.7.0"
+      "ref": "skills-test|@turnkey/viem@0.14.29|@noble/hashes@1.7.0"
     },
     {
       "ref": "skills-test|@x402/core@2.10.0",
@@ -13769,7 +13690,7 @@
       "ref": "skills-test|@x402/evm@2.10.0",
       "dependsOn": [
         "skills-test|@x402/core@2.10.0",
-        "skills-test|viem@2.48.0",
+        "skills-test|viem@2.51.3",
         "skills-test|zod@3.25.76"
       ]
     },
@@ -13777,7 +13698,7 @@
       "ref": "skills-test|@x402/fetch@2.10.0",
       "dependsOn": [
         "skills-test|@x402/core@2.10.0",
-        "skills-test|viem@2.48.0",
+        "skills-test|viem@2.51.3",
         "skills-test|zod@3.25.76"
       ]
     },
@@ -13832,20 +13753,26 @@
     {
       "ref": "skills-test|axios-retry@4.5.0",
       "dependsOn": [
-        "skills-test|axios@1.13.6",
+        "skills-test|axios@1.16.0",
         "skills-test|is-retry-allowed@2.2.0"
       ]
     },
     {
-      "ref": "skills-test|axios@1.13.6",
+      "ref": "skills-test|axios@1.16.0",
       "dependsOn": [
         "skills-test|follow-redirects@1.16.0",
         "skills-test|form-data@4.0.5",
-        "skills-test|proxy-from-env@1.1.0"
+        "skills-test|proxy-from-env@2.1.0"
       ]
     },
     {
-      "ref": "skills-test|jose@6.2.2"
+      "ref": "skills-test|bs58@6.0.0",
+      "dependsOn": [
+        "skills-test|base-x@5.0.1"
+      ]
+    },
+    {
+      "ref": "skills-test|jose@6.2.3"
     },
     {
       "ref": "skills-test|md5@2.3.0",
@@ -13859,82 +13786,63 @@
       "ref": "skills-test|uncrypto@0.1.3"
     },
     {
-      "ref": "skills-test|viem@2.48.0",
+      "ref": "skills-test|viem@2.51.3",
       "dependsOn": [
-        "skills-test|viem@2.48.0|@noble/curves@1.9.1",
+        "skills-test|viem@2.51.3|@noble/curves@1.9.1",
         "skills-test|@noble/hashes@1.8.0",
         "skills-test|@scure/bip32@1.7.0",
         "skills-test|@scure/bip39@1.6.0",
-        "skills-test|viem@2.48.0|abitype@1.2.3",
+        "skills-test|viem@2.51.3|abitype@1.2.3",
         "skills-test|isows@1.0.7",
-        "skills-test|viem@2.48.0|ox@0.14.17",
-        "skills-test|viem@2.48.0|ws@8.18.3"
+        "skills-test|ox@0.14.25",
+        "skills-test|viem@2.51.3|ws@8.20.1"
       ]
     },
     {
-      "ref": "skills-test|viem@2.48.0|@noble/curves@1.9.1",
+      "ref": "skills-test|viem@2.51.3|@noble/curves@1.9.1",
       "dependsOn": [
         "skills-test|@noble/hashes@1.8.0"
       ]
     },
     {
-      "ref": "skills-test|viem@2.48.0|abitype@1.2.3",
+      "ref": "skills-test|viem@2.51.3|abitype@1.2.3",
       "dependsOn": [
         "skills-test|zod@3.25.76"
       ]
     },
     {
-      "ref": "skills-test|viem@2.48.0|ox@0.14.17",
-      "dependsOn": [
-        "skills-test|viem@2.48.0|@adraffy/ens-normalize@1.11.1",
-        "skills-test|@noble/ciphers@1.3.0",
-        "skills-test|viem@2.48.0|@noble/curves@1.9.1",
-        "skills-test|@noble/hashes@1.8.0",
-        "skills-test|@scure/bip32@1.7.0",
-        "skills-test|@scure/bip39@1.6.0",
-        "skills-test|viem@2.48.0|abitype@1.2.3",
-        "skills-test|eventemitter3@5.0.1"
-      ]
-    },
-    {
-      "ref": "skills-test|viem@2.48.0|ws@8.18.3"
-    },
-    {
-      "ref": "skills-test|viem@2.48.0|@adraffy/ens-normalize@1.11.1"
+      "ref": "skills-test|viem@2.51.3|ws@8.20.1"
     },
     {
       "ref": "skills-test|zod@3.25.76"
     },
     {
-      "ref": "skills-test|@open-wallet-standard/core-darwin-arm64@1.3.2"
-    },
-    {
-      "ref": "skills-test|@turnkey/api-key-stamper@0.6.5",
+      "ref": "skills-test|@turnkey/api-key-stamper@0.6.6",
       "dependsOn": [
         "skills-test|@noble/curves@1.9.7",
-        "skills-test|@turnkey/crypto@2.8.14",
+        "skills-test|@turnkey/crypto@2.9.0",
         "skills-test|@turnkey/encoding@0.6.0",
         "skills-test|sha256-uint8array@0.10.7"
       ]
     },
     {
-      "ref": "skills-test|@turnkey/http@3.18.1",
+      "ref": "skills-test|@turnkey/http@4.0.0",
       "dependsOn": [
-        "skills-test|@turnkey/api-key-stamper@0.6.5",
+        "skills-test|@turnkey/api-key-stamper@0.6.6",
         "skills-test|@turnkey/encoding@0.6.0",
         "skills-test|@turnkey/webauthn-stamper@0.6.0",
         "skills-test|cross-fetch@3.2.0"
       ]
     },
     {
-      "ref": "skills-test|@turnkey/sdk-types@0.14.0"
+      "ref": "skills-test|@turnkey/sdk-types@1.0.0"
     },
     {
-      "ref": "skills-test|@turnkey/wallet-stamper@1.1.16",
+      "ref": "skills-test|@turnkey/wallet-stamper@1.1.17",
       "dependsOn": [
-        "skills-test|@turnkey/crypto@2.8.14",
+        "skills-test|@turnkey/crypto@2.9.0",
         "skills-test|@turnkey/encoding@0.6.0",
-        "skills-test|viem@2.48.0"
+        "skills-test|viem@2.51.3"
       ]
     },
     {
@@ -13954,13 +13862,13 @@
       "ref": "skills-test|@openzeppelin/contracts@5.6.1"
     },
     {
-      "ref": "skills-test|@turnkey/core@1.14.1",
+      "ref": "skills-test|@turnkey/core@2.0.0",
       "dependsOn": [
-        "skills-test|@turnkey/api-key-stamper@0.6.5",
-        "skills-test|@turnkey/crypto@2.8.14",
+        "skills-test|@turnkey/api-key-stamper@0.6.6",
+        "skills-test|@turnkey/crypto@2.9.0",
         "skills-test|@turnkey/encoding@0.6.0",
-        "skills-test|@turnkey/http@3.18.1",
-        "skills-test|@turnkey/sdk-types@0.14.0",
+        "skills-test|@turnkey/http@4.0.0",
+        "skills-test|@turnkey/sdk-types@1.0.0",
         "skills-test|@turnkey/webauthn-stamper@0.6.0",
         "skills-test|@wallet-standard/app@1.1.0",
         "skills-test|@wallet-standard/base@1.1.0",
@@ -13969,21 +13877,21 @@
         "skills-test|cross-fetch@3.2.0",
         "skills-test|ethers@6.16.0",
         "skills-test|jwt-decode@4.0.0",
-        "skills-test|uuid@11.1.0",
-        "skills-test|viem@2.48.0"
+        "skills-test|uuid@11.1.1",
+        "skills-test|viem@2.51.3"
       ]
     },
     {
-      "ref": "skills-test|@turnkey/sdk-browser@5.16.1",
+      "ref": "skills-test|@turnkey/sdk-browser@6.0.0",
       "dependsOn": [
-        "skills-test|@turnkey/api-key-stamper@0.6.5",
-        "skills-test|@turnkey/crypto@2.8.14",
+        "skills-test|@turnkey/api-key-stamper@0.6.6",
+        "skills-test|@turnkey/crypto@2.9.0",
         "skills-test|@turnkey/encoding@0.6.0",
-        "skills-test|@turnkey/http@3.18.1",
+        "skills-test|@turnkey/http@4.0.0",
         "skills-test|@turnkey/iframe-stamper@2.11.0",
-        "skills-test|@turnkey/indexed-db-stamper@1.2.6",
-        "skills-test|@turnkey/sdk-types@0.14.0",
-        "skills-test|@turnkey/wallet-stamper@1.1.16",
+        "skills-test|@turnkey/indexed-db-stamper@1.3.0",
+        "skills-test|@turnkey/sdk-types@1.0.0",
+        "skills-test|@turnkey/wallet-stamper@1.1.17",
         "skills-test|@turnkey/webauthn-stamper@0.6.0",
         "skills-test|buffer@6.0.3",
         "skills-test|cross-fetch@3.2.0",
@@ -14226,12 +14134,15 @@
         "skills-test|asynckit@0.4.0",
         "skills-test|combined-stream@1.0.8",
         "skills-test|es-set-tostringtag@2.1.0",
-        "skills-test|hasown@2.0.2",
+        "skills-test|hasown@2.0.4",
         "skills-test|mime-types@2.1.35"
       ]
     },
     {
-      "ref": "skills-test|proxy-from-env@1.1.0"
+      "ref": "skills-test|proxy-from-env@2.1.0"
+    },
+    {
+      "ref": "skills-test|base-x@5.0.1"
     },
     {
       "ref": "skills-test|charenc@0.0.2"
@@ -14263,7 +14174,32 @@
     {
       "ref": "skills-test|isows@1.0.7",
       "dependsOn": [
-        "skills-test|ws@8.20.0"
+        "skills-test|ws@8.21.0"
+      ]
+    },
+    {
+      "ref": "skills-test|ox@0.14.25",
+      "dependsOn": [
+        "skills-test|@adraffy/ens-normalize@1.11.1",
+        "skills-test|@noble/ciphers@1.3.0",
+        "skills-test|ox@0.14.25|@noble/curves@1.9.1",
+        "skills-test|@noble/hashes@1.8.0",
+        "skills-test|@scure/bip32@1.7.0",
+        "skills-test|@scure/bip39@1.6.0",
+        "skills-test|ox@0.14.25|abitype@1.2.4",
+        "skills-test|eventemitter3@5.0.1"
+      ]
+    },
+    {
+      "ref": "skills-test|ox@0.14.25|@noble/curves@1.9.1",
+      "dependsOn": [
+        "skills-test|@noble/hashes@1.8.0"
+      ]
+    },
+    {
+      "ref": "skills-test|ox@0.14.25|abitype@1.2.4",
+      "dependsOn": [
+        "skills-test|zod@3.25.76"
       ]
     },
     {
@@ -14273,20 +14209,20 @@
       ]
     },
     {
-      "ref": "skills-test|@turnkey/crypto@2.8.14",
+      "ref": "skills-test|@turnkey/crypto@2.9.0",
       "dependsOn": [
         "skills-test|@noble/ciphers@1.3.0",
-        "skills-test|@turnkey/crypto@2.8.14|@noble/curves@1.9.0",
+        "skills-test|@turnkey/crypto@2.9.0|@noble/curves@1.9.0",
         "skills-test|@noble/hashes@1.8.0",
         "skills-test|@peculiar/x509@1.12.3",
         "skills-test|@turnkey/encoding@0.6.0",
-        "skills-test|@turnkey/sdk-types@0.14.0",
+        "skills-test|@turnkey/sdk-types@1.0.0",
         "skills-test|borsh@2.0.0",
         "skills-test|cbor-js@0.1.0"
       ]
     },
     {
-      "ref": "skills-test|@turnkey/crypto@2.8.14|@noble/curves@1.9.0",
+      "ref": "skills-test|@turnkey/crypto@2.9.0|@noble/curves@1.9.0",
       "dependsOn": [
         "skills-test|@noble/hashes@1.8.0"
       ]
@@ -14356,7 +14292,7 @@
     {
       "ref": "skills-test|ethers@6.16.0",
       "dependsOn": [
-        "skills-test|@adraffy/ens-normalize@1.10.1",
+        "skills-test|ethers@6.16.0|@adraffy/ens-normalize@1.10.1",
         "skills-test|ethers@6.16.0|@noble/curves@1.2.0",
         "skills-test|ethers@6.16.0|@noble/hashes@1.3.2",
         "skills-test|@types/node@22.7.5",
@@ -14364,6 +14300,9 @@
         "skills-test|ethers@6.16.0|tslib@2.7.0",
         "skills-test|ethers@6.16.0|ws@8.17.1"
       ]
+    },
+    {
+      "ref": "skills-test|ethers@6.16.0|@adraffy/ens-normalize@1.10.1"
     },
     {
       "ref": "skills-test|ethers@6.16.0|@noble/curves@1.2.0",
@@ -14384,16 +14323,16 @@
       "ref": "skills-test|jwt-decode@4.0.0"
     },
     {
-      "ref": "skills-test|uuid@11.1.0"
+      "ref": "skills-test|uuid@11.1.1"
     },
     {
       "ref": "skills-test|@turnkey/iframe-stamper@2.11.0"
     },
     {
-      "ref": "skills-test|@turnkey/indexed-db-stamper@1.2.6",
+      "ref": "skills-test|@turnkey/indexed-db-stamper@1.3.0",
       "dependsOn": [
-        "skills-test|@turnkey/api-key-stamper@0.6.5",
-        "skills-test|@turnkey/encoding@0.6.0"
+        "skills-test|@turnkey/encoding@0.6.0",
+        "skills-test|@turnkey/sdk-types@1.0.0"
       ]
     },
     {
@@ -14502,7 +14441,7 @@
         "skills-test|@solana/functional@5.5.1",
         "skills-test|@solana/rpc-subscriptions-spec@5.5.1",
         "skills-test|@solana/subscribable@5.5.1",
-        "skills-test|ws@8.20.0"
+        "skills-test|ws@8.21.0"
       ]
     },
     {
@@ -14526,7 +14465,7 @@
         "skills-test|@solana/errors@5.5.1",
         "skills-test|@solana/rpc-spec-types@5.5.1",
         "skills-test|@solana/rpc-spec@5.5.1",
-        "skills-test|undici-types@7.25.0"
+        "skills-test|undici-types@7.26.0"
       ]
     },
     {
@@ -14544,11 +14483,11 @@
         "skills-test|es-errors@1.3.0",
         "skills-test|get-intrinsic@1.3.0",
         "skills-test|has-tostringtag@1.0.2",
-        "skills-test|hasown@2.0.2"
+        "skills-test|hasown@2.0.4"
       ]
     },
     {
-      "ref": "skills-test|hasown@2.0.2",
+      "ref": "skills-test|hasown@2.0.4",
       "dependsOn": [
         "skills-test|function-bind@1.1.2"
       ]
@@ -14563,7 +14502,10 @@
       "ref": "skills-test|@scure/base@1.2.6"
     },
     {
-      "ref": "skills-test|ws@8.20.0"
+      "ref": "skills-test|ws@8.21.0"
+    },
+    {
+      "ref": "skills-test|@adraffy/ens-normalize@1.11.1"
     },
     {
       "ref": "skills-test|@noble/ciphers@1.3.0"
@@ -14574,13 +14516,13 @@
     {
       "ref": "skills-test|@peculiar/x509@1.12.3",
       "dependsOn": [
-        "skills-test|@peculiar/asn1-cms@2.6.1",
-        "skills-test|@peculiar/asn1-csr@2.6.1",
-        "skills-test|@peculiar/asn1-ecc@2.6.1",
-        "skills-test|@peculiar/asn1-pkcs9@2.6.1",
-        "skills-test|@peculiar/asn1-rsa@2.6.1",
-        "skills-test|@peculiar/asn1-schema@2.6.0",
-        "skills-test|@peculiar/asn1-x509@2.6.1",
+        "skills-test|@peculiar/asn1-cms@2.7.0",
+        "skills-test|@peculiar/asn1-csr@2.7.0",
+        "skills-test|@peculiar/asn1-ecc@2.7.0",
+        "skills-test|@peculiar/asn1-pkcs9@2.7.0",
+        "skills-test|@peculiar/asn1-rsa@2.7.0",
+        "skills-test|@peculiar/asn1-schema@2.7.0",
+        "skills-test|@peculiar/asn1-x509@2.7.0",
         "skills-test|pvtsutils@1.3.6",
         "skills-test|reflect-metadata@0.2.2",
         "skills-test|tslib@2.8.1",
@@ -14592,12 +14534,6 @@
     },
     {
       "ref": "skills-test|cbor-js@0.1.0"
-    },
-    {
-      "ref": "skills-test|bs58@6.0.0",
-      "dependsOn": [
-        "skills-test|base-x@5.0.1"
-      ]
     },
     {
       "ref": "skills-test|bs58check@4.0.0",
@@ -14700,8 +14636,33 @@
         "skills-test|@walletconnect/window-metadata@1.0.1",
         "skills-test|blakejs@1.2.1",
         "skills-test|detect-browser@5.3.0",
-        "skills-test|ox@0.9.3",
+        "skills-test|@walletconnect/utils@2.23.9|ox@0.9.3",
         "skills-test|uint8arrays@3.1.1"
+      ]
+    },
+    {
+      "ref": "skills-test|@walletconnect/utils@2.23.9|ox@0.9.3",
+      "dependsOn": [
+        "skills-test|@adraffy/ens-normalize@1.11.1",
+        "skills-test|@noble/ciphers@1.3.0",
+        "skills-test|@walletconnect/utils@2.23.9|ox@0.9.3|@noble/curves@1.9.1",
+        "skills-test|@noble/hashes@1.8.0",
+        "skills-test|@scure/bip32@1.7.0",
+        "skills-test|@scure/bip39@1.6.0",
+        "skills-test|@walletconnect/utils@2.23.9|abitype@1.2.4",
+        "skills-test|eventemitter3@5.0.1"
+      ]
+    },
+    {
+      "ref": "skills-test|@walletconnect/utils@2.23.9|ox@0.9.3|@noble/curves@1.9.1",
+      "dependsOn": [
+        "skills-test|@noble/hashes@1.8.0"
+      ]
+    },
+    {
+      "ref": "skills-test|@walletconnect/utils@2.23.9|abitype@1.2.4",
+      "dependsOn": [
+        "skills-test|zod@3.25.76"
       ]
     },
     {
@@ -14718,12 +14679,9 @@
       "ref": "skills-test|@walletconnect/keyvaluestorage@1.1.1",
       "dependsOn": [
         "skills-test|@walletconnect/safe-json@1.0.2",
-        "skills-test|idb-keyval@6.2.2",
+        "skills-test|idb-keyval@6.2.4",
         "skills-test|unstorage@1.17.5"
       ]
-    },
-    {
-      "ref": "skills-test|@adraffy/ens-normalize@1.10.1"
     },
     {
       "ref": "skills-test|@types/node@22.7.5",
@@ -14765,7 +14723,7 @@
       ]
     },
     {
-      "ref": "skills-test|undici-types@7.25.0"
+      "ref": "skills-test|undici-types@7.26.0"
     },
     {
       "ref": "skills-test|delayed-stream@1.0.0"
@@ -14779,12 +14737,12 @@
         "skills-test|call-bind-apply-helpers@1.0.2",
         "skills-test|es-define-property@1.0.1",
         "skills-test|es-errors@1.3.0",
-        "skills-test|es-object-atoms@1.1.1",
+        "skills-test|es-object-atoms@1.1.2",
         "skills-test|function-bind@1.1.2",
         "skills-test|get-proto@1.0.1",
         "skills-test|gopd@1.2.0",
         "skills-test|has-symbols@1.1.0",
-        "skills-test|hasown@2.0.2",
+        "skills-test|hasown@2.0.4",
         "skills-test|math-intrinsics@1.1.0"
       ]
     },
@@ -14801,69 +14759,69 @@
       "ref": "skills-test|mime-db@1.52.0"
     },
     {
-      "ref": "skills-test|@peculiar/asn1-cms@2.6.1",
+      "ref": "skills-test|@peculiar/asn1-cms@2.7.0",
       "dependsOn": [
-        "skills-test|@peculiar/asn1-schema@2.6.0",
-        "skills-test|@peculiar/asn1-x509-attr@2.6.1",
-        "skills-test|@peculiar/asn1-x509@2.6.1",
-        "skills-test|asn1js@3.0.7",
+        "skills-test|@peculiar/asn1-schema@2.7.0",
+        "skills-test|@peculiar/asn1-x509-attr@2.7.0",
+        "skills-test|@peculiar/asn1-x509@2.7.0",
+        "skills-test|asn1js@3.0.10",
         "skills-test|tslib@2.8.1"
       ]
     },
     {
-      "ref": "skills-test|@peculiar/asn1-csr@2.6.1",
+      "ref": "skills-test|@peculiar/asn1-csr@2.7.0",
       "dependsOn": [
-        "skills-test|@peculiar/asn1-schema@2.6.0",
-        "skills-test|@peculiar/asn1-x509@2.6.1",
-        "skills-test|asn1js@3.0.7",
+        "skills-test|@peculiar/asn1-schema@2.7.0",
+        "skills-test|@peculiar/asn1-x509@2.7.0",
+        "skills-test|asn1js@3.0.10",
         "skills-test|tslib@2.8.1"
       ]
     },
     {
-      "ref": "skills-test|@peculiar/asn1-ecc@2.6.1",
+      "ref": "skills-test|@peculiar/asn1-ecc@2.7.0",
       "dependsOn": [
-        "skills-test|@peculiar/asn1-schema@2.6.0",
-        "skills-test|@peculiar/asn1-x509@2.6.1",
-        "skills-test|asn1js@3.0.7",
+        "skills-test|@peculiar/asn1-schema@2.7.0",
+        "skills-test|@peculiar/asn1-x509@2.7.0",
+        "skills-test|asn1js@3.0.10",
         "skills-test|tslib@2.8.1"
       ]
     },
     {
-      "ref": "skills-test|@peculiar/asn1-pkcs9@2.6.1",
+      "ref": "skills-test|@peculiar/asn1-pkcs9@2.7.0",
       "dependsOn": [
-        "skills-test|@peculiar/asn1-cms@2.6.1",
-        "skills-test|@peculiar/asn1-pfx@2.6.1",
-        "skills-test|@peculiar/asn1-pkcs8@2.6.1",
-        "skills-test|@peculiar/asn1-schema@2.6.0",
-        "skills-test|@peculiar/asn1-x509-attr@2.6.1",
-        "skills-test|@peculiar/asn1-x509@2.6.1",
-        "skills-test|asn1js@3.0.7",
+        "skills-test|@peculiar/asn1-cms@2.7.0",
+        "skills-test|@peculiar/asn1-pfx@2.7.0",
+        "skills-test|@peculiar/asn1-pkcs8@2.7.0",
+        "skills-test|@peculiar/asn1-schema@2.7.0",
+        "skills-test|@peculiar/asn1-x509-attr@2.7.0",
+        "skills-test|@peculiar/asn1-x509@2.7.0",
+        "skills-test|asn1js@3.0.10",
         "skills-test|tslib@2.8.1"
       ]
     },
     {
-      "ref": "skills-test|@peculiar/asn1-rsa@2.6.1",
+      "ref": "skills-test|@peculiar/asn1-rsa@2.7.0",
       "dependsOn": [
-        "skills-test|@peculiar/asn1-schema@2.6.0",
-        "skills-test|@peculiar/asn1-x509@2.6.1",
-        "skills-test|asn1js@3.0.7",
+        "skills-test|@peculiar/asn1-schema@2.7.0",
+        "skills-test|@peculiar/asn1-x509@2.7.0",
+        "skills-test|asn1js@3.0.10",
         "skills-test|tslib@2.8.1"
       ]
     },
     {
-      "ref": "skills-test|@peculiar/asn1-schema@2.6.0",
+      "ref": "skills-test|@peculiar/asn1-schema@2.7.0",
       "dependsOn": [
-        "skills-test|asn1js@3.0.7",
-        "skills-test|pvtsutils@1.3.6",
+        "skills-test|@peculiar/utils@2.0.3",
+        "skills-test|asn1js@3.0.10",
         "skills-test|tslib@2.8.1"
       ]
     },
     {
-      "ref": "skills-test|@peculiar/asn1-x509@2.6.1",
+      "ref": "skills-test|@peculiar/asn1-x509@2.7.0",
       "dependsOn": [
-        "skills-test|@peculiar/asn1-schema@2.6.0",
-        "skills-test|asn1js@3.0.7",
-        "skills-test|pvtsutils@1.3.6",
+        "skills-test|@peculiar/asn1-schema@2.7.0",
+        "skills-test|@peculiar/utils@2.0.3",
+        "skills-test|asn1js@3.0.10",
         "skills-test|tslib@2.8.1"
       ]
     },
@@ -14889,9 +14847,6 @@
       "ref": "skills-test|tsyringe@4.10.0|tslib@1.14.1"
     },
     {
-      "ref": "skills-test|base-x@5.0.1"
-    },
-    {
       "ref": "skills-test|tr46@0.0.3"
     },
     {
@@ -14911,11 +14866,11 @@
         "skills-test|@walletconnect/jsonrpc-utils@1.0.8",
         "skills-test|@walletconnect/safe-json@1.0.2",
         "skills-test|events@3.3.0",
-        "skills-test|@walletconnect/jsonrpc-ws-connection@1.0.16|ws@7.5.10"
+        "skills-test|@walletconnect/jsonrpc-ws-connection@1.0.16|ws@7.5.11"
       ]
     },
     {
-      "ref": "skills-test|@walletconnect/jsonrpc-ws-connection@1.0.16|ws@7.5.10"
+      "ref": "skills-test|@walletconnect/jsonrpc-ws-connection@1.0.16|ws@7.5.11"
     },
     {
       "ref": "skills-test|@walletconnect/relay-api@1.0.11",
@@ -15017,35 +14972,7 @@
       "ref": "skills-test|detect-browser@5.3.0"
     },
     {
-      "ref": "skills-test|ox@0.9.3",
-      "dependsOn": [
-        "skills-test|ox@0.9.3|@adraffy/ens-normalize@1.11.1",
-        "skills-test|@noble/ciphers@1.3.0",
-        "skills-test|ox@0.9.3|@noble/curves@1.9.1",
-        "skills-test|@noble/hashes@1.8.0",
-        "skills-test|@scure/bip32@1.7.0",
-        "skills-test|@scure/bip39@1.6.0",
-        "skills-test|ox@0.9.3|abitype@1.2.3",
-        "skills-test|eventemitter3@5.0.1"
-      ]
-    },
-    {
-      "ref": "skills-test|ox@0.9.3|@adraffy/ens-normalize@1.11.1"
-    },
-    {
-      "ref": "skills-test|ox@0.9.3|@noble/curves@1.9.1",
-      "dependsOn": [
-        "skills-test|@noble/hashes@1.8.0"
-      ]
-    },
-    {
-      "ref": "skills-test|ox@0.9.3|abitype@1.2.3",
-      "dependsOn": [
-        "skills-test|zod@3.25.76"
-      ]
-    },
-    {
-      "ref": "skills-test|idb-keyval@6.2.2"
+      "ref": "skills-test|idb-keyval@6.2.4"
     },
     {
       "ref": "skills-test|unstorage@1.17.5",
@@ -15054,11 +14981,11 @@
         "skills-test|chokidar@5.0.0",
         "skills-test|destr@2.0.5",
         "skills-test|h3@1.15.11",
-        "skills-test|idb-keyval@6.2.2",
-        "skills-test|lru-cache@11.3.5",
+        "skills-test|idb-keyval@6.2.4",
+        "skills-test|lru-cache@11.5.1",
         "skills-test|node-fetch-native@1.6.7",
         "skills-test|ofetch@1.5.1",
-        "skills-test|ufo@1.6.3"
+        "skills-test|ufo@1.6.4"
       ]
     },
     {
@@ -15072,7 +14999,7 @@
       "ref": "skills-test|es-define-property@1.0.1"
     },
     {
-      "ref": "skills-test|es-object-atoms@1.1.1",
+      "ref": "skills-test|es-object-atoms@1.1.2",
       "dependsOn": [
         "skills-test|es-errors@1.3.0"
       ]
@@ -15081,7 +15008,7 @@
       "ref": "skills-test|get-proto@1.0.1",
       "dependsOn": [
         "skills-test|dunder-proto@1.0.1",
-        "skills-test|es-object-atoms@1.1.1"
+        "skills-test|es-object-atoms@1.1.2"
       ]
     },
     {
@@ -15094,16 +15021,16 @@
       "ref": "skills-test|math-intrinsics@1.1.0"
     },
     {
-      "ref": "skills-test|@peculiar/asn1-x509-attr@2.6.1",
+      "ref": "skills-test|@peculiar/asn1-x509-attr@2.7.0",
       "dependsOn": [
-        "skills-test|@peculiar/asn1-schema@2.6.0",
-        "skills-test|@peculiar/asn1-x509@2.6.1",
-        "skills-test|asn1js@3.0.7",
+        "skills-test|@peculiar/asn1-schema@2.7.0",
+        "skills-test|@peculiar/asn1-x509@2.7.0",
+        "skills-test|asn1js@3.0.10",
         "skills-test|tslib@2.8.1"
       ]
     },
     {
-      "ref": "skills-test|asn1js@3.0.7",
+      "ref": "skills-test|asn1js@3.0.10",
       "dependsOn": [
         "skills-test|pvtsutils@1.3.6",
         "skills-test|pvutils@1.1.5",
@@ -15111,22 +15038,28 @@
       ]
     },
     {
-      "ref": "skills-test|@peculiar/asn1-pfx@2.6.1",
+      "ref": "skills-test|@peculiar/asn1-pfx@2.7.0",
       "dependsOn": [
-        "skills-test|@peculiar/asn1-cms@2.6.1",
-        "skills-test|@peculiar/asn1-pkcs8@2.6.1",
-        "skills-test|@peculiar/asn1-rsa@2.6.1",
-        "skills-test|@peculiar/asn1-schema@2.6.0",
-        "skills-test|asn1js@3.0.7",
+        "skills-test|@peculiar/asn1-cms@2.7.0",
+        "skills-test|@peculiar/asn1-pkcs8@2.7.0",
+        "skills-test|@peculiar/asn1-rsa@2.7.0",
+        "skills-test|@peculiar/asn1-schema@2.7.0",
+        "skills-test|asn1js@3.0.10",
         "skills-test|tslib@2.8.1"
       ]
     },
     {
-      "ref": "skills-test|@peculiar/asn1-pkcs8@2.6.1",
+      "ref": "skills-test|@peculiar/asn1-pkcs8@2.7.0",
       "dependsOn": [
-        "skills-test|@peculiar/asn1-schema@2.6.0",
-        "skills-test|@peculiar/asn1-x509@2.6.1",
-        "skills-test|asn1js@3.0.7",
+        "skills-test|@peculiar/asn1-schema@2.7.0",
+        "skills-test|@peculiar/asn1-x509@2.7.0",
+        "skills-test|asn1js@3.0.10",
+        "skills-test|tslib@2.8.1"
+      ]
+    },
+    {
+      "ref": "skills-test|@peculiar/utils@2.0.3",
+      "dependsOn": [
         "skills-test|tslib@2.8.1"
       ]
     },
@@ -15201,12 +15134,12 @@
         "skills-test|iron-webcrypto@1.2.1",
         "skills-test|node-mock-http@1.0.4",
         "skills-test|radix3@1.1.2",
-        "skills-test|ufo@1.6.3",
+        "skills-test|ufo@1.6.4",
         "skills-test|uncrypto@0.1.3"
       ]
     },
     {
-      "ref": "skills-test|lru-cache@11.3.5"
+      "ref": "skills-test|lru-cache@11.5.1"
     },
     {
       "ref": "skills-test|node-fetch-native@1.6.7"
@@ -15216,11 +15149,11 @@
       "dependsOn": [
         "skills-test|destr@2.0.5",
         "skills-test|node-fetch-native@1.6.7",
-        "skills-test|ufo@1.6.3"
+        "skills-test|ufo@1.6.4"
       ]
     },
     {
-      "ref": "skills-test|ufo@1.6.3"
+      "ref": "skills-test|ufo@1.6.4"
     },
     {
       "ref": "skills-test|dunder-proto@1.0.1",
@@ -15271,14 +15204,15 @@
       "dependsOn": [
         "x402-pay|@x402/evm@2.10.0",
         "x402-pay|@x402/fetch@2.10.0",
-        "x402-pay|viem@2.47.18"
+        "x402-pay|dotenv@17.4.2",
+        "x402-pay|viem@2.51.3"
       ]
     },
     {
       "ref": "x402-pay|@x402/evm@2.10.0",
       "dependsOn": [
         "x402-pay|@x402/core@2.10.0",
-        "x402-pay|viem@2.47.18",
+        "x402-pay|viem@2.51.3",
         "x402-pay|zod@3.25.76"
       ]
     },
@@ -15286,12 +15220,15 @@
       "ref": "x402-pay|@x402/fetch@2.10.0",
       "dependsOn": [
         "x402-pay|@x402/core@2.10.0",
-        "x402-pay|viem@2.47.18",
+        "x402-pay|viem@2.51.3",
         "x402-pay|zod@3.25.76"
       ]
     },
     {
-      "ref": "x402-pay|viem@2.47.18",
+      "ref": "x402-pay|dotenv@17.4.2"
+    },
+    {
+      "ref": "x402-pay|viem@2.51.3",
       "dependsOn": [
         "x402-pay|@noble/curves@1.9.1",
         "x402-pay|@noble/hashes@1.8.0",
@@ -15299,8 +15236,8 @@
         "x402-pay|@scure/bip39@1.6.0",
         "x402-pay|abitype@1.2.3",
         "x402-pay|isows@1.0.7",
-        "x402-pay|ox@0.14.15",
-        "x402-pay|ws@8.18.3"
+        "x402-pay|ox@0.14.25",
+        "x402-pay|ws@8.20.1"
       ]
     },
     {
@@ -15345,11 +15282,11 @@
     {
       "ref": "x402-pay|isows@1.0.7",
       "dependsOn": [
-        "x402-pay|ws@8.18.3"
+        "x402-pay|ws@8.20.1"
       ]
     },
     {
-      "ref": "x402-pay|ox@0.14.15",
+      "ref": "x402-pay|ox@0.14.25",
       "dependsOn": [
         "x402-pay|@adraffy/ens-normalize@1.11.1",
         "x402-pay|@noble/ciphers@1.3.0",
@@ -15362,7 +15299,7 @@
       ]
     },
     {
-      "ref": "x402-pay|ws@8.18.3"
+      "ref": "x402-pay|ws@8.20.1"
     },
     {
       "ref": "x402-pay|@scure/base@1.2.6"

@@ -2,12 +2,9 @@
   "license": "Apache-2.0",
   "type": "module",
   "dependencies": {
-    "@turnkey/sdk-server": "6.0.0",
-    "@turnkey/viem": "0.14.29",
     "@x402/evm": "2.10.0",
     "@x402/fetch": "2.10.0",
     "dotenv": "17.4.2",
-    "near-api-js": "7.2.0",
     "viem": "2.51.3"
   }
 }

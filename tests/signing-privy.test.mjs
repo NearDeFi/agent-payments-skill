@@ -3,7 +3,7 @@
 //
 // What this test does:
 //   1. Fails immediately with a list of missing env vars if credentials are not set
-//   2. Runs sign-x402-payment.mjs payload to get an EIP-712 signing payload from the fixture requirements
+//   2. Takes the static EIP-712 payload fixture (the shape @x402/fetch hands the signer)
 //   3. Builds the signer object exactly as documented in references/wallet-flows.md
 //      (Privy sub-section under "Managed signer wallets: CDP, Privy, Turnkey")
 //   4. Calls signer.signTypedData(payload) — the body POSTs to Privy's REST API
@@ -11,16 +11,13 @@
 //   5. Asserts the returned signature is a valid 65-byte hex string (0x + 130 chars)
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { run, PAYMENT_REQUIRED_FIXTURE } from './helpers.mjs';
+import { PAYMENT_PAYLOAD_FIXTURE } from './helpers.mjs';
 
 test('Privy: documented signer wrapper produces a valid EIP-712 signature', { timeout: 30_000 }, async () => {
   const missing = ['PRIVY_APP_ID', 'PRIVY_APP_SECRET', 'PRIVY_WALLET_ID', 'PRIVY_WALLET_ADDRESS'].filter(k => !process.env[k]);
   assert.equal(missing.length, 0, `Missing env vars — set these in .env to run Privy tests: ${missing.join(', ')}`);
 
-  const { code, stdout } = await run('sign-x402-payment.mjs', ['payload', '--requirements', PAYMENT_REQUIRED_FIXTURE]);
-  assert.equal(code, 0, 'payload command should succeed');
-
-  const payload = JSON.parse(stdout);
+  const payload = structuredClone(PAYMENT_PAYLOAD_FIXTURE);
   payload.message.from = process.env.PRIVY_WALLET_ADDRESS;
 
   const signer = {
@@ -33,10 +30,15 @@ test('Privy: documented signer wrapper produces a valid EIP-712 signature', { ti
           Authorization: `Basic ${Buffer.from(`${process.env.PRIVY_APP_ID}:${process.env.PRIVY_APP_SECRET}`).toString('base64')}`,
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          method: 'eth_signTypedData_v4',
-          params: { typed_data: { domain, types, primary_type: primaryType, message } },
-        }),
+        // @x402/fetch passes uint256 fields (value, validAfter, validBefore) as BigInt;
+        // JSON.stringify throws on BigInt, so stringify them via a replacer.
+        body: JSON.stringify(
+          {
+            method: 'eth_signTypedData_v4',
+            params: { typed_data: { domain, types, primary_type: primaryType, message } },
+          },
+          (_k, v) => (typeof v === 'bigint' ? v.toString() : v),
+        ),
       });
       assert.equal(res.status, 200, `Privy API returned ${res.status}`);
       const { data: { signature } } = await res.json();

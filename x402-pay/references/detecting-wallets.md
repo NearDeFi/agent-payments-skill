@@ -1,8 +1,8 @@
 # Detecting Which Wallet to Use
 
-Run this once at the start (SKILL.md Step 1) to decide which wallet you'll pay with. Once you've picked one, return to SKILL.md Step 2 and continue. For *how* to perform any action with the chosen wallet (address, balance, fund, pay), see `references/wallet-flows.md`.
+Run this once at the start (SKILL.md Step 1) to decide which wallet you'll pay with. Once you've picked one, return to SKILL.md Step 2 and continue. 
 
-The wallet **must support Base** — all options below do.
+The wallet **must support Base** — all options below do. If your current wallet set up does not support base you'll need to support a new wallet.
 
 ---
 
@@ -12,7 +12,7 @@ Look at your system prompt, agent config files, and environment setup docs. If y
 
 ## 2. Scan for a configured wallet
 
-Check environment variables and config for each setup below. The example env vars are detection signals — if you see them or similar environment variables, that wallet is configured.
+Check environment variables and config for each setup below. The example env vars are detection signals — if you see them or similar environment variables, that wallet may be configured and you should attempt to proceed with it.
 
 | Wallet | Detection signal (example env vars / check) |
 | --- | --- |
@@ -28,7 +28,7 @@ Check environment variables and config for each setup below. The example env var
 
 Choose the first that applies:
 
-1. **Coinbase Agentic Wallet (awal)** — if configured/authenticated, prefer it. (No private key to lose, agent-native, native x402.)
+1. **Coinbase Agentic Wallet (awal)** — if configured/authenticated, prefer it.
 2. **Another configured managed wallet** — CDP, Privy, or Turnkey, if its env vars/config are present.
 3. **Raw private key** — if one is configured (subject to the caution above).
 4. **Nothing configured** → default to setting up a **Coinbase Agentic Wallet** (see *Setting up the Agentic Wallet (awal)* below).
@@ -45,7 +45,7 @@ First **ask the user for the email address to use** — substitute it for `you@e
 
 ```bash
 npx awal@2.10.0 status                        # check first — shows the address if already signed in
-npx awal@2.10.0 auth login you@example.com   # if signed out: emails a 6-digit code to that address
+npx awal@2.10.0 auth login you@example.com    # if signed out: emails a 6-digit code to that address
 npx awal@2.10.0 auth verify <6-digit-code>    # complete sign-in — the 6-digit code is the only argument
 ```
 
