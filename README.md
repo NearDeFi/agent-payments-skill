@@ -6,7 +6,7 @@ Before using this skill please review the [DISCLOSURES.txt](./DISCLOSURES.txt) a
 
 ## Recommended agent setup
 
-This skill moves real money. Configure your agent/harness so it **asks for approval before executing commands** rather than running them automatically. Keep wallet-level spend limits in place (`--max-amount` on `awal x402 pay`, or Agentic Wallet / CDP spend policies), and **review every transaction** — confirm the price, recipient, and amount before approving. 
+This skill moves real money. Configure your agent/harness so it **asks for approval before executing commands** rather than running them automatically. Keep wallet-level spend limits in place, and **review every transaction** — confirm the price, recipient, and amount before approving. 
 
 ## Install
 
@@ -23,25 +23,91 @@ npm install
 
 Where `<skills-dir>` is `.agents/skills` (universal) or `.claude/skills` (Claude Code), relative to your project root or home directory depending on whether you installed globally.
 
-## Prerequisites (for development)
+## Wallet configuration
 
-**Node.js 20+** — required for built-in `node:test`, top-level `await`, and `.mjs` support.
+The skill will check the agent's context for configured wallets. It requires a wallet on Base, and will either use an existing wallet or create one if none is already configured. The skill has explicit wallet support for AWAL, CDP, Privy, Turnkey, and private key. To use your AWAL wallet, log in via the terminal where the agent executes commands. For other wallets, configure the relevant environment variables in a `.env` file in the root of your agent.
 
-**viem**, **@x402/fetch**, **@x402/evm** — used by the scripts for payment signing and protocol handling. Install once before running scripts:
+```env
+# To use CDP configure the following environment variables
+CDP_API_KEY_ID=
+CDP_API_KEY_SECRET=
+CDP_WALLET_ADDRESS=
+CDP_WALLET_SECRET=
 
-```bash
-npm install
+# To use Privy configure the following environment variables
+PRIVY_APP_ID=
+PRIVY_APP_SECRET=
+PRIVY_WALLET_ID=
+PRIVY_WALLET_ADDRESS=
+
+# To use Turnkey configure the following environment variables
+TURNKEY_API_PUBLIC_KEY=
+TURNKEY_API_PRIVATE_KEY=
+TURNKEY_ORGANIZATION_ID=
+TURNKEY_SIGN_WITH=
+
+# To use a private key configure the following environment variables
+X402_PRIVATE_KEY=
 ```
 
-## RPC provider (optional)
+The agent also requires funds to use the skill. These funds can be in the configured base wallet or in any wallet that NEAR Intents supports. You should give your agent context on how to transfer funds from the wallet and which assets from the wallet you would like the agent to use.
+
+For example if you have funds in a NEAR wallet, in your task prompt or CLAUDE.md file you could state:
+
+```txt
+You have USDC in your NEAR account (bed9cc78b590bfb6fd1db39811ded08b689b8772b06cbb67e74a86b36f56d399). 
+A NEAR_PRIVATE_KEY is configured in the .env file in the agent root.
+
+To send USDC from NEAR (USDC contract: 17208628f84f5d6ad33f0da3bbbeb27ffcb398eac501a31bd6ad2011e36133a1):
+
+node --input-type=module -e "
+  import { Account, JsonRpcProvider, KeyPairSigner } from 'near-api-js';
+  const provider = new JsonRpcProvider({ url: 'https://free.rpc.fastnear.com' });
+  const signer = KeyPairSigner.fromSecretKey(process.env.NEAR_PRIVATE_KEY);
+  const account = new Account('bed9cc78b590bfb6fd1db39811ded08b689b8772b06cbb67e74a86b36f56d399', provider, signer);
+  const r = await account.callFunctionRaw({ contractId: '17208628f84f5d6ad33f0da3bbbeb27ffcb398eac501a31bd6ad2011e36133a1', methodName: 'ft_transfer', args: { receiver_id: '<DEPOSIT_ADDRESS>', amount: '<AMOUNT_IN>' }, deposit: 1n, gas: 30000000000000n });
+  console.log(r.transaction.hash);
+  "
+
+Install near-api-js if not present: npm install near-api-js@7.2.0 (in x402-pay directory)
+```
+
+## RPC provider configuration
 
 `scripts/wallet.mjs balance` defaults to the public Base RPC (`https://mainnet.base.org`), which is rate-limited. For production, point it at your own provider via env vars in `.env`:
 
 ```
-BASE_RPC_URL=https://your-provider.example/v2/<project>
+BASE_RPC_URL=https://your-provider.example
 BASE_RPC_KEY=<bearer token>   # optional
 ```
 
-Or per-invocation: `node scripts/wallet.mjs balance <address> --rpc <url> [--rpc-key <key>]`.
+## Tests
 
-`--rpc-key` is sent as `Authorization: Bearer <key>`. Most providers (Alchemy, Infura, QuickNode) embed the key in the URL — for those, put the full URL with the key in `BASE_RPC_URL` and omit `BASE_RPC_KEY`.
+Run the suite with:
+
+```bash
+npm run test
+```
+
+Most tests need no configuration. The wallet-signing tests require their wallet credentials in `x402-pay/.env`:
+
+```env
+CDP_API_KEY_ID=
+CDP_API_KEY_SECRET=
+CDP_WALLET_ADDRESS=
+CDP_WALLET_SECRET=
+
+PRIVY_APP_ID=
+PRIVY_APP_SECRET=
+PRIVY_WALLET_ID=
+PRIVY_WALLET_ADDRESS=
+
+TURNKEY_API_PUBLIC_KEY=
+TURNKEY_API_PRIVATE_KEY=
+TURNKEY_ORGANIZATION_ID=
+TURNKEY_SIGN_WITH=
+```
+
+## Evals 
+
+TODO

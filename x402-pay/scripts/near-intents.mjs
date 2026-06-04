@@ -138,7 +138,7 @@ if (cmd === 'tokens') {
   );
   if (!token) {
     console.error(`Token not found: ${fromSymbol} on ${fromChain}`);
-    console.error('Run: node scripts/near-intents.mjs tokens  to list all valid chain:SYMBOL pairs');
+    console.error('Run: node scripts/near-intents.mjs tokens to list all valid chain:SYMBOL pairs');
     process.exit(1);
   }
 

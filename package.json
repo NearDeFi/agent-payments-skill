@@ -1,6 +1,9 @@
 {
   "license": "Apache-2.0",
   "type": "module",
+  "scripts": {
+    "test": "node --test tests/*.test.mjs"
+  },
   "devDependencies": {
     "@coinbase/cdp-sdk": "1.51.0",
     "@turnkey/sdk-server": "6.0.0",

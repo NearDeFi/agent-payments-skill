@@ -4,20 +4,12 @@
 
 **Never push directly to `main` or `master`.** This is enforced via `deny` rules in `.claude/settings.json` — the push command will be blocked at the tool level.
 
-### Branch naming
-
-Always work on a branch prefixed with `claude/`. Examples:
-
-- `claude/improvements`
-- `claude/fix-auth`
-- `claude/add-feature-x`
-
 ### Required workflow
 
-1. Check the current branch — if already on `main`, create and switch to a `claude/` branch before making any changes.
+1. Check the current branch — if already on `main`, create and switch to a new branch before making any changes.
 2. Make commits on that branch.
-3. Push the branch: `git push -u origin claude/<name>` (pre-approved in settings.json).
-4. Open a PR from `claude/<name>` → `main` for the user to review and merge.
+3. Push the branch: `git push -u origin <name>` (pre-approved in settings.json).
+4. Open a PR from `<name>` → `main` for the user to review and merge.
 
 Do **not** attempt to merge or rebase into `main` directly. Do **not** force-push.
 

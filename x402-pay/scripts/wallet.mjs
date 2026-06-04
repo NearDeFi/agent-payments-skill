@@ -13,8 +13,6 @@
 //   node scripts/wallet.mjs new
 
 import { randomBytes } from 'crypto';
-import http from 'http';
-import https from 'https';
 import { loadEnv } from './load-env.mjs';
 loadEnv();
 
@@ -42,31 +40,6 @@ function getRpcConfig() {
   return { url, key };
 }
 
-function rpcCall(method, params, { url, key } = {}) {
-  return new Promise((resolve, reject) => {
-    const body = JSON.stringify({ jsonrpc: '2.0', id: 1, method, params });
-    const headers = { 'Content-Type': 'application/json', 'Content-Length': Buffer.byteLength(body) };
-    if (key) headers['Authorization'] = `Bearer ${key}`;
-    const lib = new URL(url).protocol === 'http:' ? http : https;
-    const req = lib.request(url, { method: 'POST', headers }, (res) => {
-      let data = '';
-      res.on('data', c => { data += c; });
-      res.on('end', () => {
-        if (res.statusCode < 200 || res.statusCode >= 300) {
-          return reject(new Error(`RPC HTTP ${res.statusCode}: ${data.slice(0, 200)}`));
-        }
-        let parsed;
-        try { parsed = JSON.parse(data); } catch (e) { return reject(new Error(`Invalid RPC JSON: ${e.message}`)); }
-        if (parsed?.error) return reject(new Error(`RPC error: ${parsed.error.message || JSON.stringify(parsed.error)}`));
-        resolve(parsed.result);
-      });
-    });
-    req.on('error', reject);
-    req.write(body);
-    req.end();
-  });
-}
-
 if (cmd === 'address') {
   const key = getKey();
   if (!key) {
@@ -84,12 +57,13 @@ if (cmd === 'address') {
     console.error('Usage: node scripts/wallet.mjs balance <address>');
     process.exit(1);
   }
-  // Call balanceOf(address) on the USDC contract
-  const paddedAddr = address.toLowerCase().replace('0x', '').padStart(64, '0');
-  const data = `0x70a08231${paddedAddr}`;
-  const result = await rpcCall('eth_call', [{ to: USDC_BASE, data }, 'latest'], getRpcConfig());
-  const raw = BigInt(result);
-  const { formatUnits } = await import('viem');
+  // Read USDC balanceOf(address) via viem — handles the eth_call, ABI encoding, and decoding.
+  const { url, key } = getRpcConfig();
+  const { createPublicClient, http, formatUnits, erc20Abi } = await import('viem');
+  const client = createPublicClient({
+    transport: http(url, key ? { fetchOptions: { headers: { Authorization: `Bearer ${key}` } } } : undefined),
+  });
+  const raw = await client.readContract({ address: USDC_BASE, abi: erc20Abi, functionName: 'balanceOf', args: [address] });
   const usd = formatUnits(raw, 6);
   const display = usd.includes('.') ? usd : `${usd}.000000`;
   console.log(`${display} USDC  (${raw} atomic units)`);
