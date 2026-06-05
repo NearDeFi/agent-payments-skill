@@ -18,12 +18,7 @@ export const TEST_ADDRESS = '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266';
 
 // EIP-712 TransferWithAuthorization payload for a representative x402 "exact" payment on
 // Base (USDC) — the input the wallet signing tests feed to each documented `signTypedData`.
-// This is the exact shape @x402/fetch hands the signer at runtime, including the uint256
-// fields (value, validAfter, validBefore) as BigInt — see @x402/evm's exact client. Keeping
-// them as BigInt here is what lets the Privy test catch a missing JSON-BigInt replacer.
-// The nonce and time fields are frozen to fixed values (the tests only assert signature
-// shape, not content); `message.from` is a placeholder each test overwrites with its own
-// wallet address. Clone before mutating: structuredClone(...).
+// This is the exact shape @x402/fetch hands the signer at runtime.
 export const PAYMENT_PAYLOAD_FIXTURE = {
   domain: {
     name: 'USD Coin',

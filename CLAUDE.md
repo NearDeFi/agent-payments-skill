@@ -2,24 +2,26 @@
 
 ## Git Workflow
 
-**Never push directly to `main` or `master`.** This is enforced via `deny` rules in `.claude/settings.json` — the push command will be blocked at the tool level.
+**Never push to or open a PR against `main` directly.** Pushing to `main` is blocked via `deny` rules in `.claude/settings.json`. All work flows through the long-lived **`development`** branch, which is the integration branch; `main` only ever receives `development`.
 
-### Branch naming
+### Branch model
 
-Always work on a branch prefixed with `claude/`. Examples:
+- **`main`** — stable, eval-verified. Only the user promotes `development` → `main`, and only after the evals pass. Never target `main` with a feature PR.
+- **`development`** — the integration branch. All feature work merges here first.
 
-- `claude/improvements`
-- `claude/fix-auth`
-- `claude/add-feature-x`
+### Required workflow for any change
 
-### Required workflow
+1. Branch off `development` (not `main`): `git checkout development && git pull && git checkout -b <name>`.
+2. Make commits on `<name>`.
+3. Run `npm run test` and make it pass before opening a PR.
+4. Push: `git push -u origin <name>` (pre-approved in settings.json).
+5. Open a PR from `<name>` → **`development`** for the user to review and merge. Never open a PR into `main`.
 
-1. Check the current branch — if already on `main`, create and switch to a `claude/` branch before making any changes.
-2. Make commits on that branch.
-3. Push the branch: `git push -u origin claude/<name>` (pre-approved in settings.json).
-4. Open a PR from `claude/<name>` → `main` for the user to review and merge.
+### Promoting to `main` (user-initiated only)
 
-Do **not** attempt to merge or rebase into `main` directly. Do **not** force-push.
+Do **not** open `development` → `main` PRs as part of normal work. `main` is gated on the **evals** (which cost real USDC and are slow), so promotion happens infrequently and only when the user asks. When promoting, use a regular merge (not squash) so each feature's history is preserved on `main`.
+
+Do **not** merge or rebase into `main` directly. Do **not** force-push.
 
 ## Agent Skills — Authoring Standards
 

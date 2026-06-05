@@ -25,7 +25,7 @@ Only use this flow for the following chains. Do not attempt it for any other cha
 
 Think about the agent's role and how long it will reasonably be running, not just the immediate call. Depositing enough to avoid frequent interruptions is a good idea — but don't over-fund beyond what the role actually warrants.
 
-Estimate spend across the likely execution period (calls per session × price per call), then get a quote for that amount. The quote's **Send (units):** output is the exact raw amount to send — use that value directly, do not calculate or round it yourself.
+Base the estimate on the **actual per-call price you previewed with `check-price.mjs`** (SKILL.md Step 3) — not a guess. Estimate spend across the likely execution period (expected calls per session × that price), then get a quote for that amount. The quote's **Send (units):** output is the exact raw amount to send — use that value directly, do not calculate or round it yourself.
 
 ---
 

@@ -7,10 +7,11 @@
 //   3. balance: calls Base mainnet RPC to fetch the USDC balance of the test address
 //      (live network call — asserts the output is a numeric USDC value)
 //   4. balance (no address): exits 1 and prints usage when called without an address argument
-//   5. new: generates a fresh random private key, prints "Private key:" and "Address:",
-//      and the address matches the standard 0x + 40 hex char EVM format
+//   5. balance (invalid address): exits 1 with "Invalid address" for a non-address argument
 //   6. balance --rpc: routes the eth_call to a custom RPC URL and parses its response
 //   7. balance --rpc-key: sends the key as `Authorization: Bearer <key>` to the custom RPC
+//   8. new: generates a fresh random private key, prints "Private key:" and "Address:",
+//      and the address matches the standard 0x + 40 hex char EVM format
 
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
@@ -63,6 +64,12 @@ test('wallet balance: errors with no address', async () => {
   const { code, stderr } = await run('wallet.mjs', ['balance']);
   assert.equal(code, 1);
   assert.match(stderr, /Usage/i);
+});
+
+test('wallet balance: errors on an invalid address', async () => {
+  const { code, stderr } = await run('wallet.mjs', ['balance', 'notanaddress']);
+  assert.equal(code, 1);
+  assert.match(stderr, /Invalid address/i);
 });
 
 test('wallet balance: routes to custom --rpc url', async () => {

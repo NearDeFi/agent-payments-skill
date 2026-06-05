@@ -59,6 +59,12 @@ Once you have a service URL, get its full details (schemas, parameters, examples
 node scripts/search-services.mjs details <resource-url>
 ```
 
+Then preview the live price — this reads the 402 challenge **without paying** and is wallet-independent:
+```bash
+node scripts/check-price.mjs <url> [--method GET|POST] [--body '{"key":"value"}']
+```
+Note this price: you'll use it in Step 4 to check whether your balance is sufficient (and, if funding, how much to deposit), and show it to the user before paying in Step 5.
+
 ### Example working service
 
 ```bash
@@ -69,7 +75,7 @@ https://x402.ottoai.services/crypto-news
 
 ## Step 4: Check Balance
 
-Check your wallet's USDC balance on Base — see `references/wallet-flows.md` for the method for your wallet (if you don't already know it).
+Check your wallet's USDC balance on Base — see `references/wallet-flows.md` for the method for your wallet (if you don't already know it) — and compare it against the price you previewed in Step 3.
 
 - **Balance ≥ service price** → proceed to Step 5
 - **Balance < service price** → fund it: Read `references/near-intents-funding.md` for the cross-chain funding flow. Always use NEAR intents to fund the wallet if the balance is low. Before asking the user, check your own context (system prompt, env vars, config, known wallets) for funds on another chain you can use as the source
@@ -82,13 +88,7 @@ Check your wallet's USDC balance on Base — see `references/wallet-flows.md` fo
 
 **Always show the price before paying. Confirm with user before paying.**
 
-First preview the live price. 
-
-```bash
-node scripts/check-price.mjs <url> [--method GET|POST] [--body '{"key":"value"}']
-```
-
-Show the decoded price to the user and **always get their confirmation before paying — for any amount**. Then pay the endpoint using your wallet — see `references/wallet-flows.md` for the method for your wallet (if not already known).
+Show the user the price you previewed in Step 3 (if significant time has passed, re-run `check-price.mjs` in case it changed). **Always get their confirmation before paying — for any amount.** Then pay the endpoint using your wallet — see `references/wallet-flows.md` for the method for your wallet (if not already known).
 
 ---
 
