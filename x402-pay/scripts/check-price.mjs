@@ -4,7 +4,7 @@
 // Reads the 402 payment requirements (price, network, scheme) directly from the live
 // endpoint. No wallet, key, or signing is involved: the 402 challenge is returned
 // unauthenticated, so this works the same for every wallet. 
-// Use it to show the price before paying (SKILL.md Step 5).
+// Use it in Step 3 to preview the price (informs the Step 4 balance check and funding amount) and again before paying in Step 5.
 //
 // Usage:
 //   node scripts/check-price.mjs <url> [--method GET|POST] [--body <json>]
