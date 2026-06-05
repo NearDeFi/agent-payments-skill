@@ -55,8 +55,7 @@ The agent also requires funds to use the skill. These funds can be in the config
 For example if you have funds in a NEAR wallet, in your task prompt or CLAUDE.md file you could state:
 
 ```txt
-You have USDC in your NEAR account (bed9cc78b590bfb6fd1db39811ded08b689b8772b06cbb67e74a86b36f56d399). 
-A NEAR_PRIVATE_KEY is configured in the .env file in the agent root.
+You have USDC in your NEAR account. Its account ID is in the NEAR_ACCOUNT_ID environment variable and a NEAR_PRIVATE_KEY is configured in the .env file in the agent root.
 
 To send USDC from NEAR (USDC contract: 17208628f84f5d6ad33f0da3bbbeb27ffcb398eac501a31bd6ad2011e36133a1):
 
@@ -64,7 +63,7 @@ node --input-type=module -e "
   import { Account, JsonRpcProvider, KeyPairSigner } from 'near-api-js';
   const provider = new JsonRpcProvider({ url: 'https://free.rpc.fastnear.com' });
   const signer = KeyPairSigner.fromSecretKey(process.env.NEAR_PRIVATE_KEY);
-  const account = new Account('bed9cc78b590bfb6fd1db39811ded08b689b8772b06cbb67e74a86b36f56d399', provider, signer);
+  const account = new Account(process.env.NEAR_ACCOUNT_ID, provider, signer);
   const r = await account.callFunctionRaw({ contractId: '17208628f84f5d6ad33f0da3bbbeb27ffcb398eac501a31bd6ad2011e36133a1', methodName: 'ft_transfer', args: { receiver_id: '<DEPOSIT_ADDRESS>', amount: '<AMOUNT_IN>' }, deposit: 1n, gas: 30000000000000n });
   console.log(r.transaction.hash);
   "
