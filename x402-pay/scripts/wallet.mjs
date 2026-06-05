@@ -59,11 +59,19 @@ if (cmd === 'address') {
   }
   // Read USDC balanceOf(address) via viem — handles the eth_call, ABI encoding, and decoding.
   const { url, key } = getRpcConfig();
-  const { createPublicClient, http, formatUnits, erc20Abi } = await import('viem');
+  const { createPublicClient, http, formatUnits, erc20Abi, getAddress } = await import('viem');
+  // Normalize/validate the address — viem requires a 0x-prefixed, checksum-valid address.
+  let target;
+  try {
+    target = getAddress(address.startsWith('0x') ? address : `0x${address}`);
+  } catch {
+    console.error(`Invalid address: ${address}`);
+    process.exit(1);
+  }
   const client = createPublicClient({
     transport: http(url, key ? { fetchOptions: { headers: { Authorization: `Bearer ${key}` } } } : undefined),
   });
-  const raw = await client.readContract({ address: USDC_BASE, abi: erc20Abi, functionName: 'balanceOf', args: [address] });
+  const raw = await client.readContract({ address: USDC_BASE, abi: erc20Abi, functionName: 'balanceOf', args: [target] });
   const usd = formatUnits(raw, 6);
   const display = usd.includes('.') ? usd : `${usd}.000000`;
   console.log(`${display} USDC  (${raw} atomic units)`);

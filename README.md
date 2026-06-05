@@ -89,7 +89,7 @@ Run the suite with:
 npm run test
 ```
 
-Most tests need no configuration. The wallet-signing tests require their wallet credentials in `x402-pay/.env`:
+Tests are integration tests and require network connection. The wallet-signing tests require their wallet credentials in `x402-pay/.env`:
 
 ```env
 CDP_API_KEY_ID=

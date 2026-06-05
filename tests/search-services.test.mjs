@@ -28,6 +28,11 @@ test('search-services: keyword surfaces the matching service', { timeout: 20_000
   // A topical keyword should narrow to relevant services. Our crypto-news example
   // service (Otto AI, https://x402.ottoai.services) is listed on x402-list with
   // "news" in its description, so searching "news" should surface it.
+  //
+  // NOTE: this deliberately couples to a specific third-party service being present in
+  // the externally-managed x402-list. It is a network-tier test (not part of the offline
+  // gate) and will fail if Otto AI is delisted/renamed or its description changes — an
+  // accepted trade-off for asserting our example service is discoverable by keyword.
   const { code, stdout } = await run('search-services.mjs', ['search', 'news']);
   assert.equal(code, 0);
   assert.match(stdout, /x402\.ottoai\.services/, 'expected the crypto-news example service for keyword "news"');
