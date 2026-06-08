@@ -6,7 +6,20 @@ compatibility: >
   Requires internet access and `npm install` in x402-pay/. Wallet support: Coinbase Agentic Wallet
   (awal, default), raw private key, CDP SDK, Privy server wallets, Turnkey.
 metadata:
-  version: "1.0"
+  version: "1.0.0"
+  openclaw:
+    homepage: https://github.com/NearDeFi/agent-payments-skill
+    emoji: "💸"
+    requires:
+      bins: ["node"]
+    install:
+      - node: { cwd: "." }
+    envVars:
+      - { name: X402_PRIVATE_KEY, required: false, description: "Raw private key wallet (aliases: PRIVATE_KEY/WALLET_PRIVATE_KEY/AGENT_PRIVATE_KEY/ETH_PRIVATE_KEY)" }
+      - { name: BASE_RPC_URL,     required: false, description: "Custom Base RPC (else public RPC)" }
+      - { name: CDP_API_KEY_ID,   required: false, description: "Coinbase CDP SDK wallet" }
+      - { name: PRIVY_APP_ID,     required: false, description: "Privy server wallet" }
+      - { name: TURNKEY_ORGANIZATION_ID, required: false, description: "Turnkey wallet" }
 ---
 
 # x402 — HTTP-Native Payments
