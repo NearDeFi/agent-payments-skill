@@ -73,6 +73,19 @@ node scripts/near-intents.mjs quote \
 
 Once the script prints the quote, **send the exact `Send (units):` amount to the `Deposit to:` address using your source wallet** (the wallet on the origin chain you identified in "Determine source of funds"). Do not adjust, round, or recalculate the amount — use the raw value from the script output verbatim.
 
+### If the quote is rejected: `COST LIMIT EXCEEDED`
+
+The quote command enforces a hard cost cap: it **refuses to print a deposit address** when the swap's USD overhead (what you send vs. what arrives on Base) exceeds **both 2.5% and $0.005**. This usually means the chosen source asset is illiquid or the route is unfavourable.
+
+When you see `COST LIMIT EXCEEDED`, **do not just override it.** Always:
+
+1. **Report it to the user** — state what was quoted and exactly what exceeded the limit, e.g. *"Funding from `<chain:SYMBOL>` would cost $X to receive $Y USDC on Base — Z% / $W overhead, above the 2.5% / $0.005 limit."*
+2. **Ask the user how to proceed, then act on their choice:**
+   - **Fund from a different source asset** → re-run `quote` with a different `--from` (run `tokens` to list options; prefer a liquid asset like a stablecoin).
+   - **Continue anyway at this cost** → only with the user's explicit agreement, re-run the **exact same** `quote` command with `--override-cost-cap` appended (this proceeds and prints the deposit address; the overhead is still logged as a warning).
+
+Never append `--override-cost-cap` without the user's explicit go-ahead.
+
 ### Refund address
 
 Always provide `--refund` with the sending wallet address — if the swap fails, funds return directly to that address.

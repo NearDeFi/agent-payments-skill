@@ -5,12 +5,14 @@
 //   node scripts/near-intents.mjs tokens [--chain <chain>]
 //
 // Get a committed quote (deposit address + exact send amount):
-//   node scripts/near-intents.mjs quote --usdc <amount> --from <chain:SYMBOL> --wallet <baseAddress> [--refund <sendingAddress>]
+//   node scripts/near-intents.mjs quote --usdc <amount> --from <chain:SYMBOL> --wallet <baseAddress> [--refund <sendingAddress>] [--override-cost-cap]
+//   Rejects quotes whose USD overhead exceeds both 2.5% and $0.005; --override-cost-cap proceeds anyway (user-approved).
 //
 // Check swap status:
 //   node scripts/near-intents.mjs status <depositAddress> [--memo <memo>]
 
 import https from 'https';
+import { assessOverhead, MAX_OVERHEAD_USD, MAX_OVERHEAD_PCT } from './cost-guard.mjs';
 
 const API        = 'https://1click.chaindefuser.com';
 const DEST_ASSET = 'nep141:base-0x833589fcd6edb6e08f4c7c32d4f71b54bda02913.omft.near';
@@ -175,6 +177,28 @@ if (cmd === 'tokens') {
   }
 
   const q = response.quote;
+
+  // ── Cost guard ────────────────────────────────────────────────────────────
+  // Reject quotes whose USD overhead exceeds BOTH the % and $ caps (see cost-guard.mjs).
+  // Override only with explicit user consent via --override-cost-cap.
+  const cost     = assessOverhead(q.amountInUsd, q.amountOutUsd);
+  const override = args.includes('--override-cost-cap');
+
+  if (cost.exceeds && !override) {
+    console.error('COST LIMIT EXCEEDED — funding quote withheld (no deposit address shown).');
+    console.error(`  Send:     $${Number(q.amountInUsd).toFixed(4)} of ${fromSymbol} on ${fromChain}`);
+    console.error(`  Receive:  $${Number(q.amountOutUsd).toFixed(4)} USDC on Base`);
+    console.error(`  Overhead: $${cost.overheadUsd.toFixed(4)} (${cost.overheadPct.toFixed(2)}%) — over the ${MAX_OVERHEAD_PCT}% AND $${MAX_OVERHEAD_USD} limit.`);
+    console.error('');
+    console.error('Do NOT proceed silently. Report the above to the user and ask whether to:');
+    console.error('  1. Fund from a different, more liquid source asset — re-run quote with a different');
+    console.error('     --from (run the "tokens" command to list options), OR');
+    console.error('  2. Continue anyway at this cost — ONLY if the user explicitly agrees, re-run this');
+    console.error('     exact command with --override-cost-cap appended.');
+    process.exit(1);
+  } else if (cost.exceeds && override) {
+    console.warn(`WARNING: overhead $${cost.overheadUsd.toFixed(4)} (${cost.overheadPct.toFixed(2)}%) exceeds the ${MAX_OVERHEAD_PCT}% / $${MAX_OVERHEAD_USD} limit — proceeding (user-approved via --override-cost-cap).\n`);
+  }
 
   console.log(`Send:    ${q.amountInFormatted} ${fromSymbol} on ${fromChain}`);
   console.log(`Receive: ${q.amountOutFormatted} USDC on Base`);
