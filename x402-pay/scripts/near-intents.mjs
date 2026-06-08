@@ -174,7 +174,16 @@ if (cmd === 'tokens') {
   // ── Cost guard ────────────────────────────────────────────────────────────
   // Reject quotes whose USD overhead exceeds BOTH the % and $ caps (see cost-guard.mjs).
   // Override only with explicit user consent via --override-cost-cap.
-  const cost     = assessOverhead(q.amountInUsd, q.amountOutUsd);
+  // assessOverhead throws when the quote lacks usable USD figures — fail closed:
+  // print a clear message and exit 1 rather than crash with a raw stack trace.
+  let cost;
+  try {
+    cost = assessOverhead(q.amountInUsd, q.amountOutUsd);
+  } catch (e) {
+    console.error(`COST LIMIT EXCEEDED — ${e.message}`);
+    console.error('Funding cost could not be verified, so the deposit address is withheld. Report this to the user.');
+    process.exit(1);
+  }
   const override = args.includes('--override-cost-cap');
 
   if (cost.exceeds && !override) {
