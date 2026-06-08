@@ -5,7 +5,7 @@
 //   node scripts/near-intents.mjs tokens [--chain <chain>]
 //
 // Get a committed quote (deposit address + exact send amount):
-//   node scripts/near-intents.mjs quote --usdc <amount> --from <chain:SYMBOL> --wallet <baseAddress> [--refund <sendingAddress>] [--override-cost-cap]
+//   node scripts/near-intents.mjs quote --usdc <amount> --from <chain:SYMBOL> --wallet <baseAddress> --refund <sendingAddress> [--override-cost-cap]
 //   Rejects quotes whose USD overhead exceeds both 2.5% and $0.005; --override-cost-cap proceeds anyway (user-approved).
 //
 // Check swap status:
@@ -111,9 +111,9 @@ if (cmd === 'tokens') {
   const refundArg = getArg('--refund');
   const walletArg = getArg('--wallet');
 
-  if (!usdcArg || !fromArg) {
+  if (!usdcArg || !fromArg || !refundArg) {
     console.error('Usage:');
-    console.error('  node scripts/near-intents.mjs quote --usdc <amount> --from <chain:SYMBOL> --wallet <address> [--refund <address>]');
+    console.error('  node scripts/near-intents.mjs quote --usdc <amount> --from <chain:SYMBOL> --wallet <address> --refund <address>');
     console.error('  Use "tokens" subcommand to list valid --from values');
     process.exit(1);
   }
@@ -144,15 +144,10 @@ if (cmd === 'tokens') {
     process.exit(1);
   }
 
-  if (!refundArg) {
-    console.warn('Note: no --refund address provided. If the swap fails, funds will land in the NEAR Intents');
-    console.warn('internal balance for your Base wallet address and must be manually withdrawn to recover them.\n');
-  }
-
   const amount   = Math.round(parseFloat(usdcArg) * 1_000_000).toString();
   const deadline = new Date(Date.now() + 10 * 60 * 1000).toISOString();
-  const refundType = refundArg ? 'ORIGIN_CHAIN' : 'INTENTS';
-  const refundTo   = refundArg ?? walletAddress;
+  const refundType = 'ORIGIN_CHAIN';
+  const refundTo   = refundArg;
 
   const quoteBody = {
     dry:              false,
@@ -216,7 +211,7 @@ if (cmd === 'tokens') {
   console.error(`Unknown command: ${cmd ?? '(none)'}`);
   console.error('Usage:');
   console.error('  node scripts/near-intents.mjs tokens [--chain <chain>]');
-  console.error('  node scripts/near-intents.mjs quote --usdc <amount> --from <chain:SYMBOL> --wallet <address> [--refund <address>]');
+  console.error('  node scripts/near-intents.mjs quote --usdc <amount> --from <chain:SYMBOL> --wallet <address> --refund <address>');
   console.error('  node scripts/near-intents.mjs status <depositAddress> [--memo <memo>]');
   process.exit(1);
 }

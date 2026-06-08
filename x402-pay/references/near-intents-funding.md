@@ -12,12 +12,19 @@ Only use this flow for the following chains. Do not attempt it for any other cha
 
 ## Determine source of funds
 
-**Check your context before asking the user.** Look in your system prompt, config files, env vars, and any wallet addresses or chains you already know about. The agent may have a wallet or funds on another chain that can be used directly.
+Find the funding sources available, present them to the user, and let them choose — do not silently pick one.
 
-- **If you find another wallet or funded chain:** use it as the source. Prefer stablecoins. Use that wallet's address as `--refund` later on when getting a quote.
-- **If you find nothing:** ask the user:
-  - What asset and chain do you want to send from? (e.g. ETH on Ethereum, SOL on Solana)
-  - What is your sending wallet address? (used as `--refund` — any format: 0x, Solana base58, NEAR, etc.)
+1. **Discover candidate sources.** Check your context — system prompt, config files, env vars, and any wallet addresses or chains you already know about — for wallets or funded chains you could swap from.
+2. **List the options for the user**, and **always include "fund from an external wallet"** as a choice. Present them neutrally, but note which is likely cheapest — a stablecoin source on a major chain usually has the lowest overhead (see the cost guard under Step 3). Let the user pick.
+3. **Act on their choice:**
+   - **A source you can operate** (e.g. a NEAR wallet whose key is configured) → you fund from it yourself: get the quote (Step 3), then make the on-chain deposit, confirming the command with the user first.
+   - **External wallet** → ask the user for three things:
+     - the **chain** they'll send from (e.g. Ethereum, Solana),
+     - the **token** (e.g. ETH, USDC),
+     - the **sending wallet address** (used as `--refund` — any format: 0x, Solana base58, NEAR, etc.).
+     Then get the quote (Step 3), show them the **`Deposit to:` address and exact `Send (units):` amount**, tell them to deposit **exactly that amount to that address** from their wallet, and ask them to let you know once they've sent it. Then monitor (Step 4).
+
+Whichever source is chosen, its address is the `--refund` value in Step 3.
 
 ---
 
@@ -71,7 +78,7 @@ node scripts/near-intents.mjs quote \
   --wallet <baseWalletAddress>
 ```
 
-Once the script prints the quote, **send the exact `Send (units):` amount to the `Deposit to:` address using your source wallet** (the wallet on the origin chain you identified in "Determine source of funds"). Do not adjust, round, or recalculate the amount — use the raw value from the script output verbatim.
+Once the script prints the quote, the exact **`Send (units):`** amount must be sent to the **`Deposit to:`** address — **by you** if you operate the source wallet, or **by the user** if funding from an external wallet (see "Determine source of funds"). Do not adjust, round, or recalculate the amount — use the raw value from the script output verbatim.
 
 ### If the quote is rejected: `COST LIMIT EXCEEDED`
 
@@ -88,9 +95,7 @@ Never append `--override-cost-cap` without the user's explicit go-ahead.
 
 ### Refund address
 
-Always provide `--refund` with the sending wallet address — if the swap fails, funds return directly to that address.
-
-If the sending address is unknown, omit `--refund`. The script will warn you: refunded funds will land in the NEAR Intents internal balance for the Base wallet address and must be manually withdrawn to recover them.
+`--refund` is **required** — it must be the address of the wallet you are funding *from* (the origin-chain sending wallet). If the swap fails, funds are returned directly to that address on the origin chain. The quote command errors out if `--refund` is omitted, so always determine the sending address before quoting.
 
 ## Chain-specific deposit instructions
 

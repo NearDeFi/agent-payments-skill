@@ -7,7 +7,7 @@
 //   3. tokens --chain fake: exits 1 with "No tokens found" error
 //   4. quote: gets a committed quote for 1 USDC from ETH,
 //      asserts Send:, Receive:, Send (units):, and Deposit to: lines
-//   5. no --refund warning: runs a quote without --refund, asserts a warning on stderr
+//   5. missing --refund: runs the quote command without --refund, asserts exit 1 and usage output
 //   6. unknown token: uses a non-existent chain:SYMBOL (fake:FAKE), asserts exit 1
 //      and a "Token not found" error message
 //   7. missing --usdc: runs the quote command without --usdc, asserts exit 1 and usage output
@@ -49,16 +49,17 @@ test('near-intents: quote shows Send, Receive, Send (units), Deposit to', { time
   assert.match(stdout, /Deposit to:/);
 });
 
-test('near-intents: warns when no --refund provided', { timeout: 20_000 }, async () => {
-  const { stderr } = await run('near-intents.mjs', [
+test('near-intents: errors when no --refund provided', async () => {
+  const { code, stderr } = await run('near-intents.mjs', [
     'quote', '--usdc', '1.00', '--from', 'eth:ETH', '--wallet', TEST_ADDRESS,
   ]);
-  assert.match(stderr, /no --refund/i);
+  assert.equal(code, 1);
+  assert.match(stderr, /Usage/i);
 });
 
 test('near-intents: errors on unknown token', { timeout: 20_000 }, async () => {
   const { code, stderr } = await run('near-intents.mjs', [
-    'quote', '--usdc', '1.00', '--from', 'fake:FAKE', '--wallet', TEST_ADDRESS,
+    'quote', '--usdc', '1.00', '--from', 'fake:FAKE', '--wallet', TEST_ADDRESS, '--refund', TEST_ADDRESS,
   ]);
   assert.equal(code, 1);
   assert.match(stderr, /Token not found/i);
