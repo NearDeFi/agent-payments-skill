@@ -1,7 +1,15 @@
 // Unit tests for the funding cost guard (x402-pay/scripts/cost-guard.mjs).
 // Pure logic — deterministic, no network or wallet needed.
-//
 // The rule: reject only when overhead exceeds BOTH the $ floor AND the % cap.
+//
+// Tests:
+//   1. thresholds are 2.5% and $0.005
+//   2. rejects when overhead is over BOTH caps
+//   3. large $ overhead passes when the % is under the cap
+//   4. dust passes via the $ floor despite a huge %
+//   5. exactly at the % cap does not exceed (strict >)
+//   6. accepts string USD figures (as the quote API returns them)
+//   7. throws on missing/invalid/zero-output figures (fail closed)
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { assessOverhead, MAX_OVERHEAD_USD, MAX_OVERHEAD_PCT } from '../x402-pay/scripts/cost-guard.mjs';

@@ -84,3 +84,13 @@ Scripts that don't read any env vars (e.g. `near-intents.mjs`, `search-services.
 Whenever the scripts are updated the tests should be updated also.
 
 Whenever code snippets in `SKILL.md` or any `references/` file are updated, the corresponding test that exercises that snippet must be updated to match. The tests for wallet adapter signing (CDP, Privy, Turnkey) are the ground truth that the reference snippets are correct — if a snippet changes, the test changes with it.
+
+Each test file must begin with a header comment listing its tests as a numbered list under a `Tests:` heading, so the file's coverage is scannable:
+
+```js
+// Tests:
+//   1. <what the first test asserts>
+//   2. <what the second test asserts>
+```
+
+Keep the list in sync with the actual `test(...)` blocks — same descriptions, same order — whenever tests are added, removed, or reordered. A file with only a single test does not need the list; a one-line description is enough.
