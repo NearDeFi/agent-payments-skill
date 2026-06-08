@@ -14,6 +14,7 @@
 
 import { randomBytes } from 'crypto';
 import { loadEnv } from './load-env.mjs';
+import { makeGetArg } from './cli-args.mjs';
 loadEnv();
 
 const USDC_BASE = '0x833589fcd6edb6e08f4c7c32d4f71b54bda02913';
@@ -21,11 +22,11 @@ const BASE_RPC_DEFAULT = 'https://mainnet.base.org';
 
 const args = process.argv.slice(2);
 const cmd  = args[0];
+const getArg = makeGetArg(args);
 
 function getKey() {
-  const idx = args.indexOf('--key');
-  return idx !== -1 ? args[idx + 1]
-    : process.env.X402_PRIVATE_KEY
+  return getArg('--key')
+    || process.env.X402_PRIVATE_KEY
     || process.env.PRIVATE_KEY
     || process.env.WALLET_PRIVATE_KEY
     || process.env.ETH_PRIVATE_KEY
@@ -33,10 +34,8 @@ function getKey() {
 }
 
 function getRpcConfig() {
-  const urlIdx = args.indexOf('--rpc');
-  const url = urlIdx !== -1 ? args[urlIdx + 1] : process.env.BASE_RPC_URL || BASE_RPC_DEFAULT;
-  const keyIdx = args.indexOf('--rpc-key');
-  const key = keyIdx !== -1 ? args[keyIdx + 1] : process.env.BASE_RPC_KEY || null;
+  const url = getArg('--rpc') || process.env.BASE_RPC_URL || BASE_RPC_DEFAULT;
+  const key = getArg('--rpc-key') || process.env.BASE_RPC_KEY || null;
   return { url, key };
 }
 
