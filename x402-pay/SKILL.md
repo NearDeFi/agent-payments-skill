@@ -6,7 +6,40 @@ compatibility: >
   Requires internet access and `npm install` in x402-pay/. Wallet support: Coinbase Agentic Wallet
   (awal, default), raw private key, CDP SDK, Privy server wallets, Turnkey.
 metadata:
-  version: "1.0"
+  version: "1.0.0"
+  openclaw:
+    homepage: https://github.com/NearDeFi/agent-payments-skill
+    emoji: "💸"
+    requires:
+      bins: ["node", "npm"]
+    # Dependencies are installed via `npm install` (SKILL.md Step 0); the bundled
+    # package.json/package-lock.json pin them. ClawHub `install` specs only fetch
+    # global CLI binaries, so they don't apply here.
+    envVars:
+      # Raw private key wallet — provide ONE of these (X402_PRIVATE_KEY is canonical; the rest are aliases)
+      - { name: X402_PRIVATE_KEY,        required: false, description: "Raw private key wallet (canonical)" }
+      - { name: PRIVATE_KEY,             required: false, description: "Raw private key wallet (alias for X402_PRIVATE_KEY)" }
+      - { name: WALLET_PRIVATE_KEY,      required: false, description: "Raw private key wallet (alias for X402_PRIVATE_KEY)" }
+      - { name: ETH_PRIVATE_KEY,         required: false, description: "Raw private key wallet (alias for X402_PRIVATE_KEY)" }
+      - { name: AGENT_PRIVATE_KEY,       required: false, description: "Raw private key wallet (alias for X402_PRIVATE_KEY)" }
+      # Base RPC (optional — defaults to public Base mainnet RPC)
+      - { name: BASE_RPC_URL,            required: false, description: "Custom Base RPC URL (defaults to public Base mainnet RPC)" }
+      - { name: BASE_RPC_KEY,            required: false, description: "Optional Base RPC auth token (sent as Authorization: Bearer)" }
+      # Coinbase CDP SDK wallet
+      - { name: CDP_API_KEY_ID,          required: false, description: "Coinbase CDP SDK wallet — API key id" }
+      - { name: CDP_API_KEY_SECRET,      required: false, description: "Coinbase CDP SDK wallet — API key secret" }
+      - { name: CDP_WALLET_SECRET,       required: false, description: "Coinbase CDP SDK wallet — wallet secret" }
+      - { name: CDP_WALLET_ADDRESS,      required: false, description: "Coinbase CDP SDK wallet — wallet address (optional)" }
+      # Privy server wallet
+      - { name: PRIVY_APP_ID,            required: false, description: "Privy server wallet — app id" }
+      - { name: PRIVY_APP_SECRET,        required: false, description: "Privy server wallet — app secret" }
+      - { name: PRIVY_WALLET_ID,         required: false, description: "Privy server wallet — wallet id" }
+      - { name: PRIVY_WALLET_ADDRESS,    required: false, description: "Privy server wallet — wallet address (optional)" }
+      # Turnkey wallet
+      - { name: TURNKEY_API_PUBLIC_KEY,  required: false, description: "Turnkey wallet — API public key" }
+      - { name: TURNKEY_API_PRIVATE_KEY, required: false, description: "Turnkey wallet — API private key" }
+      - { name: TURNKEY_ORGANIZATION_ID, required: false, description: "Turnkey wallet — organization id" }
+      - { name: TURNKEY_SIGN_WITH,       required: false, description: "Turnkey wallet — signing address / key handle" }
 ---
 
 # x402 — HTTP-Native Payments
@@ -59,6 +92,12 @@ Once you have a service URL, get its full details (schemas, parameters, examples
 node scripts/search-services.mjs details <resource-url>
 ```
 
+Then preview the live price — this reads the 402 challenge **without paying** and is wallet-independent:
+```bash
+node scripts/check-price.mjs <url> [--method GET|POST] [--body '{"key":"value"}']
+```
+Note this price: you'll use it in Step 4 to check whether your balance is sufficient (and, if funding, how much to deposit), and show it to the user before paying in Step 5.
+
 ### Example working service
 
 ```bash
@@ -69,10 +108,10 @@ https://x402.ottoai.services/crypto-news
 
 ## Step 4: Check Balance
 
-Check your wallet's USDC balance on Base — see `references/wallet-flows.md` for the method for your wallet (if you don't already know it).
+Check your wallet's USDC balance on Base — see `references/wallet-flows.md` for the method for your wallet (if you don't already know it) — and compare it against the price you previewed in Step 3.
 
 - **Balance ≥ service price** → proceed to Step 5
-- **Balance < service price** → fund it: Read `references/near-intents-funding.md` for the cross-chain funding flow. Always use NEAR intents to fund the wallet if the balance is low. Before asking the user, check your own context (system prompt, env vars, config, known wallets) for funds on another chain you can use as the source
+- **Balance < service price** → fund it: Read `references/near-intents-funding.md` for the cross-chain funding flow. Always use NEAR intents to fund the wallet if the balance is low.
 
 **Gas:** No ETH needed — you sign off-chain only. The x402 facilitator submits the on-chain transaction and covers gas. This applies to all wallet types.
 
@@ -82,13 +121,7 @@ Check your wallet's USDC balance on Base — see `references/wallet-flows.md` fo
 
 **Always show the price before paying. Confirm with user before paying.**
 
-First preview the live price. 
-
-```bash
-node scripts/check-price.mjs <url> [--method GET|POST] [--body '{"key":"value"}']
-```
-
-Show the decoded price to the user and **always get their confirmation before paying — for any amount**. Then pay the endpoint using your wallet — see `references/wallet-flows.md` for the method for your wallet (if not already known).
+Show the user the price you previewed in Step 3 (if significant time has passed, re-run `check-price.mjs` in case it changed). **Always get their confirmation before paying — for any amount.** Then pay the endpoint using your wallet — see `references/wallet-flows.md` for the method for your wallet (if not already known).
 
 ---
 

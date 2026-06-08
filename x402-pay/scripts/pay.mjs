@@ -8,13 +8,11 @@
 // Requires: npm install
 
 import { loadEnv } from './load-env.mjs';
+import { makeGetArg } from './cli-args.mjs';
 loadEnv();
 
 const args = process.argv.slice(2);
-function getArg(name) {
-  const idx = args.indexOf(name);
-  return idx !== -1 ? args[idx + 1] : null;
-}
+const getArg = makeGetArg(args);
 
 const urlArg  = getArg('--url');
 const method  = (getArg('--method') || 'GET').toUpperCase();
@@ -31,10 +29,21 @@ if (!keyArg) {
 }
 
 // Initial probe to detect 402 and display price before paying
-const CHAIN_IDS = { 'base': 8453, 'base-sepolia': 84532 };
+const BASE_MAINNET_CHAIN_ID = 8453; // only Base mainnet is supported (no testnets / other chains)
+const CHAIN_IDS = { 'base': BASE_MAINNET_CHAIN_ID };
+// Normalize an x402 network field to its numeric EVM chain ID. Handles both the
+// CAIP-2 form ("eip155:8453") and the short-name form ("base"); returns null for
+// anything unrecognized.
 function evmChainId(network) {
   if (network?.startsWith('eip155:')) return parseInt(network.split(':')[1], 10);
   return CHAIN_IDS[network] ?? null;
+}
+
+// Format an atomic USDC amount (6 decimals) as a decimal string, using BigInt so
+// large values don't lose precision.
+function formatUsdc(atomic) {
+  const v = BigInt(atomic);
+  return `${v / 1_000_000n}.${(v % 1_000_000n).toString().padStart(6, '0')}`;
 }
 
 const reqHeaders = bodyArg ? { 'Content-Type': 'application/json' } : {};
@@ -63,17 +72,16 @@ if (!requirements?.accepts) {
 
 if (requirements?.accepts) {
   const evmOptions = requirements.accepts
-    .filter(a => a.scheme === 'exact' && evmChainId(a.network) !== null)
+    .filter(a => a.scheme === 'exact' && evmChainId(a.network) === BASE_MAINNET_CHAIN_ID)
     .sort((a, b) => {
-      const aMain = evmChainId(a.network) === 8453 ? 0 : 1;
-      const bMain = evmChainId(b.network) === 8453 ? 0 : 1;
-      if (aMain !== bMain) return aMain - bMain;
-      return parseInt(a.maxAmountRequired || a.amount || 0) - parseInt(b.maxAmountRequired || b.amount || 0);
+      const av = BigInt(a.maxAmountRequired || a.amount || 0);
+      const bv = BigInt(b.maxAmountRequired || b.amount || 0);
+      return av < bv ? -1 : av > bv ? 1 : 0;   // cheapest first
     });
   const accepted = evmOptions[0];
   if (accepted) {
     const amount = accepted.maxAmountRequired || accepted.amount;
-    console.log(`Payment required: ${(parseInt(amount, 10) / 1e6).toFixed(6)} USDC on network ${accepted.network}`);
+    console.log(`Payment required: ${formatUsdc(amount)} USDC on network ${accepted.network}`);
   }
 }
 

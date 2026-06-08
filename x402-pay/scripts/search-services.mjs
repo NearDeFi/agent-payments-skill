@@ -1,10 +1,11 @@
 #!/usr/bin/env node
 // Search x402 services by keyword, or get full details for a specific service.
 // Default source: x402-list.com (curated, uptime-monitored).
-// Usage:  node scripts/search-services.mjs search <keyword> [--all] [--source bazaar]
+// Usage:  node scripts/search-services.mjs search [keyword] [--source bazaar]
 //         node scripts/search-services.mjs details <resource-url>
-// Flags:  --all            include offline services (x402-list) or undescribed (bazaar)
-//         --source bazaar  use Coinbase bazaar instead of x402-list
+// Flags:  --source bazaar  use Coinbase bazaar instead of x402-list
+// Only online (x402-list) / described (bazaar) services are listed — an agent should
+// never act on an offline endpoint or a service it can't identify.
 import https from 'https';
 
 const X402LIST_API = 'https://x402-list.com/api/v1';
@@ -17,7 +18,7 @@ const useBazaar = args.includes('--source') && args[args.indexOf('--source') + 1
 
 if (!cmd) {
   console.log('Usage:');
-  console.log('  node scripts/search-services.mjs search <keyword> [--all] [--source bazaar]');
+  console.log('  node scripts/search-services.mjs search [keyword] [--source bazaar]');
   console.log('  node scripts/search-services.mjs details <resource-url>');
   process.exit(0);
 }
@@ -118,7 +119,6 @@ if (cmd === 'details') {
 // ── Search mode ───────────────────────────────────────────────────────────────
 
 if (cmd === 'search') {
-  const showAll = args.includes('--all');
   const sliced = args.slice(1);
   const localSourceIdx = sliced.indexOf('--source');
   const keyword = sliced
@@ -126,10 +126,10 @@ if (cmd === 'search') {
     .join(' ').toLowerCase();
 
   if (!useBazaar) {
-    // x402-list: filter online by default, --all includes offline
+    // x402-list: only list services that are currently online
     const items = await fetchX402List();
     const results = items
-      .filter(s => showAll || s.status === 'online')
+      .filter(s => s.status === 'online')
       .filter(s => {
         if (!keyword) return true;
         return (s.description + ' ' + s.base_url).toLowerCase().includes(keyword);
@@ -140,17 +140,16 @@ if (cmd === 'search') {
     for (const s of results.slice(0, 20)) {
       const price = parseFloat(s.min_price_usd).toFixed(4);
       const uptime = s.uptime_24h != null ? ` | ${s.uptime_24h}% up` : '';
-      const offline = s.status !== 'online' ? ' [offline]' : '';
-      console.log(`$${price}${uptime} | ${s.base_url}${offline}`);
+      console.log(`$${price}${uptime} | ${s.base_url}`);
       if (s.description) console.log(`  ${s.description.slice(0, 100)}`);
     }
     if (results.length === 0) console.log('No results found.');
 
   } else {
-    // Bazaar: behaviour unchanged from original
+    // Bazaar: only list services that carry a description (identifiable to an agent)
     const items = await fetchBazaar();
     const results = items
-      .filter(s => showAll || s.description || s.metadata?.description)
+      .filter(s => s.description || s.metadata?.description)
       .filter(s => {
         const desc = s.description || s.metadata?.description || '';
         return !keyword || (desc + s.resource).toLowerCase().includes(keyword);
@@ -176,7 +175,7 @@ if (cmd === 'search') {
 } else {
   console.error(`Unknown command: ${cmd}`);
   console.error('Usage:');
-  console.error('  node scripts/search-services.mjs search <keyword> [--all] [--source bazaar]');
+  console.error('  node scripts/search-services.mjs search [keyword] [--source bazaar]');
   console.error('  node scripts/search-services.mjs details <resource-url>');
   process.exit(1);
 }

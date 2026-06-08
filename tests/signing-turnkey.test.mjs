@@ -1,9 +1,14 @@
 // Turnkey signing test using @turnkey/sdk-server + @turnkey/viem.
 // Requires: TURNKEY_API_PUBLIC_KEY, TURNKEY_API_PRIVATE_KEY, TURNKEY_ORGANIZATION_ID, TURNKEY_SIGN_WITH
 //
-// This test mirrors the snippet in references/wallet-flows.md (Turnkey sub-section)
-// verbatim — the doc snippet is the source of truth and this test exercises it as
-// written. If the doc changes, this test changes with it.
+// What this test does:
+//   1. Fails immediately with a list of missing env vars if credentials are not set
+//   2. Takes the static EIP-712 payload fixture (the shape @x402/fetch hands the signer)
+//   3. Builds the signer object exactly as documented in references/wallet-flows.md
+//      (Turnkey sub-section under "Managed signer wallets: CDP, Privy, Turnkey")
+//   4. Calls signer.signTypedData(payload) — signs via @turnkey/viem's walletClient
+//      (Turnkey API client + a viem wallet account on Base)
+//   5. Asserts the returned signature is a valid 65-byte hex string (0x + 130 chars)
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { PAYMENT_PAYLOAD_FIXTURE } from './helpers.mjs';

@@ -5,12 +5,15 @@
 //   node scripts/near-intents.mjs tokens [--chain <chain>]
 //
 // Get a committed quote (deposit address + exact send amount):
-//   node scripts/near-intents.mjs quote --usdc <amount> --from <chain:SYMBOL> --wallet <baseAddress> [--refund <sendingAddress>]
+//   node scripts/near-intents.mjs quote --usdc <amount> --from <chain:SYMBOL> --wallet <baseAddress> --refund <sendingAddress> [--override-cost-cap]
+//   Rejects quotes whose USD overhead exceeds both 2.5% and $0.005; --override-cost-cap proceeds anyway (user-approved).
 //
 // Check swap status:
 //   node scripts/near-intents.mjs status <depositAddress> [--memo <memo>]
 
 import https from 'https';
+import { assessOverhead, MAX_OVERHEAD_USD, MAX_OVERHEAD_PCT } from './cost-guard.mjs';
+import { makeGetArg } from './cli-args.mjs';
 
 const API        = 'https://1click.chaindefuser.com';
 const DEST_ASSET = 'nep141:base-0x833589fcd6edb6e08f4c7c32d4f71b54bda02913.omft.near';
@@ -18,10 +21,7 @@ const DEST_ASSET = 'nep141:base-0x833589fcd6edb6e08f4c7c32d4f71b54bda02913.omft.
 const args = process.argv.slice(2);
 const cmd  = args[0];
 
-function getArg(name) {
-  const idx = args.indexOf(name);
-  return idx !== -1 ? args[idx + 1] : null;
-}
+const getArg = makeGetArg(args);
 
 function apiRequest(method, path, body) {
   return new Promise((resolve, reject) => {
@@ -109,9 +109,9 @@ if (cmd === 'tokens') {
   const refundArg = getArg('--refund');
   const walletArg = getArg('--wallet');
 
-  if (!usdcArg || !fromArg) {
+  if (!usdcArg || !fromArg || !refundArg) {
     console.error('Usage:');
-    console.error('  node scripts/near-intents.mjs quote --usdc <amount> --from <chain:SYMBOL> --wallet <address> [--refund <address>]');
+    console.error('  node scripts/near-intents.mjs quote --usdc <amount> --from <chain:SYMBOL> --wallet <address> --refund <address>');
     console.error('  Use "tokens" subcommand to list valid --from values');
     process.exit(1);
   }
@@ -138,19 +138,14 @@ if (cmd === 'tokens') {
   );
   if (!token) {
     console.error(`Token not found: ${fromSymbol} on ${fromChain}`);
-    console.error('Run: node scripts/near-intents.mjs tokens  to list all valid chain:SYMBOL pairs');
+    console.error('Run: node scripts/near-intents.mjs tokens to list all valid chain:SYMBOL pairs');
     process.exit(1);
-  }
-
-  if (!refundArg) {
-    console.warn('Note: no --refund address provided. If the swap fails, funds will land in the NEAR Intents');
-    console.warn('internal balance for your Base wallet address and must be manually withdrawn to recover them.\n');
   }
 
   const amount   = Math.round(parseFloat(usdcArg) * 1_000_000).toString();
   const deadline = new Date(Date.now() + 10 * 60 * 1000).toISOString();
-  const refundType = refundArg ? 'ORIGIN_CHAIN' : 'INTENTS';
-  const refundTo   = refundArg ?? walletAddress;
+  const refundType = 'ORIGIN_CHAIN';
+  const refundTo   = refundArg;
 
   const quoteBody = {
     dry:              false,
@@ -176,6 +171,39 @@ if (cmd === 'tokens') {
 
   const q = response.quote;
 
+  // ── Cost guard ────────────────────────────────────────────────────────────
+  // Reject quotes whose USD overhead exceeds BOTH the % and $ caps (see cost-guard.mjs).
+  // Override only with explicit user consent via --override-cost-cap.
+  // assessOverhead throws when the quote lacks usable USD figures — fail closed:
+  // print a clear message and exit 1 rather than crash with a raw stack trace.
+  let cost;
+  try {
+    cost = assessOverhead(q.amountInUsd, q.amountOutUsd);
+  } catch (e) {
+    console.error(`COST LIMIT EXCEEDED (unverifiable quote) — ${e.message}`);
+    console.error('The funding cost could not be measured, so the deposit address is withheld. This is NOT');
+    console.error('bypassable with --override-cost-cap. Report to the user and fund from a different source');
+    console.error('asset (run the "tokens" command for options).');
+    process.exit(1);
+  }
+  const override = args.includes('--override-cost-cap');
+
+  if (cost.exceeds && !override) {
+    console.error('COST LIMIT EXCEEDED — funding quote withheld (no deposit address shown).');
+    console.error(`  Send:     $${Number(q.amountInUsd).toFixed(4)} of ${fromSymbol} on ${fromChain}`);
+    console.error(`  Receive:  $${Number(q.amountOutUsd).toFixed(4)} USDC on Base`);
+    console.error(`  Overhead: $${cost.overheadUsd.toFixed(4)} (${cost.overheadPct.toFixed(2)}%) — over the ${MAX_OVERHEAD_PCT}% AND $${MAX_OVERHEAD_USD} limit.`);
+    console.error('');
+    console.error('Do NOT proceed silently. Report the above to the user and ask whether to:');
+    console.error('  1. Fund from a different, more liquid source asset — re-run quote with a different');
+    console.error('     --from (run the "tokens" command to list options), OR');
+    console.error('  2. Continue anyway at this cost — ONLY if the user explicitly agrees, re-run this');
+    console.error('     exact command with --override-cost-cap appended.');
+    process.exit(1);
+  } else if (cost.exceeds && override) {
+    console.warn(`WARNING: overhead $${cost.overheadUsd.toFixed(4)} (${cost.overheadPct.toFixed(2)}%) exceeds the ${MAX_OVERHEAD_PCT}% / $${MAX_OVERHEAD_USD} limit — proceeding (user-approved via --override-cost-cap).\n`);
+  }
+
   console.log(`Send:    ${q.amountInFormatted} ${fromSymbol} on ${fromChain}`);
   console.log(`Receive: ${q.amountOutFormatted} USDC on Base`);
   console.log(`Send (units): ${q.amountIn}`);
@@ -192,7 +220,7 @@ if (cmd === 'tokens') {
   console.error(`Unknown command: ${cmd ?? '(none)'}`);
   console.error('Usage:');
   console.error('  node scripts/near-intents.mjs tokens [--chain <chain>]');
-  console.error('  node scripts/near-intents.mjs quote --usdc <amount> --from <chain:SYMBOL> --wallet <address> [--refund <address>]');
+  console.error('  node scripts/near-intents.mjs quote --usdc <amount> --from <chain:SYMBOL> --wallet <address> --refund <address>');
   console.error('  node scripts/near-intents.mjs status <depositAddress> [--memo <memo>]');
   process.exit(1);
 }
