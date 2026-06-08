@@ -16,8 +16,12 @@ metadata:
     # package.json/package-lock.json pin them. ClawHub `install` specs only fetch
     # global CLI binaries, so they don't apply here.
     envVars:
-      # Raw private key wallet — provide ONE of these (X402_PRIVATE_KEY is canonical)
-      - { name: X402_PRIVATE_KEY,        required: false, description: "Raw private key wallet (aliases: PRIVATE_KEY / WALLET_PRIVATE_KEY / AGENT_PRIVATE_KEY / ETH_PRIVATE_KEY)" }
+      # Raw private key wallet — provide ONE of these (X402_PRIVATE_KEY is canonical; the rest are aliases)
+      - { name: X402_PRIVATE_KEY,        required: false, description: "Raw private key wallet (canonical)" }
+      - { name: PRIVATE_KEY,             required: false, description: "Raw private key wallet (alias for X402_PRIVATE_KEY)" }
+      - { name: WALLET_PRIVATE_KEY,      required: false, description: "Raw private key wallet (alias for X402_PRIVATE_KEY)" }
+      - { name: ETH_PRIVATE_KEY,         required: false, description: "Raw private key wallet (alias for X402_PRIVATE_KEY)" }
+      - { name: AGENT_PRIVATE_KEY,       required: false, description: "Raw private key wallet (alias for X402_PRIVATE_KEY)" }
       # Base RPC (optional — defaults to public Base mainnet RPC)
       - { name: BASE_RPC_URL,            required: false, description: "Custom Base RPC URL (defaults to public Base mainnet RPC)" }
       - { name: BASE_RPC_KEY,            required: false, description: "Optional Base RPC auth token (sent as Authorization: Bearer)" }
