@@ -13,7 +13,6 @@ test('cost-guard: thresholds are 2.5% and $0.005', () => {
 
 test('cost-guard: rejects when over BOTH caps', () => {
   const r = assessOverhead(0.2052, 0.1999); // ~2.65%, ~$0.0053
-  assert.equal(r.computable, true);
   assert.equal(r.exceeds, true);
   assert.ok(r.overheadPct > MAX_OVERHEAD_PCT && r.overheadUsd > MAX_OVERHEAD_USD);
 });
@@ -43,10 +42,8 @@ test('cost-guard: accepts string USD figures (as the quote API returns them)', (
   assert.equal(r.exceeds, true);
 });
 
-test('cost-guard: non-computable for missing/invalid/zero-output figures', () => {
+test('cost-guard: throws on missing/invalid/zero-output figures (fail closed)', () => {
   for (const [a, b] of [[undefined, 1], [1, undefined], ['nope', 1], [1, 0], [1, -1], [NaN, 1]]) {
-    const r = assessOverhead(a, b);
-    assert.equal(r.computable, false, `expected non-computable for (${a}, ${b})`);
-    assert.equal(r.exceeds, false);
+    assert.throws(() => assessOverhead(a, b), /Cannot verify funding cost/, `expected throw for (${a}, ${b})`);
   }
 });

@@ -75,7 +75,7 @@ Once the script prints the quote, **send the exact `Send (units):` amount to the
 
 ### If the quote is rejected: `COST LIMIT EXCEEDED`
 
-The quote command enforces a hard cost cap: it **refuses to print a deposit address** when the swap's USD overhead (what you send vs. what arrives on Base) exceeds **both 2.5% and $0.005**. This usually means the chosen source asset is illiquid or the route is unfavourable — funding a *larger* amount does **not** help (the overhead is proportional).
+The quote command enforces a hard cost cap: it **refuses to print a deposit address** when the swap's USD overhead (what you send vs. what arrives on Base) exceeds **both 2.5% and $0.005**. This usually means the chosen source asset is illiquid or the route is unfavourable — funding a *larger* amount does **not** help (the overhead is proportional). (If a quote ever lacks the USD figures needed to verify cost, the command errors out instead of proceeding — re-quote from a different source asset.)
 
 When you see `COST LIMIT EXCEEDED`, **do not just override it.** Always:
 

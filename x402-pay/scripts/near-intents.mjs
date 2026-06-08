@@ -184,9 +184,7 @@ if (cmd === 'tokens') {
   const cost     = assessOverhead(q.amountInUsd, q.amountOutUsd);
   const override = args.includes('--override-cost-cap');
 
-  if (!cost.computable) {
-    console.warn('Note: could not verify funding cost (USD fields missing from quote) — proceeding without the cost check.\n');
-  } else if (cost.exceeds && !override) {
+  if (cost.exceeds && !override) {
     console.error('COST LIMIT EXCEEDED — funding quote withheld (no deposit address shown).');
     console.error(`  Send:     $${Number(q.amountInUsd).toFixed(4)} of ${fromSymbol} on ${fromChain}`);
     console.error(`  Receive:  $${Number(q.amountOutUsd).toFixed(4)} USDC on Base`);
