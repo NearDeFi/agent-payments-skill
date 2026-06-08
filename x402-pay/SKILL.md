@@ -11,15 +11,31 @@ metadata:
     homepage: https://github.com/NearDeFi/agent-payments-skill
     emoji: "💸"
     requires:
-      bins: ["node"]
-    install:
-      - node: { cwd: "." }
+      bins: ["node", "npm"]
+    # Dependencies are installed via `npm install` (SKILL.md Step 0); the bundled
+    # package.json/package-lock.json pin them. ClawHub `install` specs only fetch
+    # global CLI binaries, so they don't apply here.
     envVars:
-      - { name: X402_PRIVATE_KEY, required: false, description: "Raw private key wallet (aliases: PRIVATE_KEY/WALLET_PRIVATE_KEY/AGENT_PRIVATE_KEY/ETH_PRIVATE_KEY)" }
-      - { name: BASE_RPC_URL,     required: false, description: "Custom Base RPC (else public RPC)" }
-      - { name: CDP_API_KEY_ID,   required: false, description: "Coinbase CDP SDK wallet" }
-      - { name: PRIVY_APP_ID,     required: false, description: "Privy server wallet" }
-      - { name: TURNKEY_ORGANIZATION_ID, required: false, description: "Turnkey wallet" }
+      # Raw private key wallet — provide ONE of these (X402_PRIVATE_KEY is canonical)
+      - { name: X402_PRIVATE_KEY,        required: false, description: "Raw private key wallet (aliases: PRIVATE_KEY / WALLET_PRIVATE_KEY / AGENT_PRIVATE_KEY / ETH_PRIVATE_KEY)" }
+      # Base RPC (optional — defaults to public Base mainnet RPC)
+      - { name: BASE_RPC_URL,            required: false, description: "Custom Base RPC URL (defaults to public Base mainnet RPC)" }
+      - { name: BASE_RPC_KEY,            required: false, description: "Optional Base RPC auth token (sent as Authorization: Bearer)" }
+      # Coinbase CDP SDK wallet
+      - { name: CDP_API_KEY_ID,          required: false, description: "Coinbase CDP SDK wallet — API key id" }
+      - { name: CDP_API_KEY_SECRET,      required: false, description: "Coinbase CDP SDK wallet — API key secret" }
+      - { name: CDP_WALLET_SECRET,       required: false, description: "Coinbase CDP SDK wallet — wallet secret" }
+      - { name: CDP_WALLET_ADDRESS,      required: false, description: "Coinbase CDP SDK wallet — wallet address (optional)" }
+      # Privy server wallet
+      - { name: PRIVY_APP_ID,            required: false, description: "Privy server wallet — app id" }
+      - { name: PRIVY_APP_SECRET,        required: false, description: "Privy server wallet — app secret" }
+      - { name: PRIVY_WALLET_ID,         required: false, description: "Privy server wallet — wallet id" }
+      - { name: PRIVY_WALLET_ADDRESS,    required: false, description: "Privy server wallet — wallet address (optional)" }
+      # Turnkey wallet
+      - { name: TURNKEY_API_PUBLIC_KEY,  required: false, description: "Turnkey wallet — API public key" }
+      - { name: TURNKEY_API_PRIVATE_KEY, required: false, description: "Turnkey wallet — API private key" }
+      - { name: TURNKEY_ORGANIZATION_ID, required: false, description: "Turnkey wallet — organization id" }
+      - { name: TURNKEY_SIGN_WITH,       required: false, description: "Turnkey wallet — signing address / key handle" }
 ---
 
 # x402 — HTTP-Native Payments
