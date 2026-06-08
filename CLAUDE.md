@@ -37,9 +37,20 @@ skill-name/
 ```
 
 **Frontmatter rules:**
-- `version` is not a valid top-level field — put it under `metadata.version`
+- `version` is not a valid top-level field — put it under `metadata.version`, in semver (`"1.0.0"`). This single location satisfies both validators: the Agent Skills spec / `skills-ref` (which **rejects** a top-level `version`) and ClawHub (which reads `metadata.version`). Never add a top-level `version`.
 - Add `compatibility` if the skill requires specific tools, packages, or network access
 - `name` must be lowercase, hyphens only, and match the directory name
+
+### ClawHub publishing metadata (`metadata.openclaw`)
+
+Skills published to [ClawHub](https://docs.openclaw.ai/clawhub/skill-format) carry a `metadata.openclaw` block. It lives under the spec-allowed arbitrary `metadata` map, so Claude/`skills-ref` ignore it — it only affects the ClawHub listing and preflight checks. **Keep it in sync with the skill's actual runtime needs:**
+
+- **`envVars`** — must list **every** env var the scripts and `references/` read. Whenever you add, remove, or rename an env var anywhere in the skill, update this list to match. Source of truth: `grep -rohE 'process\.env\.[A-Z0-9_]+' scripts/` plus any vars documented in `references/`. Mark each `required: false` unless the skill cannot run without it.
+- **`requires.env`** — stays **empty** here: every wallet backend is optional (the default Coinbase Agentic Wallet needs no env vars), so no var is universally required. Only list a var here if the skill is unusable without it.
+- **`requires.bins`** — the CLI binaries the skill invokes (currently `node`, `npm`). Update if the skill starts shelling out to other tools.
+- **`install`** — do **not** use it for the skill's own npm dependencies. ClawHub `install` specs only fetch **global CLI binaries** (`kind: brew|node|go|uv` + a named `package`/`formula`). Local deps are pinned in `package.json`/`package-lock.json` and installed via SKILL.md Step 0 (`npm install`).
+
+After any change to this block, re-validate: `npx -y skills-ref validate ./x402-pay` (Claude side) and `clawhub sync --dry-run` (ClawHub side, before publishing).
 
 **File references:**
 - Use paths relative to the skill root (e.g. `references/foo.md`, not `skill-name/references/foo.md`)
