@@ -93,6 +93,8 @@ When you see `COST LIMIT EXCEEDED`, **do not just override it.** Always:
 
 Never append `--override-cost-cap` without the user's explicit go-ahead.
 
+A distinct variant — **`COST LIMIT EXCEEDED (unverifiable quote)`** — means the quote came back without usable USD figures, so the overhead couldn't be measured at all (rather than measured-and-too-high). This fails closed and **cannot** be bypassed with `--override-cost-cap`; report it to the user and fund from a different source asset.
+
 ### Refund address
 
 `--refund` is **required** — it must be the address of the wallet you are funding *from* (the origin-chain sending wallet). If the swap fails, funds are returned directly to that address on the origin chain. The quote command errors out if `--refund` is omitted, so always determine the sending address before quoting.

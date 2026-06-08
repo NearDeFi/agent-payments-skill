@@ -180,8 +180,10 @@ if (cmd === 'tokens') {
   try {
     cost = assessOverhead(q.amountInUsd, q.amountOutUsd);
   } catch (e) {
-    console.error(`COST LIMIT EXCEEDED — ${e.message}`);
-    console.error('Funding cost could not be verified, so the deposit address is withheld. Report this to the user.');
+    console.error(`COST LIMIT EXCEEDED (unverifiable quote) — ${e.message}`);
+    console.error('The funding cost could not be measured, so the deposit address is withheld. This is NOT');
+    console.error('bypassable with --override-cost-cap. Report to the user and fund from a different source');
+    console.error('asset (run the "tokens" command for options).');
     process.exit(1);
   }
   const override = args.includes('--override-cost-cap');
