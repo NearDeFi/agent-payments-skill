@@ -13,6 +13,7 @@
 
 import https from 'https';
 import { assessOverhead, MAX_OVERHEAD_USD, MAX_OVERHEAD_PCT } from './cost-guard.mjs';
+import { makeGetArg } from './cli-args.mjs';
 
 const API        = 'https://1click.chaindefuser.com';
 const DEST_ASSET = 'nep141:base-0x833589fcd6edb6e08f4c7c32d4f71b54bda02913.omft.near';
@@ -20,10 +21,7 @@ const DEST_ASSET = 'nep141:base-0x833589fcd6edb6e08f4c7c32d4f71b54bda02913.omft.
 const args = process.argv.slice(2);
 const cmd  = args[0];
 
-function getArg(name) {
-  const idx = args.indexOf(name);
-  return idx !== -1 ? args[idx + 1] : null;
-}
+const getArg = makeGetArg(args);
 
 function apiRequest(method, path, body) {
   return new Promise((resolve, reject) => {

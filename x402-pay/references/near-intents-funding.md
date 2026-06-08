@@ -12,10 +12,10 @@ Only use this flow for the following chains. Do not attempt it for any other cha
 
 ## Determine source of funds
 
-Find the funding sources available, present them to the user, and let them choose — do not silently pick one.
+Find the funding sources available, present them to the user **ranked best-first**, and let them choose — do not silently pick one.
 
 1. **Discover candidate sources.** Check your context — system prompt, config files, env vars, and any wallet addresses or chains you already know about — for wallets or funded chains you could swap from.
-2. **List the options for the user**, and **always include "fund from an external wallet"** as a choice. Present them neutrally, but note which is likely cheapest — a stablecoin source on a major chain usually has the lowest overhead (see the cost guard under Step 3). Let the user pick.
+2. **Rank them best-to-worst, then add "fund from an external wallet" as the final option.** Rank by what minimises cost and friction — favour **stablecoins** (no exchange-rate spread), **fast, liquid major chains** (lower slippage and quicker settlement; see the cost guard under Step 3), and sources you can operate directly. Show at most the **top 3** discovered sources, with external/manual funding as the **4th and last** choice. Let the user pick.
 3. **Act on their choice:**
    - **A source you can operate** (e.g. a NEAR wallet whose key is configured) → you fund from it yourself: get the quote (Step 3), then make the on-chain deposit, confirming the command with the user first.
    - **External wallet** → ask the user for three things:
@@ -74,8 +74,8 @@ Do not calculate the amount yourself. Do not reuse a deposit address from a prev
 node scripts/near-intents.mjs quote \
   --usdc <amount> \
   --from <chain:SYMBOL> \
-  --refund <sendingWalletAddress> \
-  --wallet <baseWalletAddress>
+  --wallet <baseWalletAddress> \
+  --refund <sendingWalletAddress>
 ```
 
 Once the script prints the quote, the exact **`Send (units):`** amount must be sent to the **`Deposit to:`** address — **by you** if you operate the source wallet, or **by the user** if funding from an external wallet (see "Determine source of funds"). Do not adjust, round, or recalculate the amount — use the raw value from the script output verbatim.

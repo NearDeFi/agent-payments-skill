@@ -14,6 +14,8 @@
 //   8. missing --from: runs the quote command without --from, asserts exit 1 and usage output
 //   9. status: calls the status subcommand with a dummy deposit address,
 //      asserts the output contains a "Status:" line
+//  10. flag-as-value: --refund immediately followed by another flag (no real value)
+//      is treated as missing, exits 1 with usage output
 
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
@@ -83,4 +85,12 @@ test('near-intents: status returns a status line', { timeout: 20_000 }, async ()
   ]);
   assert.equal(code, 0);
   assert.match(stdout, /Status:/);
+});
+
+test('near-intents: errors when --refund value is missing (next token is a flag)', async () => {
+  const { code, stderr } = await run('near-intents.mjs', [
+    'quote', '--usdc', '1.00', '--from', 'eth:ETH', '--refund', '--wallet', TEST_ADDRESS,
+  ]);
+  assert.equal(code, 1);
+  assert.match(stderr, /Usage/i);
 });

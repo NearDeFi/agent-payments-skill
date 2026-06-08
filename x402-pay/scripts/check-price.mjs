@@ -9,12 +9,11 @@
 // Usage:
 //   node scripts/check-price.mjs <url> [--method GET|POST] [--body <json>]
 
+import { makeGetArg } from './cli-args.mjs';
+
 const args = process.argv.slice(2);
 const url = args[0] && !args[0].startsWith('--') ? args[0] : null;
-function getArg(name) {
-  const i = args.indexOf(name);
-  return i !== -1 ? args[i + 1] : null;
-}
+const getArg = makeGetArg(args);
 const method = (getArg('--method') || 'GET').toUpperCase();
 const body   = getArg('--body');
 
