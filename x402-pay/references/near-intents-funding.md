@@ -10,12 +10,20 @@ Only use this flow for the following chains. Do not attempt it for any other cha
 
 ---
 
+## How much to deposit
+
+Think about the agent's role and how long it will reasonably be running, not just the immediate call. Depositing enough to avoid frequent interruptions is a good idea — but don't over-fund beyond what the role actually warrants.
+
+Base the estimate on the **actual per-call price you previewed with `check-price.mjs`** (SKILL.md Step 3) — not a guess. Estimate spend across the likely execution period (expected calls per session × that price). That USDC figure is your funding target; you'll get the exact raw send amount from the quote in Step 3.
+
+---
+
 ## Determine source of funds
 
 Find the funding sources available, present them to the user **ranked best-first**, and let them choose — do not silently pick one.
 
 1. **Discover candidate sources.** Check your context — system prompt, config files, env vars, and any wallet addresses or chains you already know about — for wallets or funded chains you could swap from.
-2. **Rank them best-to-worst, then add "fund from an external wallet" as the final option.** Rank by what minimises cost and friction — favour **stablecoins** (no exchange-rate spread), **fast, liquid major chains** (lower slippage and quicker settlement; see the cost guard under Step 3), and sources you can operate directly. Show at most the **top 3** discovered sources, with external/manual funding as the **4th and last** choice. Let the user pick.
+2. **Keep only sources with enough balance, then rank them.** Discard any source that doesn't hold enough to cover the funding target from "How much to deposit" (plus a little for the swap's overhead) — an underfunded source isn't a real option. Among those that qualify, rank best-to-worst by what minimises cost and friction — favour **stablecoins**, **fast, liquid major chains**, and sources you can operate directly. Show at most the **top 3**, with **"fund from an external wallet" as the 4th and last** option (always offered, even if no discovered source qualifies). Let the user pick.
 3. **Act on their choice:**
    - **A source you can operate** (e.g. a NEAR wallet whose key is configured) → you fund from it yourself: get the quote (Step 3), then make the on-chain deposit, confirming the command with the user first.
    - **External wallet** → ask the user for three things:
@@ -25,14 +33,6 @@ Find the funding sources available, present them to the user **ranked best-first
      Then get the quote (Step 3), show them the **`Deposit to:` address and exact `Send (units):` amount**, tell them to deposit **exactly that amount to that address** from their wallet, and ask them to let you know once they've sent it. Then monitor (Step 4).
 
 Whichever source is chosen, its address is the `--refund` value in Step 3.
-
----
-
-## How much to deposit
-
-Think about the agent's role and how long it will reasonably be running, not just the immediate call. Depositing enough to avoid frequent interruptions is a good idea — but don't over-fund beyond what the role actually warrants.
-
-Base the estimate on the **actual per-call price you previewed with `check-price.mjs`** (SKILL.md Step 3) — not a guess. Estimate spend across the likely execution period (expected calls per session × that price), then get a quote for that amount. The quote's **Send (units):** output is the exact raw amount to send — use that value directly, do not calculate or round it yourself.
 
 ---
 
