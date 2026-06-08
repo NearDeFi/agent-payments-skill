@@ -120,6 +120,6 @@ There are two kinds of evals, both run headless `claude` sessions against the sk
 - **`npm run eval:description`** — *trigger* evals. Fires a set of user queries and checks the skill activates when it should (and stays quiet when it shouldn't). No wallet, no payments.
 - **`npm run eval:output`** — *end-to-end* evals. Runs the full flow (discover service → fund cross-chain → pay) for each wallet type and grades the result plus a no-errors check. **Spends real USDC** 
 
-**`eval:output` additionally needs real funds and credentials** in `x402-pay/.env`: a NEAR account (`NEAR_ACCOUNT_ID` + `NEAR_PRIVATE_KEY`) as the cross-chain funding source, funded with **~0.1 USDC** to cover all funded evals plus **~0.02 NEAR** for gas, and the wallet credentials for whichever wallets you're testing (see the env block under [Wallet configuration](#wallet-configuration)).
+**`eval:output` additionally needs real funds and credentials** in `x402-pay/.env`: a NEAR account (`NEAR_ACCOUNT_ID` + `NEAR_PRIVATE_KEY`) as the cross-chain funding source, funded with **~0.1 USDC** to cover all funded evals plus **~0.02 NEAR** for gas, and the wallet credentials for whichever wallets you're testing (see the env block under [Wallet configuration](#wallet-configuration)). You also need to log in to your awal account before running the evals `npx awal@2.10.0 auth login you@example.com`.
 
 Results are written to `evals/workspace/iteration-<N>/`.
