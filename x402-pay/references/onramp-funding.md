@@ -31,7 +31,7 @@ refund target the user can actually recover from (see `--refund-type` in
 | **awal** (managed, has a Solana address) | `origin` | the wallet's own Solana address — `npx awal@2.10.0 address --json` |
 | **CDP / Privy / Turnkey** (managed, EVM-only) | `origin` | a **Solana address the user controls** — ask them for one |
 
-Do **not** use `--refund-type intents` for managed wallets — they generally can't connect
+Do **not** use `--refund-type intents` for managed wallets — they can't connect
 to NEAR Intents to claim, so the refund would be stranded. Note that a Cash App /
 Robinhood / Revolut withdrawal address is **not** a safe `origin` refund target — those
 are custodial and may not credit an inbound refund.
@@ -56,9 +56,6 @@ Reason: NEAR Intents 1Click receives USDC on Solana, routes it to USDC on Base, 
 
 Solana USDC deposit address:
 <Deposit to: address>
-
-[If the quote printed MEMO REQUIRED: include it as the transaction memo — funds are lost without it.]
-[Show a QR of the deposit address if your environment can render one.]
 
 If the swap fails, your refund goes to: <Refund to: line — confirm this with me first>.
 
