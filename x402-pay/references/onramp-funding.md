@@ -45,7 +45,7 @@ Use `references/near-intents-funding.md` directly — do not reinvent the comman
 3. Show the user the funding prompt below.
 4. **Step 4 (monitor)** the swap to a terminal status, then verify the Base balance (Step 5).
 
-## Funding prompt to show the user
+### Funding prompt to show the user
 
 Adapt this once the quote prints (values come straight from the quote output):
 
@@ -57,12 +57,14 @@ Reason: NEAR Intents 1Click receives USDC on Solana, routes it to USDC on Base, 
 Solana USDC deposit address:
 <Deposit to: address>
 
+QR (optional, scannable in Robinhood): https://api.qrserver.com/v1/create-qr-code/?size=240x240&data=<Deposit to: address>
+
 If the swap fails, your refund goes to: <Refund to: line — confirm this with me first>.
 
 Cash App / Robinhood / Revolut:
 Selected network: Solana.
 1. Enter <Send amount> USDC.
-2. Scan the QR, or copy/paste the Solana deposit address on the send/pay/withdraw page.
+2. Paste the Solana deposit address (set the network to Solana). Some apps (e.g. Robinhood) also let you scan its QR.
 3. Send.
 
 Reply with the Solana transaction signature when sent (or just "sent"), and I'll track it.
