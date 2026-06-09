@@ -17,7 +17,7 @@ Loss of funds is possible and may be irreversible.
 
 THIRD-PARTY SOFTWARE
 
-This software depends on third-party software packages, each subject to its own license terms. Third-party license notices are provided in LICENSE-THIRD-PARTY.txt.
+The original x402-pay skill source code is licensed under MIT-0. Third-party dependencies and optional/transitive wallet-provider components remain subject to their own license terms, including those described in LICENSE-THIRD-PARTY.txt.
 
 Certain optional or transitive wallet-provider dependencies may include WalletConnect / Reown software. WalletConnect / Reown software is subject to the WalletConnect Community License Agreement and is not licensed under the primary license for this software. See LICENSE-THIRD-PARTY.txt for additional information.
 

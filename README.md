@@ -1,6 +1,6 @@
 # x402-pay
 
-Skill for making HTTP 402 micropayments using USDC on Base and funding it from most chains. 
+Skill for making HTTP 402 micropayments using USDC on Base. Fund it from a crypto wallet on most chains, or from an onramp like Cash App, Robinhood, or Revolut. Designed to work across most agent frameworks (Claude Code, OpenClaw, etc.).
 
 Before using this skill please review the [DISCLOSURES.txt](./DISCLOSURES.txt) and [NOTICE.txt](./NOTICE.txt) files.
 
@@ -64,7 +64,10 @@ node --input-type=module -e "
   const provider = new JsonRpcProvider({ url: 'https://free.rpc.fastnear.com' });
   const signer = KeyPairSigner.fromSecretKey(process.env.NEAR_PRIVATE_KEY);
   const account = new Account(process.env.NEAR_ACCOUNT_ID, provider, signer);
-  const r = await account.callFunctionRaw({ contractId: '17208628f84f5d6ad33f0da3bbbeb27ffcb398eac501a31bd6ad2011e36133a1', methodName: 'ft_transfer', args: { receiver_id: '<DEPOSIT_ADDRESS>', amount: '<AMOUNT_IN>' }, deposit: 1n, gas: 30000000000000n });
+  const USDC = '17208628f84f5d6ad33f0da3bbbeb27ffcb398eac501a31bd6ad2011e36133a1';
+  // Register the deposit address for USDC storage first (no-op if already registered; ft_transfer panics without it)
+  await account.callFunctionRaw({ contractId: USDC, methodName: 'storage_deposit', args: { account_id: '<DEPOSIT_ADDRESS>' }, deposit: 1250000000000000000000n, gas: 30000000000000n });
+  const r = await account.callFunctionRaw({ contractId: USDC, methodName: 'ft_transfer', args: { receiver_id: '<DEPOSIT_ADDRESS>', amount: '<AMOUNT_IN>' }, deposit: 1n, gas: 30000000000000n });
   console.log(r.transaction.hash);
   "
 

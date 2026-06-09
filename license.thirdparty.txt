@@ -2,7 +2,7 @@ THIRD-PARTY LICENSE NOTICES
 
 This file summarizes certain third-party software licenses and notices for the Agent Payments Skill. It is provided for notice and attribution purposes only. Third-party software remains subject to the applicable third-party license terms.
 
-Primary project license: [APACHE-2.0]
+Primary project license: [MIT-0]
 
 The primary project license does not apply to third-party software, hosted services, SDKs, APIs, protocols, wallets, payment facilitators, RPC endpoints, service catalogs, or other third-party materials, except to the extent expressly stated by the applicable third party.
 
