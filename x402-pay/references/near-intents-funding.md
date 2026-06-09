@@ -23,7 +23,7 @@ Base the estimate on the **actual per-call price you previewed with `check-price
 Find the funding sources available, present them to the user **ranked best-first**, and let them choose — do not silently pick one.
 
 1. **Discover candidate sources.** Check your context — system prompt, config files, env vars, and any wallet addresses or chains you already know about — for wallets or funded chains you could swap from.
-2. **Keep only sources with enough balance, then rank them.** Discard any source that doesn't hold enough to cover the funding target from "How much to deposit" (plus a little for the swap's overhead) — an underfunded source isn't a real option. Among those that qualify, rank best-to-worst by what minimises cost and friction — favour **stablecoins**, **fast, liquid major chains**, and sources you can operate directly. Show at most the **top 3**, with **"fund from an external wallet" as the 4th and last** option (always offered, even if no discovered source qualifies). Let the user pick.
+2. **Keep only sources with enough balance, then rank them.** Discard any source that doesn't hold enough to cover the funding target from "How much to deposit" (plus a little for the swap's overhead) — an underfunded source isn't a real option. Among those that qualify, rank best-to-worst by what minimises cost and friction — favour **stablecoins**, **fast, liquid major chains**, and sources you can operate directly. Show at most the **top 3**, then two always-offered options (even if no discovered source qualifies): **"fund from an external wallet" (4th)** and **"fund via onramp — Cash App / Robinhood / Revolut" (5th and last)**. Let the user pick.
 3. **Act on their choice:**
    - **A source you can operate** (e.g. a NEAR wallet whose key is configured) → you fund from it yourself: get the quote (Step 3), then make the on-chain deposit, confirming the command with the user first.
    - **External wallet** → ask the user for three things:
@@ -31,8 +31,9 @@ Find the funding sources available, present them to the user **ranked best-first
      - the **token** (e.g. ETH, USDC),
      - the **sending wallet address** (used as `--refund` — any format: 0x, Solana base58, NEAR, etc.).
      Then get the quote (Step 3), show them the **`Deposit to:` address and exact `Send (units):` amount**, tell them to deposit **exactly that amount to that address** from their wallet, and ask them to let you know once they've sent it. Then monitor (Step 4).
+   - **Onramp (Cash App / Robinhood / Revolut)** → for a user with no crypto to swap from. Read `references/onramp-funding.md` — it covers the sender-app steps, the Solana-USDC-only route, and how to set `--refund` / `--refund-type` per wallet type. It then rejoins Step 3 (quote) and Step 4 (monitor) here.
 
-Whichever source is chosen, its address is the `--refund` value in Step 3.
+Whichever source is chosen, it determines the `--refund` value in Step 3 (and, for the onramp, possibly `--refund-type`).
 
 ---
 
@@ -75,10 +76,22 @@ node scripts/near-intents.mjs quote \
   --usdc <amount> \
   --from <chain:SYMBOL> \
   --wallet <baseWalletAddress> \
-  --refund <sendingWalletAddress>
+  --refund <sendingWalletAddress> \
+  [--refund-type origin|intents]
 ```
 
 Once the script prints the quote, the exact **`Send (units):`** amount must be sent to the **`Deposit to:`** address — **by you** if you operate the source wallet, or **by the user** if funding from an external wallet (see "Determine source of funds"). Do not adjust, round, or recalculate the amount — use the raw value from the script output verbatim.
+
+### Confirm the refund destination before any deposit
+
+The quote prints a **`Refund to:`** line — where funds go if the swap fails. **Before** you send (or tell the user to send) anything to the `Deposit to:` address, **confirm this with the user**: the refund **address**, its **chain**, and **whether it's returned on the origin chain or held as a NEAR Intents balance**. Only proceed once they acknowledge. Never send to a deposit address without the user having seen where a failed swap refunds to.
+
+### Choosing `--refund-type`
+
+`--refund-type` controls what happens to a **failed/partial** swap (refunds are always in the *origin* asset you sent, not Base USDC):
+
+- **`origin`** (default) → refunds on-chain to `--refund`. Automatic, no manual recovery. Use whenever you have an origin-chain address the user controls (a self-custody Solana/EVM wallet, or awal's own Solana address).
+- **`intents`** → credits the refund to a **NEAR Intents balance** keyed to `--refund` (defaults to the `--wallet` Base address; EVM addresses are auto-lowercased to the intents account format). Reclaiming is **manual** — the user must connect that wallet at app.near-intents.org and sign. Only use when the user holds an **interactive, self-custody** signer for that address. **Do not** use `intents` for managed wallets (awal/CDP/Privy/Turnkey) — they generally can't connect to claim, and the refund would be stranded.
 
 ### If the quote is rejected: `COST LIMIT EXCEEDED`
 

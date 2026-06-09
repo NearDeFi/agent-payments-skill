@@ -111,7 +111,7 @@ https://x402.ottoai.services/crypto-news
 Check your wallet's USDC balance on Base — see `references/wallet-flows.md` for the method for your wallet (if you don't already know it) — and compare it against the price you previewed in Step 3.
 
 - **Balance ≥ service price** → proceed to Step 5
-- **Balance < service price** → fund it: Read `references/near-intents-funding.md` for the cross-chain funding flow. Always use NEAR intents to fund the wallet if the balance is low.
+- **Balance < service price** → fund it: Read `references/near-intents-funding.md` for the cross-chain funding flow. Always use NEAR intents to fund the wallet if the balance is low. If the user has no crypto to swap from, the **onramp** path (`references/onramp-funding.md`) funds the wallet from Cash App / Robinhood / Revolut.
 
 **Gas:** No ETH needed — you sign off-chain only. The x402 facilitator submits the on-chain transaction and covers gas. This applies to all wallet types.
 
@@ -135,6 +135,7 @@ Report the response body and any transaction hash to the user.
 
 - **Always ask the user before executing any command.** Show the exact command you intend to run and wait for explicit approval before running it — this applies to wallet, payment, and funding commands.
 - Abide by configured safeguards such as wallet spend limits and allowlists.
+- When funding, always confirm the refund destination (address, chain, and origin-chain vs. NEAR Intents balance) with the user before any deposit.
 - Never pay silently — always show the decoded price first
 - Confirm with user before any payment
 - Always report the tx hash after a successful payment
