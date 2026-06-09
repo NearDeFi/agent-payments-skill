@@ -58,13 +58,14 @@ Solana USDC deposit address:
 <Deposit to: address>
 
 QR (optional, scannable in Robinhood): https://api.qrserver.com/v1/create-qr-code/?size=240x240&data=<Deposit to: address>
+After scanning, check the address your app shows matches the deposit address above before sending.
 
 If the swap fails, your refund goes to: <Refund to: line — confirm this with me first>.
 
 Cash App / Robinhood / Revolut:
 Selected network: Solana.
 1. Enter <Send amount> USDC.
-2. Paste the Solana deposit address (set the network to Solana). Some apps (e.g. Robinhood) also let you scan its QR.
+2. Paste the Solana deposit address (set the network to Solana). Some apps also let you scan its QR.
 3. Send.
 
 Reply with the Solana transaction signature when sent (or just "sent"), and I'll track it.

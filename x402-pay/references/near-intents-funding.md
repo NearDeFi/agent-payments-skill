@@ -30,7 +30,7 @@ Find the funding sources available, present them to the user **ranked best-first
      - the **chain** they'll send from (e.g. Ethereum, Solana),
      - the **token** (e.g. ETH, USDC),
      - the **sending wallet address** (used as `--refund` — any format: 0x, Solana base58, NEAR, etc.).
-     Then get the quote (Step 3), show them the **`Deposit to:` address and exact `Send (units):` amount**, tell them to deposit **exactly that amount to that address** from their wallet, and ask them to let you know once they've sent it. Then monitor (Step 4).
+     Then get the quote (Step 3), show them the **`Deposit to:` address and exact `Send (units):` amount** (and a scannable QR of the deposit address — see Step 3), tell them to deposit **exactly that amount to that address** from their wallet, and ask them to let you know once they've sent it. Then monitor (Step 4).
    - **Onramp (Cash App / Robinhood / Revolut)** → for a user with no crypto to swap from. Read `references/onramp-funding.md` — it covers the sender-app steps, the Solana-USDC-only route, and how to set `--refund` / `--refund-type` per wallet type. It then rejoins Step 3 (quote) and Step 4 (monitor) here.
 
 Whichever source is chosen, it determines the `--refund` value in Step 3 (and, for the onramp, possibly `--refund-type`).
@@ -88,6 +88,16 @@ Choose `--refund-type` before running — it sets where a **failed/partial** swa
 If you do not have an address to refund the deposit to and they are using a managed wallet, ask the user for a refund address on the chain they deposited from and do not proceed without one.
 
 Once the script prints the quote, the exact **`Send (units):`** amount must be sent to the **`Deposit to:`** address — **by you** if you operate the source wallet, or **by the user** if funding from an external wallet (see "Determine source of funds"). Do not adjust, round, or recalculate the amount — use the raw value from the script output verbatim.
+
+### Show the deposit address as a QR (optional)
+
+When you give the deposit address to the user to send to (external-wallet or onramp funding), you can also offer a scannable QR of it:
+
+```
+https://api.qrserver.com/v1/create-qr-code/?size=240x240&data=<Deposit to: address>
+```
+
+Put the exact `Deposit to:` address in the `data` parameter. **Always tell the user to check that the address their wallet shows after scanning matches the `Deposit to:` address printed by the script** — if they differ, the QR is wrong or corrupted and they must not send.
 
 ### Confirm the refund destination before any deposit
 
