@@ -5,7 +5,7 @@
 //   node scripts/near-intents.mjs tokens [--chain <chain>]
 //
 // Get a committed quote (deposit address + exact send amount):
-//   node scripts/near-intents.mjs quote --usdc <amount> --from <chain:SYMBOL> --wallet <baseAddress> --refund <sendingAddress> [--refund-type origin|intents] [--override-cost-cap]
+//   node scripts/near-intents.mjs quote --usdc <amount> --from <chain:SYMBOL> --wallet <baseAddress> [--refund <sendingAddress>] [--refund-type origin|intents] [--override-cost-cap]
 //   Rejects quotes whose USD overhead exceeds both 2.5% and $0.005; --override-cost-cap proceeds anyway (user-approved).
 //   --refund-type origin (default): refund to --refund on the origin chain. intents: refund to a NEAR Intents
 //   balance keyed to --refund (defaults to --wallet) — claimable by connecting that wallet at app.near-intents.org.
@@ -121,7 +121,7 @@ if (cmd === 'tokens') {
   // --refund is required for an origin-chain refund; for intents it defaults to --wallet.
   if (!usdcArg || !fromArg || (!refundArg && !refundToIntents)) {
     console.error('Usage:');
-    console.error('  node scripts/near-intents.mjs quote --usdc <amount> --from <chain:SYMBOL> --wallet <address> --refund <address> [--refund-type origin|intents]');
+    console.error('  node scripts/near-intents.mjs quote --usdc <amount> --from <chain:SYMBOL> --wallet <address> [--refund <address>] [--refund-type origin|intents]');
     console.error('  --refund is required unless --refund-type intents (then it defaults to --wallet)');
     console.error('  Use "tokens" subcommand to list valid --from values');
     process.exit(1);
@@ -241,7 +241,7 @@ if (cmd === 'tokens') {
   console.error(`Unknown command: ${cmd ?? '(none)'}`);
   console.error('Usage:');
   console.error('  node scripts/near-intents.mjs tokens [--chain <chain>]');
-  console.error('  node scripts/near-intents.mjs quote --usdc <amount> --from <chain:SYMBOL> --wallet <address> --refund <address> [--refund-type origin|intents]');
+  console.error('  node scripts/near-intents.mjs quote --usdc <amount> --from <chain:SYMBOL> --wallet <address> [--refund <address>] [--refund-type origin|intents]');
   console.error('  node scripts/near-intents.mjs status <depositAddress> [--memo <memo>]');
   process.exit(1);
 }

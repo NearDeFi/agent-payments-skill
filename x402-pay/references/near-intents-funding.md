@@ -76,7 +76,7 @@ node scripts/near-intents.mjs quote \
   --usdc <amount> \
   --from <chain:SYMBOL> \
   --wallet <baseWalletAddress> \
-  --refund <sendingWalletAddress> \
+  [--refund <sendingWalletAddress>] \
   [--refund-type origin|intents]
 ```
 
