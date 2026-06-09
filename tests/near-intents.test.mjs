@@ -5,8 +5,8 @@
 //   1. tokens: lists supported tokens, output contains chain:SYMBOL entries
 //   2. tokens --chain near: filters by chain, output contains near: entries
 //   3. tokens --chain fake: exits 1 with "No tokens found" error
-//   4. quote: gets a committed quote for 1 USDC from ETH,
-//      asserts Send:, Receive:, Send (units):, Deposit to:, and an origin-chain Refund to: line
+//   4. quote: gets a committed quote for 1 USDC from ETH, asserts the Send:, Receive:,
+//      Send (units):, Deposit to:, and (origin-chain variant) Refund to: output lines
 //   5. missing --refund: runs the quote command without --refund, asserts exit 1 and usage output
 //   6. unknown token: uses a non-existent chain:SYMBOL (fake:FAKE), asserts exit 1
 //      and a "Token not found" error message
