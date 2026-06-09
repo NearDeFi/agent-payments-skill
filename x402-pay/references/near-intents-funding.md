@@ -80,18 +80,16 @@ node scripts/near-intents.mjs quote \
   [--refund-type origin|intents]
 ```
 
+Choose `--refund-type` before running — it sets where a **failed/partial** swap is refunded (refunds are always in the *origin* asset you sent, not Base USDC):
+
+- **`origin`** (default) → refunds on-chain to `--refund`. Automatic, no manual recovery. Use whenever you have an origin-chain address the user controls (a self-custody Solana/EVM wallet, or awal's own Solana address).
+- **`intents`** → credits the refund to a **NEAR Intents balance** keyed to `--refund` (defaults to the `--wallet` Base address; EVM addresses are auto-lowercased to the intents account format). Reclaiming is **manual** — the user must connect that wallet at app.near-intents.org and sign. Only use when the user holds an **interactive, self-custody** signer for that address. **Do not** use `intents` for managed wallets (awal/CDP/Privy/Turnkey) — they generally can't connect to claim, and the refund would be stranded.
+
 Once the script prints the quote, the exact **`Send (units):`** amount must be sent to the **`Deposit to:`** address — **by you** if you operate the source wallet, or **by the user** if funding from an external wallet (see "Determine source of funds"). Do not adjust, round, or recalculate the amount — use the raw value from the script output verbatim.
 
 ### Confirm the refund destination before any deposit
 
 The quote prints a **`Refund to:`** line — where funds go if the swap fails. **Before** you send (or tell the user to send) anything to the `Deposit to:` address, **confirm this with the user**: the refund **address**, its **chain**, and **whether it's returned on the origin chain or held as a NEAR Intents balance**. Only proceed once they acknowledge. Never send to a deposit address without the user having seen where a failed swap refunds to.
-
-### Choosing `--refund-type`
-
-`--refund-type` controls what happens to a **failed/partial** swap (refunds are always in the *origin* asset you sent, not Base USDC):
-
-- **`origin`** (default) → refunds on-chain to `--refund`. Automatic, no manual recovery. Use whenever you have an origin-chain address the user controls (a self-custody Solana/EVM wallet, or awal's own Solana address).
-- **`intents`** → credits the refund to a **NEAR Intents balance** keyed to `--refund` (defaults to the `--wallet` Base address; EVM addresses are auto-lowercased to the intents account format). Reclaiming is **manual** — the user must connect that wallet at app.near-intents.org and sign. Only use when the user holds an **interactive, self-custody** signer for that address. **Do not** use `intents` for managed wallets (awal/CDP/Privy/Turnkey) — they generally can't connect to claim, and the refund would be stranded.
 
 ### If the quote is rejected: `COST LIMIT EXCEEDED`
 
@@ -105,10 +103,6 @@ When you see `COST LIMIT EXCEEDED`, **do not just override it.** Always:
    - **Continue anyway at this cost** → only with the user's explicit agreement, re-run the **exact same** `quote` command with `--override-cost-cap` appended (this proceeds and prints the deposit address; the overhead is still logged as a warning).
 
 Never append `--override-cost-cap` without the user's explicit go-ahead.
-
-### Refund address
-
-`--refund` is **required** — it must be the address of the wallet you are funding *from* (the origin-chain sending wallet). If the swap fails, funds are returned directly to that address on the origin chain. The quote command errors out if `--refund` is omitted, so always determine the sending address before quoting.
 
 ## Chain-specific deposit instructions
 
