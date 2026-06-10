@@ -13,7 +13,7 @@ metadata:
     requires:
       bins: ["node", "npm"]
     # Dependencies are installed via `npm install` (SKILL.md Step 0); the bundled
-    # package.json/package-lock.json pin them. ClawHub `install` specs only fetch
+    # package.json declares them. ClawHub `install` specs only fetch
     # global CLI binaries, so they don't apply here.
     envVars:
       # Raw private key wallet — provide ONE of these (X402_PRIVATE_KEY is canonical; the rest are aliases)
