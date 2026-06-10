@@ -42,7 +42,7 @@ Use `references/near-intents-funding.md` directly — do not reinvent the comman
 
 1. **Step 3 (quote)** with `--from sol:USDC`, the `--wallet`/`--refund`/`--refund-type` chosen above.
 2. **Confirm the refund destination** with the user (the `Refund to:` line) — required before any send.
-3. Show the user the funding prompt below.
+3. Show the user the funding prompt below — it **must include the `Valid until:` time limit** from the quote. If the deadline passes before the user sends, run a fresh quote and re-show the prompt with the new address, amount, and deadline.
 4. **Step 4 (monitor)** the swap to a terminal status, then verify the Base balance (Step 5).
 
 ### Funding prompt to show the user
@@ -51,6 +51,8 @@ Adapt this once the quote prints (values come straight from the quote output):
 
 ```text
 Before I make the payment, please send <Send amount> USDC on Solana from Cash App, Robinhood, or Revolut.
+
+This quote is valid until <Valid until: time> (about <minutes> minutes from now) — the deposit must arrive by then. If you can't send in time, tell me and I'll get a fresh quote.
 
 Reason: NEAR Intents 1Click receives USDC on Solana, routes it to USDC on Base, and delivers it to your Base wallet. Expected Base output: <Receive amount> USDC.
 

@@ -30,7 +30,7 @@ Find the funding sources available, present them to the user **ranked best-first
      - the **chain** they'll send from (e.g. Ethereum, Solana),
      - the **token** (e.g. ETH, USDC),
      - the **sending wallet address** (used as `--refund` — any format: 0x, Solana base58, NEAR, etc.).
-     Then get the quote (Step 3), show them the **`Deposit to:` address and exact `Send (units):` amount** (and a scannable QR of the deposit address — see Step 3), tell them to deposit **exactly that amount to that address** from their wallet, and ask them to let you know once they've sent it. Then monitor (Step 4).
+     Then get the quote (Step 3), show them the **`Deposit to:` address, exact `Send (units):` amount, and the `Valid until:` time limit** (and a scannable QR of the deposit address — see Step 3), tell them to deposit **exactly that amount to that address before the deadline** from their wallet, and ask them to let you know once they've sent it. Then monitor (Step 4).
    - **Onramp (Cash App / Robinhood / Revolut)** → for a user with no crypto to swap from. Read `references/onramp-funding.md` — it covers the sender-app steps, the Solana-USDC-only route, and how to set `--refund` / `--refund-type` per wallet type. It then rejoins Step 3 (quote) and Step 4 (monitor) here.
 
 Whichever source is chosen, it determines the `--refund` value in Step 3 (and, for the onramp, possibly `--refund-type`).
@@ -68,6 +68,7 @@ Each line is `chain:SYMBOL`. Pick the entry that matches the asset you're sendin
 **You cannot skip this step.** The quote is the only source of:
 - The **Deposit to:** address — where to send funds (unique per quote, not reusable)
 - The **Send (units):** value — the exact raw amount for the on-chain transfer
+- The **Valid until:** deadline — how long the quote (and its deposit address) stays valid
 
 Do not calculate the amount yourself. Do not reuse a deposit address from a previous quote. Run a fresh quote every time:
 
@@ -88,6 +89,10 @@ Choose `--refund-type` before running — it sets where a **failed/partial** swa
 If you do not have an address to refund the deposit to and they are using a managed wallet, ask the user for a refund address on the chain they deposited from and do not proceed without one.
 
 Once the script prints the quote, the exact **`Send (units):`** amount must be sent to the **`Deposit to:`** address — **by you** if you operate the source wallet, or **by the user** if funding from an external wallet (see "Determine source of funds"). Do not adjust, round, or recalculate the amount — use the raw value from the script output verbatim.
+
+### Always tell the user the quote's time limit
+
+The quote prints a **`Valid until:`** line — the deadline by which the deposit must arrive. Whenever the **user** is the one sending the deposit (external-wallet or onramp funding), you **must** include this time limit in the instructions you give them — never hand over a deposit address without it. If the deadline passes before they send, do **not** let them use the old address: run a fresh quote and give them the new address, amount, and deadline.
 
 ### Show the deposit address as a QR (optional)
 
