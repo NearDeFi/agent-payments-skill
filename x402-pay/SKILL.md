@@ -8,7 +8,7 @@ compatibility: >
 metadata:
   version: "1.0.0"
   openclaw:
-    homepage: https://github.com/NearDeFi/x402-pay
+    homepage: https://github.com/NearDeFi/agent-payments-skill
     emoji: "💸"
     requires:
       bins: ["node", "npm"]

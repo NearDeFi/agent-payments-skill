@@ -11,7 +11,7 @@ This skill moves real money. Configure your agent/harness so it **asks for appro
 ## Install
 
 ```bash
-npx skills add NearDeFi/x402-pay
+npx skills add NearDeFi/agent-payments-skill
 ```
 
 Then install the runtime dependency inside the skill directory:
