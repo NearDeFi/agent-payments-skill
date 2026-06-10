@@ -48,7 +48,7 @@ Skills published to [ClawHub](https://docs.openclaw.ai/clawhub/skill-format) car
 - **`envVars`** — must list **every** env var the scripts and `references/` read. Whenever you add, remove, or rename an env var anywhere in the skill, update this list to match. Source of truth: `grep -rohE 'process\.env\.[A-Z0-9_]+' scripts/` plus any vars documented in `references/`. Mark each `required: false` unless the skill cannot run without it.
 - **`requires.env`** — stays **empty** here: every wallet backend is optional (the default Coinbase Agentic Wallet needs no env vars), so no var is universally required. Only list a var here if the skill is unusable without it.
 - **`requires.bins`** — the CLI binaries the skill invokes (currently `node`, `npm`). Update if the skill starts shelling out to other tools.
-- **`install`** — do **not** use it for the skill's own npm dependencies. ClawHub `install` specs only fetch **global CLI binaries** (`kind: brew|node|go|uv` + a named `package`/`formula`). Local deps are pinned in `package.json`/`package-lock.json` and installed via SKILL.md Step 0 (`npm install`).
+- **`install`** — do **not** use it for the skill's own npm dependencies. ClawHub `install` specs only fetch **global CLI binaries** (`kind: brew|node|go|uv` + a named `package`/`formula`). Local deps are declared in `package.json` and installed via SKILL.md Step 0 (`npm install`).
 
 After any change to this block, re-validate: `npx -y skills-ref validate ./x402-pay` (Claude side) and `clawhub sync --dry-run` (ClawHub side, before publishing).
 
