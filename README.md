@@ -1,4 +1,4 @@
-# x402-pay
+# x402 Pay
 
 Skill for making HTTP 402 micropayments using USDC on Base. Fund it from a crypto wallet on most chains, or from an onramp like Cash App, Robinhood, or Revolut. Designed to work across most agent frameworks (Claude Code, OpenClaw, etc.).
 
@@ -11,7 +11,7 @@ This skill moves real money. Configure your agent/harness so it **asks for appro
 ## Install
 
 ```bash
-npx skills add NearDeFi/agent-payments-skill
+npx skills add NearDeFi/x402-pay
 ```
 
 Then install the runtime dependency inside the skill directory:

@@ -3,7 +3,7 @@ NOTICE
 Copyright (c) Proximity 2026 
 ========================================================================
 
-Agent Payments Skill
+x402 Pay
 
 This software enables AI agents to discover and pay HTTP 402 / x402-enabled services using blockchain transactions, including payments on Base and optional cross-chain funding.
 
