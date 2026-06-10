@@ -1,6 +1,6 @@
 THIRD-PARTY LICENSE NOTICES
 
-This file summarizes certain third-party software licenses and notices for the Agent Payments Skill. It is provided for notice and attribution purposes only. Third-party software remains subject to the applicable third-party license terms.
+This file summarizes certain third-party software licenses and notices for x402 Pay. It is provided for notice and attribution purposes only. Third-party software remains subject to the applicable third-party license terms.
 
 Primary project license: [MIT-0]
 
@@ -20,7 +20,7 @@ WalletConnect / Reown software, including WalletKit-related packages where prese
 
 The WalletConnect Community License Agreement is not a standard permissive open-source license. It may impose attribution, license-copying, network-infrastructure, commercial-license, export-control, arbitration, and other obligations. Users and redistributors should review the license before distributing, modifying, bundling, making available, or using WalletConnect / Reown software in production.
 
-For avoidance of doubt, WalletConnect / Reown is included here because it may appear as an optional or transitive wallet-provider dependency. Inclusion of this notice does not imply that WalletConnect / Reown is a core dependency of the Agent Payments Skill, that Reown endorses this project, or that this project endorses Reown.
+For avoidance of doubt, WalletConnect / Reown is included here because it may appear as an optional or transitive wallet-provider dependency. Inclusion of this notice does not imply that WalletConnect / Reown is a core dependency of x402 Pay, that Reown endorses this project, or that this project endorses Reown.
 
 2. Other third-party software
 
