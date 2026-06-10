@@ -223,7 +223,7 @@ if (cmd === 'tokens') {
   console.log(`Send (units): ${q.amountIn}`);
   console.log(`\nDeposit to: ${q.depositAddress}`);
   if (token.contractAddress) console.log(`Asset:      ${token.contractAddress}`);
-  const minutesLeft = Math.max(0, Math.round((new Date(q.deadline) - Date.now()) / 60_000));
+  const minutesLeft = Math.max(0, Math.floor((new Date(q.deadline) - Date.now()) / 60_000));
   console.log(`Valid until: ${q.deadline} (~${minutesLeft} minutes from now) — the deposit must arrive by then; after that the quote expires and you must run a fresh quote.`);
 
   // Refund destination — confirm this with the user BEFORE they send to the deposit address.
