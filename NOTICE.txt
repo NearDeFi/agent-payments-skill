@@ -27,6 +27,14 @@ Operation of this software may require or optionally use third-party hosted serv
 
 Use of this software does not mean that any third-party service has been endorsed, audited, vetted, or approved by the authors of this software.
 
+QR CODE GENERATION SERVICE
+
+This skill may generate QR codes for deposit addresses, payment URIs, or funding instructions using the third-party QR Code API operated at api.qrserver.com by Foundata GmbH. Use of that service is subject to its own terms, privacy notices, availability, request filtering, logging, and operational limits.
+
+When QR code generation is used, the data encoded in the QR code, such as a wallet address or payment URI, is transmitted to the third-party QR code service for generation. Do not encode private keys, seed phrases, authentication secrets, confidential user data, or other sensitive information in QR codes. QR codes should be used only for public deposit addresses, payment URIs, or non-sensitive funding instructions.
+
+The authors of this skill do not operate or control the QR code service and do not guarantee that generated QR codes will be available, correct, scannable, private, or secure. Users should verify the displayed address, network, token, and amount before sending funds.
+
 NO ENDORSEMENT OF PAID APIs
 
 This software is generic and may allow an agent to pay any service that supports the relevant payment standard. The authors of this software do not endorse, monitor, audit, or guarantee any paid API, service listing, service catalog, or third-party endpoint. Users are responsible for reviewing the terms, legality, accuracy, security, and suitability of any service their agent pays for.
