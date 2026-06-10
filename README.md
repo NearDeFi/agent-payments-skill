@@ -1,4 +1,4 @@
-# x402-pay
+# x402 Pay
 
 Skill for making HTTP 402 micropayments using USDC on Base. Fund it from a crypto wallet on most chains, or from an onramp like Cash App, Robinhood, or Revolut. Designed to work across most agent frameworks (Claude Code, OpenClaw, etc.).
 
