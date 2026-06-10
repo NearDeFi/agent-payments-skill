@@ -6,7 +6,8 @@
 //   2. tokens --chain near: filters by chain, output contains near: entries
 //   3. tokens --chain fake: exits 1 with "No tokens found" error
 //   4. quote: gets a committed quote for 1 USDC from ETH, asserts the Send:, Receive:,
-//      Send (units):, Deposit to:, and (origin-chain variant) Refund to: output lines
+//      Send (units):, Deposit to:, Valid until: (with minutes remaining), and
+//      (origin-chain variant) Refund to: output lines
 //   5. missing --refund: runs the quote command without --refund, asserts exit 1 and usage output
 //   6. unknown token: uses a non-existent chain:SYMBOL (fake:FAKE), asserts exit 1
 //      and a "Token not found" error message
@@ -42,7 +43,7 @@ test('near-intents: tokens --chain fake exits 1', { timeout: 20_000 }, async () 
   assert.match(stderr, /No tokens found/i);
 });
 
-test('near-intents: quote shows Send, Receive, Send (units), Deposit to', { timeout: 20_000 }, async () => {
+test('near-intents: quote shows Send, Receive, Send (units), Deposit to, Valid until', { timeout: 20_000 }, async () => {
   const { code, stdout } = await run('near-intents.mjs', [
     'quote', '--usdc', '1.00', '--from', 'eth:ETH',
     '--wallet', TEST_ADDRESS, '--refund', TEST_ADDRESS,
@@ -52,6 +53,8 @@ test('near-intents: quote shows Send, Receive, Send (units), Deposit to', { time
   assert.match(stdout, /Receive:/);
   assert.match(stdout, /Send \(units\):/);
   assert.match(stdout, /Deposit to:/);
+  // ISO deadline plus a human-readable minutes-remaining hint
+  assert.match(stdout, /Valid until: \d{4}-\d{2}-\d{2}T.*\(~\d+ minutes from now\)/);
   assert.match(stdout, /Refund to:.*origin chain/);
 });
 
