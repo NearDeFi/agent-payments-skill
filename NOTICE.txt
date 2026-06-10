@@ -39,6 +39,10 @@ NO ENDORSEMENT OF PAID APIs
 
 This software is generic and may allow an agent to pay any service that supports the relevant payment standard. The authors of this software do not endorse, monitor, audit, or guarantee any paid API, service listing, service catalog, or third-party endpoint. Users are responsible for reviewing the terms, legality, accuracy, security, and suitability of any service their agent pays for.
 
+INDEPENDENT PROJECT NOTICE
+
+x402 Pay is an independent agent skill for interacting with x402-compatible HTTP 402 payment services. It is not affiliated with, endorsed by, or sponsored by Coinbase, LF Projects, the x402 project, or any x402 Foundation entity.
+
 NO LEGAL, FINANCIAL, OR COMPLIANCE ADVICE
 
 This software is provided as software only. It does not provide legal, financial, tax, sanctions, AML, consumer-protection, money-transmission, securities, commodities, data-protection, or other compliance advice. Users and redistributors are responsible for determining whether their use, distribution, integration, or operation of this software complies with applicable law.
