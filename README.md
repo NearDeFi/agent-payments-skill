@@ -23,6 +23,8 @@ npm install
 
 Where `<skills-dir>` is `.agents/skills` (universal) or `.claude/skills` (Claude Code), relative to your project root or home directory depending on whether you installed globally.
 
+The skill is available at https://clawhub.ai/pivortex/x402-pay on ClawHub.
+
 ## Wallet configuration
 
 The skill will check the agent's context for configured wallets. It requires a wallet on Base, and will either use an existing wallet or create one if none is already configured. The skill has explicit wallet support for AWAL, CDP, Privy, Turnkey, and private key. To use your AWAL wallet, log in via the terminal where the agent executes commands. For other wallets, configure the relevant environment variables in a `.env` file in the root of your agent.
