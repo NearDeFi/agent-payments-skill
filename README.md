@@ -1,8 +1,8 @@
 # x402 Pay
 
-Skill for making HTTP 402 micropayments using USDC on Base. Fund it from a crypto wallet on most chains, or from an onramp like Cash App, Robinhood, or Revolut. Designed to work across most agent frameworks (Claude Code, OpenClaw, etc.).
+A skill for making HTTP 402 (x402) micropayments in USDC on Base. It can be funded cross-chain via NEAR Intents or from onramps like Cash App, Revolut, and Robinhood. Designed to work across most agent frameworks (Claude Code, OpenClaw, etc.) and to be compatible with multiple agent wallet setups.
 
-Before using this skill please review the [DISCLOSURES.txt](./DISCLOSURES.txt) and [NOTICE.txt](./NOTICE.txt) files.
+Before using this skill, please review the [DISCLOSURES.txt](./DISCLOSURES.txt) and [NOTICE.txt](./NOTICE.txt) files.
 
 ## Recommended agent setup
 
