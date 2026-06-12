@@ -3,9 +3,8 @@ name: x402-pay
 description: >
   Use this skill when an HTTP request returns 402 Payment Required, when the user wants to call a paid API or x402-protected resource, when they want to discover x402 services, or when they need to fund a wallet across chains. Triggers: a 402 response, "x402", "HTTP 402", "pay for API", "paid endpoint", "find x402 services", "bazaar", "fund my x402 wallet", "top up my x402 wallet".
 compatibility: >
-  Requires internet access, Node.js with npm, and a one-time `npm install` in the skill directory (Step 0).
   No API keys required. Works out of the box with the default Coinbase Agentic Wallet (awal) — just an email address to log in.
-  Also supports raw private key, CDP SDK, Privy, and Turnkey if already configured.
+  Also supports raw private key, CDP SDK, Privy, and Turnkey if already configured. Requires internet access.
 metadata:
   version: "1.0.2"
   openclaw:
