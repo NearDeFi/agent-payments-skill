@@ -14,8 +14,11 @@
 //  10. Proceeds normally when price is within --max-price
 //  11. Fails closed when 402 requirements cannot be decoded
 //  12. Enforces --max-price against the library's re-probe (price raised after initial probe)
-//  13. Handles the full v2 402 flow (requirements in payment-required header, PAYMENT-SIGNATURE header)
-//  14. Rejects when cheapest Base option passes but most expensive exceeds --max-price
+//  13. Pays the cheapest Base USDC option when a dearer one is listed first
+//  14. Pays the Base USDC option when an expensive non-Base option is listed first
+//  15. Fails closed when the only Base option's asset is not USDC
+//  16. Ignores a cheap-looking non-USDC decoy and pays the verified USDC option
+//  17. Handles the full v2 402 flow (requirements in payment-required header, PAYMENT-SIGNATURE header)
 
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
@@ -271,40 +274,109 @@ test('pay: enforces --max-price against library re-probe when price rises', { ti
   }
 });
 
-test('pay: rejects when most expensive Base option exceeds --max-price', { timeout: 10_000 }, async () => {
-  // Server returns two Base options: $0.005 (under limit) and $0.02 (over limit).
-  // Checking only opts[0] would pass; a correct guard must check the most expensive.
+// Helper for the option-selection tests: a v1 exact option on the given network.
+function v1Option(network, atomicAmount, asset = '0x833589fcd6edb6e08f4c7c32d4f71b54bda02913') {
+  return {
+    scheme: 'exact',
+    network,
+    maxAmountRequired: atomicAmount,
+    asset,
+    payTo: '0x1234567890123456789012345678901234567890',
+    maxTimeoutSeconds: 60,
+    extra: { name: 'USD Coin', version: '2' },
+  };
+}
+
+// 402-with-accepts until the request carries X-PAYMENT, then 200. Captures the
+// decoded payment payload so tests can assert exactly which option was paid.
+function startSelectionServer(accepts) {
+  let paidPayload = null;
+  const serverPromise = startServer((req, res) => {
+    if (req.headers['x-payment']) {
+      paidPayload = JSON.parse(Buffer.from(req.headers['x-payment'], 'base64').toString('utf8'));
+      res.writeHead(200);
+      res.end(JSON.stringify({ paid: true }));
+    } else {
+      res.writeHead(402, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ x402Version: 1, accepts }));
+    }
+  });
+  return serverPromise.then(({ server, url }) => ({ server, url, getPaidPayload: () => paidPayload }));
+}
+
+test('pay: pays the cheapest Base USDC option when a dearer one is listed first', { timeout: 10_000 }, async () => {
+  // Server lists $0.02 (over limit) before $0.005 (under limit). The library's default
+  // selector takes the first option in server order — the pinned selector must pick
+  // the cheap verified one instead.
+  const { server, url, getPaidPayload } = await startSelectionServer([
+    v1Option('base', '20000'), // $0.02 — over the $0.01 limit
+    v1Option('base', '5000'),  // $0.005 — under the limit; must be the one paid
+  ]);
+
+  try {
+    const { code } = await run('pay.mjs', ['--url', url, '--key', TEST_KEY, '--max-price', '0.01']);
+    assert.equal(code, 0);
+    const paid = getPaidPayload();
+    assert.ok(paid, 'a payment should have been made');
+    assert.equal(BigInt(paid.payload.authorization.value), 5000n, 'must pay the cheapest verified option');
+  } finally {
+    server.close();
+  }
+});
+
+test('pay: pays the Base USDC option when an expensive non-Base option is listed first', { timeout: 10_000 }, async () => {
+  // The exact-evm scheme supports many EVM networks, and the library's default
+  // selector takes accepts[0] in server order — so without pinning, this $5
+  // Ethereum-mainnet option listed first would be the one paid.
+  const { server, url, getPaidPayload } = await startSelectionServer([
+    v1Option('ethereum', '5000000', '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48'), // $5 USDC on Ethereum
+    v1Option('base', '5000'), // $0.005 on Base — must be the one paid
+  ]);
+
+  try {
+    const { code } = await run('pay.mjs', ['--url', url, '--key', TEST_KEY, '--max-price', '0.01']);
+    assert.equal(code, 0);
+    const paid = getPaidPayload();
+    assert.ok(paid, 'a payment should have been made');
+    assert.equal(paid.network, 'base', 'must pay on Base, not the first-listed network');
+    assert.equal(BigInt(paid.payload.authorization.value), 5000n);
+  } finally {
+    server.close();
+  }
+});
+
+test('pay: fails closed when the only Base option asset is not USDC', { timeout: 10_000 }, async () => {
+  // Amounts are token-atomic units: '10000' of an 8- or 18-decimal token is not
+  // $0.01, so a non-USDC asset cannot be checked against a USDC --max-price.
   const { server, url } = await startServer((req, res) => {
     res.writeHead(402, { 'Content-Type': 'application/json' });
     res.end(JSON.stringify({
       x402Version: 1,
-      accepts: [
-        {
-          scheme: 'exact',
-          network: 'base',
-          maxAmountRequired: '5000', // $0.005 — under the $0.01 limit
-          asset: '0x833589fcd6edb6e08f4c7c32d4f71b54bda02913',
-          payTo: '0x1234567890123456789012345678901234567890',
-          maxTimeoutSeconds: 60,
-          extra: { name: 'USD Coin', version: '2' },
-        },
-        {
-          scheme: 'exact',
-          network: 'base',
-          maxAmountRequired: '20000', // $0.02 — over the $0.01 limit
-          asset: '0x833589fcd6edb6e08f4c7c32d4f71b54bda02913',
-          payTo: '0x1234567890123456789012345678901234567890',
-          maxTimeoutSeconds: 60,
-          extra: { name: 'USD Coin', version: '2' },
-        },
-      ],
+      accepts: [v1Option('base', '10000', '0x50c5725949a6f0c72e6c4a641f24049a917db0cb')], // DAI on Base
     }));
   });
 
   try {
     const { code, stderr } = await run('pay.mjs', ['--url', url, '--key', TEST_KEY, '--max-price', '0.01']);
     assert.equal(code, 1);
-    assert.match(stderr, /exceeds --max-price/i);
+    assert.match(stderr, /unable to verify.*fail closed/i);
+  } finally {
+    server.close();
+  }
+});
+
+test('pay: ignores a cheap-looking non-USDC decoy and pays the verified USDC option', { timeout: 10_000 }, async () => {
+  const { server, url, getPaidPayload } = await startSelectionServer([
+    v1Option('base', '5000', '0x50c5725949a6f0c72e6c4a641f24049a917db0cb'), // DAI decoy, listed first
+    v1Option('base', '8000'), // $0.008 USDC — must be the one paid
+  ]);
+
+  try {
+    const { code } = await run('pay.mjs', ['--url', url, '--key', TEST_KEY, '--max-price', '0.01']);
+    assert.equal(code, 0);
+    const paid = getPaidPayload();
+    assert.ok(paid, 'a payment should have been made');
+    assert.equal(BigInt(paid.payload.authorization.value), 8000n, 'must pay the USDC option, not the decoy');
   } finally {
     server.close();
   }

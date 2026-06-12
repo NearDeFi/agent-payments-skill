@@ -58,7 +58,7 @@ test('signer template: custom signer flows through wrapFetchWithPayment and pays
     };
 
     const client = new x402Client();
-    registerExactEvmScheme(client, { signer });
+    registerExactEvmScheme(client, { signer, networks: ['eip155:8453'] });
     const fetchWithPayment = wrapFetchWithPayment(fetch, client);
 
     const res = await fetchWithPayment(url);

@@ -65,7 +65,9 @@ const signer = {
 };
 
 const client = new x402Client();
-registerExactEvmScheme(client, { signer });
+// Scope to Base mainnet — without `networks` the scheme registers an eip155:* wildcard
+// and the client will pay the first option the server lists on ANY EVM chain.
+registerExactEvmScheme(client, { signer, networks: ['eip155:8453'] });
 const fetchWithPayment = wrapFetchWithPayment(fetch, client);
 
 const res = await fetchWithPayment('https://api.example.com/data');
