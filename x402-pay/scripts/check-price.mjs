@@ -26,6 +26,15 @@ if (args.includes('--max-price') && maxPriceArg === null) {
   console.error('--max-price requires a value (e.g. --max-price 0.0100).');
   process.exit(1);
 }
+let maxAtomic = null;
+if (maxPriceArg !== null) {
+  const m = maxPriceArg.match(/^(\d+)(?:\.(\d{1,6}))?$/);
+  if (!m) {
+    console.error(`Invalid --max-price value: ${maxPriceArg}. Expected a USDC amount like 0.0100 (up to 6 decimals).`);
+    process.exit(1);
+  }
+  maxAtomic = (BigInt(m[1]) * 1_000_000n) + BigInt((m[2] || '').padEnd(6, '0'));
+}
 
 const BASE_MAINNET_CHAIN_ID = 8453; // only Base mainnet is supported (no testnets / other chains)
 const CHAIN_IDS = { 'base': BASE_MAINNET_CHAIN_ID };
@@ -90,13 +99,7 @@ for (const opt of evmOptions) {
   console.log(`Payment required: ${formatUsdc(amount)} USDC on network ${opt.network} (atomic: ${amount})`);
 }
 
-if (maxPriceArg !== null) {
-  const m = maxPriceArg.match(/^(\d+)(?:\.(\d{1,6}))?$/);
-  if (!m) {
-    console.error(`Invalid --max-price value: ${maxPriceArg}. Expected a USDC amount like 0.0100 (up to 6 decimals).`);
-    process.exit(1);
-  }
-  const maxAtomic = (BigInt(m[1]) * 1_000_000n) + BigInt((m[2] || '').padEnd(6, '0'));
+if (maxAtomic !== null) {
   const cheapestAmount = evmOptions[0].maxAmountRequired || evmOptions[0].amount;
   if (BigInt(cheapestAmount) > maxAtomic) {
     console.error(`Price ${formatUsdc(cheapestAmount)} USDC exceeds --max-price ${maxPriceArg} USDC.`);
