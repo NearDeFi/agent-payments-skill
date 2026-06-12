@@ -140,6 +140,7 @@ Report the response body and any transaction hash to the user.
 - **Always ask the user before executing any command.** Show the exact command you intend to run and wait for explicit approval before running it — this applies to wallet, payment, and funding commands.
 - Abide by configured safeguards such as wallet spend limits and allowlists.
 - Never pay through a mechanism that cannot enforce the user-confirmed price as a hard cap at payment time — for wallets without one, route signing through the managed-signer template in `references/wallet-flows.md`.
+- If a wallet's authentication is missing or expired (e.g. awal is signed out), **stop immediately and report it**, telling the user what login action to take. Never attempt to recover access yourself: do not search the user's files, email, message history, or browser/app storage for keys, session tokens, or OTP codes, and do not retry authentication repeatedly.
 - When funding, always confirm the refund destination (address, chain, and origin-chain vs. NEAR Intents balance) with the user before any deposit.
 - Never pay silently — always show the decoded price first
 - Confirm with user before any payment
