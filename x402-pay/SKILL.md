@@ -123,7 +123,7 @@ Check your wallet's USDC balance on Base — see `references/wallet-flows.md` fo
 
 **Always show the price before paying. Confirm with user before paying.**
 
-Show the user the price you previewed in Step 3 (if significant time has passed, re-run `check-price.mjs` in case it changed). **Always get their confirmation before paying — for any amount.** Then pay the endpoint using your wallet — see `references/wallet-flows.md` for the method for your wallet (if not already known). Pass `--max-price <confirmed-price>` to the payment command — it is required and the script will refuse to run without it (e.g. `--max-price 0.0100`).
+Show the user the price you previewed in Step 3 (if significant time has passed, re-run `check-price.mjs` in case it changed). **Always get their confirmation before paying — for any amount.** Then pay the endpoint using your wallet — see `references/wallet-flows.md` for the method for your wallet (if not already known). Always pass the confirmed price, unpadded, as the payment command's hard cap — `--max-price <usdc>` for `pay.mjs`, `--max-amount <atomic>` for awal, `MAX_PRICE` in the managed-signer template — so a quote raised at payment time fails closed instead of overcharging.
 
 ---
 

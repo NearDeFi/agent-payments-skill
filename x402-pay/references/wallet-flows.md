@@ -51,11 +51,16 @@ These three are the most similar — each is a managed/MPC wallet that plugs int
 
 - **Address:** read it from the wallet's env var — `CDP_WALLET_ADDRESS`, `PRIVY_WALLET_ADDRESS`, or `TURNKEY_SIGN_WITH` — or from the SDK.
 - **Balance:** use the common `node scripts/wallet.mjs balance <address>` command above.
-- **Pay:** there's no prebuilt CLI for these wallets — write a short one-off Node script (save it under `scripts/`, run it with `node`). The block below is the **template** for that script: it makes the paid request to the endpoint. It is identical for all three wallets — **fill in two things** to make it runnable: your wallet `address`, and the `signTypedData` body for your wallet (per-wallet bodies follow). `wrapFetchWithPayment` wraps `fetch` so that when the endpoint returns 402, it signs the payment authorization with your `signer` and retries automatically; `res` is the final paid response.
+- **Pay:** there's no prebuilt CLI for these wallets — write a short one-off Node script (save it under `scripts/`, run it with `node`). The block below is the **template** for that script: it makes the paid request to the endpoint. It is identical for all three wallets — **fill in three things** to make it runnable: your wallet `address`, the `signTypedData` body for your wallet (per-wallet bodies follow), and `MAX_PRICE` — the exact price the user confirmed, unpadded. `wrapFetchWithPayment` wraps `fetch` so that when the endpoint returns 402, it signs the payment authorization with your `signer` and retries automatically; `res` is the final paid response.
 
 ```js
 import { x402Client, wrapFetchWithPayment } from '@x402/fetch';
 import { registerExactEvmScheme } from '@x402/evm/exact/client';
+import { parseUsdcToAtomic, optionAmount, isVerifiableBaseUsdcOption, baseUsdcOptions } from './x402-options.mjs';
+
+const MAX_PRICE = '<user-confirmed price in USDC, e.g. 0.0100>';
+const maxAtomic = parseUsdcToAtomic(MAX_PRICE);
+if (maxAtomic === null) throw new Error(`Invalid MAX_PRICE: ${MAX_PRICE}`);
 
 const signer = {
   address: '<your wallet address>',
@@ -64,15 +69,29 @@ const signer = {
   },
 };
 
-const client = new x402Client();
-// Scope to Base mainnet — without `networks` the scheme registers an eip155:* wildcard
-// and the client will pay the first option the server lists on ANY EVM chain.
-registerExactEvmScheme(client, { signer, networks: ['eip155:8453'] });
+// The server quotes a fresh price at payment time, which may differ from the one
+// previewed with check-price.mjs. Pin the client to the cheapest Base USDC option
+// within MAX_PRICE — the library's default takes the first option the server lists,
+// on ANY EVM chain, in any asset — and fail closed when nothing qualifies.
+const client = new x402Client((_version, accepts) => {
+  const ok = baseUsdcOptions(accepts).filter(o => BigInt(optionAmount(o)) <= maxAtomic);
+  if (!ok[0]) throw new Error(`Payment rejected: no Base USDC option within ${MAX_PRICE} USDC.`);
+  return ok[0];
+});
+registerExactEvmScheme(client, { signer, networks: ['eip155:8453'] }); // Base mainnet only — no eip155:* wildcard
+// Last line of defence: re-verify whatever was selected right before signing.
+client.onBeforePaymentCreation(({ selectedRequirements: sel }) => {
+  if (!isVerifiableBaseUsdcOption(sel) || BigInt(optionAmount(sel)) > maxAtomic) {
+    return { abort: true, reason: `selected option is not Base USDC within ${MAX_PRICE} USDC` };
+  }
+});
 const fetchWithPayment = wrapFetchWithPayment(fetch, client);
 
 const res = await fetchWithPayment('https://api.example.com/data');
 console.log(await res.text());   // the paid response body
 ```
+
+Set `MAX_PRICE` to the price the user confirmed — never pad it for headroom. If the script fails with `Payment rejected`, the server is now quoting more than the user agreed to: re-run `check-price.mjs`, show the user the new price, and only retry with an updated `MAX_PRICE` after they re-confirm.
 
 ### CDP SDK (`@coinbase/cdp-sdk`)
 
