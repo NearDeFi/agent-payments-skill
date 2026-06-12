@@ -5,12 +5,14 @@
 //   1. Exits 0 and prints the status when the server returns 200 immediately (no payment needed)
 //   2. Exits 1 and prints usage when --url is not provided
 //   3. Exits 1 when --max-price is not provided
-//   4. Exits 1 with "No private key" when no key is available in env or args
-//   5. Handles the full v1 402 flow (requirements in JSON body, X-PAYMENT header)
-//   6. POST with --body sends the body to the server and handles 402 → retry
-//   7. Handles the full v2 402 flow (requirements in payment-required header, PAYMENT-SIGNATURE header)
-//   8. Exits 1 with rejection message when price exceeds --max-price
-//   9. Proceeds normally when price is within --max-price
+//   4. Exits 1 with a clear error on invalid --max-price format
+//   5. Exits 1 with "No private key" when no key is available in env or args
+//   6. Handles the full v1 402 flow (requirements in JSON body, X-PAYMENT header)
+//   7. POST with --body sends the body to the server and handles 402 → retry
+//   8. Handles the full v2 402 flow (requirements in payment-required header, PAYMENT-SIGNATURE header)
+//   9. Exits 1 with rejection message when price exceeds --max-price
+//  10. Proceeds normally when price is within --max-price
+//  11. Fails closed when 402 requirements cannot be decoded
 
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
@@ -53,6 +55,12 @@ test('pay: errors with no --max-price', async () => {
   const { code, stderr } = await run('pay.mjs', ['--url', 'http://localhost:1', '--key', TEST_KEY]);
   assert.equal(code, 1);
   assert.match(stderr, /--max-price.*required/i);
+});
+
+test('pay: errors on invalid --max-price format', async () => {
+  const { code, stderr } = await run('pay.mjs', ['--url', 'http://localhost:1', '--max-price', 'abc', '--key', TEST_KEY]);
+  assert.equal(code, 1);
+  assert.match(stderr, /Invalid --max-price/i);
 });
 
 test('pay: errors with no key', async () => {
@@ -203,6 +211,22 @@ test('pay: proceeds when price is within --max-price', { timeout: 10_000 }, asyn
   try {
     const { code } = await run('pay.mjs', ['--url', url, '--key', TEST_KEY, '--max-price', '0.01']);
     assert.equal(code, 0);
+  } finally {
+    server.close();
+  }
+});
+
+test('pay: fails closed when 402 requirements cannot be decoded', { timeout: 10_000 }, async () => {
+  const { server, url } = await startServer((req, res) => {
+    // 402 with no decodable requirements body or header
+    res.writeHead(402);
+    res.end('payment required');
+  });
+
+  try {
+    const { code, stderr } = await run('pay.mjs', ['--url', url, '--max-price', '0.01', '--key', TEST_KEY]);
+    assert.equal(code, 1);
+    assert.match(stderr, /fail closed/i);
   } finally {
     server.close();
   }

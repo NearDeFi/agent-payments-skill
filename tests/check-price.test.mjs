@@ -10,6 +10,7 @@
 //   6. Sorts cheapest-first using BigInt (no precision loss on huge amounts)
 //   7. Exits 1 with rejection message when price exceeds --max-price
 //   8. Exits 0 when price is within --max-price
+//   9. Exits 1 with a clear error on invalid --max-price format
 
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
@@ -170,6 +171,24 @@ test('check-price: exits 0 when price is within --max-price', { timeout: 10_000 
   try {
     const { code } = await run('check-price.mjs', [url, '--max-price', '0.01']);
     assert.equal(code, 0);
+  } finally {
+    server.close();
+  }
+});
+
+test('check-price: errors on invalid --max-price format', { timeout: 10_000 }, async () => {
+  const { server, url } = await startServer((req, res) => {
+    res.writeHead(402, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({
+      x402Version: 1,
+      accepts: [{ scheme: 'exact', network: 'base', maxAmountRequired: '10000', asset: '0x0', payTo: '0x1', maxTimeoutSeconds: 60 }],
+    }));
+  });
+
+  try {
+    const { code, stderr } = await run('check-price.mjs', [url, '--max-price', 'abc']);
+    assert.equal(code, 1);
+    assert.match(stderr, /Invalid --max-price/i);
   } finally {
     server.close();
   }

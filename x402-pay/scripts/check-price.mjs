@@ -87,8 +87,13 @@ for (const opt of evmOptions) {
 }
 
 if (maxPriceArg !== null) {
+  const m = maxPriceArg.match(/^(\d+)(?:\.(\d{1,6}))?$/);
+  if (!m) {
+    console.error(`Invalid --max-price value: ${maxPriceArg}. Expected a USDC amount like 0.0100 (up to 6 decimals).`);
+    process.exit(1);
+  }
+  const maxAtomic = (BigInt(m[1]) * 1_000_000n) + BigInt((m[2] || '').padEnd(6, '0'));
   const cheapestAmount = evmOptions[0].maxAmountRequired || evmOptions[0].amount;
-  const maxAtomic = BigInt(Math.round(parseFloat(maxPriceArg) * 1_000_000));
   if (BigInt(cheapestAmount) > maxAtomic) {
     console.error(`Price ${formatUsdc(cheapestAmount)} USDC exceeds --max-price ${maxPriceArg} USDC.`);
     process.exit(1);

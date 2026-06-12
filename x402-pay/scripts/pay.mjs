@@ -28,6 +28,12 @@ if (!maxPriceArg) {
   console.error('--max-price <usdc> is required. Preview the price with check-price.mjs, confirm with the user, then pass the confirmed price here.');
   process.exit(1);
 }
+const maxPriceMatch = maxPriceArg.match(/^(\d+)(?:\.(\d{1,6}))?$/);
+if (!maxPriceMatch) {
+  console.error(`Invalid --max-price value: ${maxPriceArg}. Expected a USDC amount like 0.0100 (up to 6 decimals).`);
+  process.exit(1);
+}
+const maxAtomic = (BigInt(maxPriceMatch[1]) * 1_000_000n) + BigInt((maxPriceMatch[2] || '').padEnd(6, '0'));
 if (!keyArg) {
   console.error('No private key. Set X402_PRIVATE_KEY env var or pass --key <hex>.');
   process.exit(1);
@@ -75,6 +81,7 @@ if (!requirements?.accepts) {
   if (hdr) try { requirements = JSON.parse(Buffer.from(hdr, 'base64').toString('utf8')); } catch {}
 }
 
+let priceVerified = false;
 if (requirements?.accepts) {
   const evmOptions = requirements.accepts
     .filter(a => a.scheme === 'exact' && evmChainId(a.network) === BASE_MAINNET_CHAIN_ID)
@@ -87,14 +94,18 @@ if (requirements?.accepts) {
   if (accepted) {
     const amount = accepted.maxAmountRequired || accepted.amount;
     console.log(`Payment required: ${formatUsdc(amount)} USDC on network ${accepted.network}`);
-    if (maxPriceArg !== null) {
-      const maxAtomic = BigInt(Math.round(parseFloat(maxPriceArg) * 1_000_000));
-      if (BigInt(amount) > maxAtomic) {
-        console.error(`Payment rejected: price ${formatUsdc(amount)} USDC exceeds --max-price ${maxPriceArg} USDC.`);
-        process.exit(1);
-      }
+    if (BigInt(amount) > maxAtomic) {
+      console.error(`Payment rejected: price ${formatUsdc(amount)} USDC exceeds --max-price ${maxPriceArg} USDC.`);
+      process.exit(1);
     }
+    priceVerified = true;
   }
+}
+
+// Fail closed — if we couldn't decode the price requirements we cannot verify --max-price
+if (!priceVerified) {
+  console.error('Payment rejected: could not decode 402 price to verify --max-price. Aborting to fail closed.');
+  process.exit(1);
 }
 
 // Set up x402 client — handles all payment schemes and extensions automatically
