@@ -3,7 +3,7 @@
 // Supports v1 (body) and v2 (payment-required header) 402 responses using the exact-evm scheme.
 //
 // Usage:
-//   node scripts/pay.mjs --url <url> [--method GET|POST] [--body <json>] [--key <hex>]
+//   node scripts/pay.mjs --url <url> --max-price <usdc> [--method GET|POST] [--body <json>] [--key <hex>]
 //
 // Requires: npm install
 
@@ -14,13 +14,18 @@ loadEnv();
 const args = process.argv.slice(2);
 const getArg = makeGetArg(args);
 
-const urlArg  = getArg('--url');
-const method  = (getArg('--method') || 'GET').toUpperCase();
-const bodyArg = getArg('--body');
-const keyArg  = getArg('--key') || process.env.X402_PRIVATE_KEY || process.env.PRIVATE_KEY || process.env.WALLET_PRIVATE_KEY || process.env.ETH_PRIVATE_KEY || process.env.AGENT_PRIVATE_KEY;
+const urlArg      = getArg('--url');
+const method      = (getArg('--method') || 'GET').toUpperCase();
+const bodyArg     = getArg('--body');
+const keyArg      = getArg('--key') || process.env.X402_PRIVATE_KEY || process.env.PRIVATE_KEY || process.env.WALLET_PRIVATE_KEY || process.env.ETH_PRIVATE_KEY || process.env.AGENT_PRIVATE_KEY;
+const maxPriceArg = getArg('--max-price');
 
 if (!urlArg) {
-  console.error('Usage: node scripts/pay.mjs --url <url> [--method GET|POST] [--body <json>] [--key <hex>]');
+  console.error('Usage: node scripts/pay.mjs --url <url> --max-price <usdc> [--method GET|POST] [--body <json>] [--key <hex>]');
+  process.exit(1);
+}
+if (!maxPriceArg) {
+  console.error('--max-price <usdc> is required. Preview the price with check-price.mjs, confirm with the user, then pass the confirmed price here.');
   process.exit(1);
 }
 if (!keyArg) {
@@ -82,6 +87,13 @@ if (requirements?.accepts) {
   if (accepted) {
     const amount = accepted.maxAmountRequired || accepted.amount;
     console.log(`Payment required: ${formatUsdc(amount)} USDC on network ${accepted.network}`);
+    if (maxPriceArg !== null) {
+      const maxAtomic = BigInt(Math.round(parseFloat(maxPriceArg) * 1_000_000));
+      if (BigInt(amount) > maxAtomic) {
+        console.error(`Payment rejected: price ${formatUsdc(amount)} USDC exceeds --max-price ${maxPriceArg} USDC.`);
+        process.exit(1);
+      }
+    }
   }
 }
 

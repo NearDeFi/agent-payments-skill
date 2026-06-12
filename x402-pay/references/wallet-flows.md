@@ -158,6 +158,8 @@ Use this only if a raw secp256k1 private key is configured (see `references/dete
 node scripts/wallet.mjs new
 ```
 
+**Security warning:** A raw private key in `.env` is stored in plaintext. Anyone with access to this file or machine can drain the wallet. Use a dedicated low-balance wallet, never commit `.env` to version control, exclude it from backups, and prefer a managed wallet (awal, CDP, Privy, or Turnkey) if larger amounts are involved.
+
 Immediately write the key to `.env` in the project root so it is persisted — do not just display it and move on:
 
 ```
@@ -176,5 +178,5 @@ node scripts/wallet.mjs balance <your-address>  # USDC balance (common command a
 **Pay** — `pay.mjs` handles the full flow (fetch → 402 → sign → retry) in one command:
 
 ```bash
-node scripts/pay.mjs --url <service-url> [--method GET|POST] [--body '{"key":"value"}']
+node scripts/pay.mjs --url <service-url> --max-price <usdc> [--method GET|POST] [--body '{"key":"value"}']
 ```

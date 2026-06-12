@@ -4,10 +4,13 @@
 // Tests:
 //   1. Exits 0 and prints the status when the server returns 200 immediately (no payment needed)
 //   2. Exits 1 and prints usage when --url is not provided
-//   3. Exits 1 with "No private key" when no key is available in env or args
-//   4. Handles the full v1 402 flow (requirements in JSON body, X-PAYMENT header)
-//   5. POST with --body sends the body to the server and handles 402 → retry
-//   6. Handles the full v2 402 flow (requirements in payment-required header, PAYMENT-SIGNATURE header)
+//   3. Exits 1 when --max-price is not provided
+//   4. Exits 1 with "No private key" when no key is available in env or args
+//   5. Handles the full v1 402 flow (requirements in JSON body, X-PAYMENT header)
+//   6. POST with --body sends the body to the server and handles 402 → retry
+//   7. Handles the full v2 402 flow (requirements in payment-required header, PAYMENT-SIGNATURE header)
+//   8. Exits 1 with rejection message when price exceeds --max-price
+//   9. Proceeds normally when price is within --max-price
 
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
@@ -32,7 +35,7 @@ test('pay: exits 0 when server returns 200', { timeout: 10_000 }, async () => {
   });
 
   try {
-    const { code, stdout } = await run('pay.mjs', ['--url', url, '--key', TEST_KEY]);
+    const { code, stdout } = await run('pay.mjs', ['--url', url, '--max-price', '0.01', '--key', TEST_KEY]);
     assert.equal(code, 0);
     assert.match(stdout, /200/);
   } finally {
@@ -46,8 +49,14 @@ test('pay: errors with no --url', async () => {
   assert.match(stderr, /Usage/i);
 });
 
+test('pay: errors with no --max-price', async () => {
+  const { code, stderr } = await run('pay.mjs', ['--url', 'http://localhost:1', '--key', TEST_KEY]);
+  assert.equal(code, 1);
+  assert.match(stderr, /--max-price.*required/i);
+});
+
 test('pay: errors with no key', async () => {
-  const { code, stderr } = await run('pay.mjs', ['--url', 'http://localhost:1'],
+  const { code, stderr } = await run('pay.mjs', ['--url', 'http://localhost:1', '--max-price', '0.01'],
     { X402_PRIVATE_KEY: '', PRIVATE_KEY: '', WALLET_PRIVATE_KEY: '', ETH_PRIVATE_KEY: '', AGENT_PRIVATE_KEY: '' });
   assert.equal(code, 1);
   assert.match(stderr, /No private key/i);
@@ -85,7 +94,7 @@ test('pay: handles 402 and sends signed retry', { timeout: 10_000 }, async () =>
   });
 
   try {
-    const { code, stdout } = await run('pay.mjs', ['--url', url, '--key', TEST_KEY]);
+    const { code, stdout } = await run('pay.mjs', ['--url', url, '--max-price', '0.01', '--key', TEST_KEY]);
     assert.equal(code, 0);
     assert.match(stdout, /Payment required:.*USDC/i, 'should log price before paying');
     assert.ok(retryHeaders?.['x-payment'], 'retry should include X-PAYMENT header');
@@ -132,10 +141,68 @@ test('pay: POST with --body sends body and handles 402 → retry', { timeout: 10
 
   try {
     const { code } = await run('pay.mjs', [
-      '--url', url, '--method', 'POST', '--body', '{"key":"value"}', '--key', TEST_KEY,
+      '--url', url, '--max-price', '0.01', '--method', 'POST', '--body', '{"key":"value"}', '--key', TEST_KEY,
     ]);
     assert.equal(code, 0);
     assert.equal(receivedBody, '{"key":"value"}', 'retry should re-send the original body');
+  } finally {
+    server.close();
+  }
+});
+
+test('pay: rejects when price exceeds --max-price', { timeout: 10_000 }, async () => {
+  const { server, url } = await startServer((req, res) => {
+    res.writeHead(402, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({
+      x402Version: 1,
+      accepts: [{
+        scheme: 'exact',
+        network: 'base',
+        maxAmountRequired: '10000', // $0.01
+        asset: '0x833589fcd6edb6e08f4c7c32d4f71b54bda02913',
+        payTo: '0x1234567890123456789012345678901234567890',
+        maxTimeoutSeconds: 60,
+        extra: { name: 'USD Coin', version: '2' },
+      }],
+    }));
+  });
+
+  try {
+    const { code, stderr } = await run('pay.mjs', ['--url', url, '--key', TEST_KEY, '--max-price', '0.005']);
+    assert.equal(code, 1);
+    assert.match(stderr, /exceeds --max-price/i);
+  } finally {
+    server.close();
+  }
+});
+
+test('pay: proceeds when price is within --max-price', { timeout: 10_000 }, async () => {
+  let requestCount = 0;
+  const { server, url } = await startServer((req, res) => {
+    requestCount++;
+    if (requestCount <= 2) {
+      res.writeHead(402, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({
+        x402Version: 1,
+        accepts: [{
+          scheme: 'exact',
+          network: 'base',
+          maxAmountRequired: '10000', // $0.01
+          asset: '0x833589fcd6edb6e08f4c7c32d4f71b54bda02913',
+          payTo: '0x1234567890123456789012345678901234567890',
+          maxTimeoutSeconds: 60,
+          extra: { name: 'USD Coin', version: '2' },
+        }],
+      }));
+    } else {
+      res.writeHead(200);
+      res.end(JSON.stringify({ paid: true }));
+    }
+  });
+
+  try {
+    const { code } = await run('pay.mjs', ['--url', url, '--key', TEST_KEY, '--max-price', '0.01']);
+    assert.equal(code, 0);
   } finally {
     server.close();
   }
@@ -170,7 +237,7 @@ test('pay: handles v2 402 (requirements in payment-required header)', { timeout:
   });
 
   try {
-    const { code, stdout } = await run('pay.mjs', ['--url', url, '--key', TEST_KEY]);
+    const { code, stdout } = await run('pay.mjs', ['--url', url, '--max-price', '0.01', '--key', TEST_KEY]);
     assert.equal(code, 0);
     assert.match(stdout, /Payment required:.*USDC/i, 'should log price before paying');
     // v2: library sends PAYMENT-SIGNATURE header (not X-PAYMENT which is v1)

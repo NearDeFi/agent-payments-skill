@@ -7,15 +7,16 @@
 // Use it in Step 3 to preview the price (informs the Step 4 balance check and funding amount) and again before paying in Step 5.
 //
 // Usage:
-//   node scripts/check-price.mjs <url> [--method GET|POST] [--body <json>]
+//   node scripts/check-price.mjs <url> [--method GET|POST] [--body <json>] [--max-price <usdc>]
 
 import { makeGetArg } from './cli-args.mjs';
 
 const args = process.argv.slice(2);
 const url = args[0] && !args[0].startsWith('--') ? args[0] : null;
 const getArg = makeGetArg(args);
-const method = (getArg('--method') || 'GET').toUpperCase();
-const body   = getArg('--body');
+const method      = (getArg('--method') || 'GET').toUpperCase();
+const body        = getArg('--body');
+const maxPriceArg = getArg('--max-price');
 
 if (!url) {
   console.error('Usage: node scripts/check-price.mjs <url> [--method GET|POST] [--body <json>]');
@@ -83,4 +84,13 @@ if (!evmOptions.length) {
 for (const opt of evmOptions) {
   const amount = opt.maxAmountRequired || opt.amount;
   console.log(`Payment required: ${formatUsdc(amount)} USDC on network ${opt.network} (atomic: ${amount})`);
+}
+
+if (maxPriceArg !== null) {
+  const cheapestAmount = evmOptions[0].maxAmountRequired || evmOptions[0].amount;
+  const maxAtomic = BigInt(Math.round(parseFloat(maxPriceArg) * 1_000_000));
+  if (BigInt(cheapestAmount) > maxAtomic) {
+    console.error(`Price ${formatUsdc(cheapestAmount)} USDC exceeds --max-price ${maxPriceArg} USDC.`);
+    process.exit(1);
+  }
 }

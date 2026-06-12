@@ -1,10 +1,10 @@
 ---
 name: x402-pay
 description: >
-  Use this skill when an HTTP request returns 402 Payment Required, when the user wants to call a paid API or x402-protected resource, when they want to discover x402 services, or when they need to fund a wallet across chains. Triggers: a 402 response, "x402", "HTTP 402", "pay for API", "paid endpoint", "find x402 services", "bazaar", "fund my wallet", "top up".
+  Use this skill when an HTTP request returns 402 Payment Required, when the user wants to call a paid API or x402-protected resource, when they want to discover x402 services, or when they need to fund a wallet across chains. Triggers: a 402 response, "x402", "HTTP 402", "pay for API", "paid endpoint", "find x402 services", "bazaar", "fund my x402 wallet", "top up my x402 wallet".
 compatibility: >
-  Requires internet access and `npm install` in x402-pay/. No API keys required. Wallet support: Coinbase Agentic Wallet
-  (awal, default), raw private key, CDP SDK, Privy server wallets, Turnkey.
+  No API keys required. Works out of the box with the default Coinbase Agentic Wallet (awal) — just an email address to log in.
+  Also supports raw private key, CDP SDK, Privy, and Turnkey if already configured. Requires internet access.
 metadata:
   version: "1.0.0"
   openclaw:
@@ -57,7 +57,7 @@ cd <skills-dir>/x402-pay
 npm install
 ```
 
-No API keys required.
+**No API keys required.** The default wallet (awal) works with just an email address. CDP, Privy, and Turnkey wallets are also supported if already configured.
 
 ---
 
@@ -123,7 +123,7 @@ Check your wallet's USDC balance on Base — see `references/wallet-flows.md` fo
 
 **Always show the price before paying. Confirm with user before paying.**
 
-Show the user the price you previewed in Step 3 (if significant time has passed, re-run `check-price.mjs` in case it changed). **Always get their confirmation before paying — for any amount.** Then pay the endpoint using your wallet — see `references/wallet-flows.md` for the method for your wallet (if not already known).
+Show the user the price you previewed in Step 3 (if significant time has passed, re-run `check-price.mjs` in case it changed). **Always get their confirmation before paying — for any amount.** Then pay the endpoint using your wallet — see `references/wallet-flows.md` for the method for your wallet (if not already known). Pass `--max-price <confirmed-price>` to the payment command — it is required and the script will refuse to run without it (e.g. `--max-price 0.0100`).
 
 ---
 

@@ -8,6 +8,8 @@
 //   4. Reports "No payment required" (exit 0) when the server returns 200
 //   5. Includes only Base mainnet — excludes testnets and other EVM chains
 //   6. Sorts cheapest-first using BigInt (no precision loss on huge amounts)
+//   7. Exits 1 with rejection message when price exceeds --max-price
+//   8. Exits 0 when price is within --max-price
 
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
@@ -119,6 +121,55 @@ test('check-price: includes only Base mainnet, excludes other EVM networks', { t
     assert.equal(lines.length, 1, 'only the Base mainnet option should be listed');
     assert.match(lines[0], /network base/i);
     assert.doesNotMatch(stdout, /eip155|137|84532/, 'non-Base-mainnet networks must be excluded');
+  } finally {
+    server.close();
+  }
+});
+
+test('check-price: exits 1 when price exceeds --max-price', { timeout: 10_000 }, async () => {
+  const { server, url } = await startServer((req, res) => {
+    res.writeHead(402, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({
+      x402Version: 1,
+      accepts: [{
+        scheme: 'exact',
+        network: 'base',
+        maxAmountRequired: '10000', // $0.01
+        asset: '0x833589fcd6edb6e08f4c7c32d4f71b54bda02913',
+        payTo: '0x1234567890123456789012345678901234567890',
+        maxTimeoutSeconds: 60,
+      }],
+    }));
+  });
+
+  try {
+    const { code, stderr } = await run('check-price.mjs', [url, '--max-price', '0.005']);
+    assert.equal(code, 1);
+    assert.match(stderr, /exceeds --max-price/i);
+  } finally {
+    server.close();
+  }
+});
+
+test('check-price: exits 0 when price is within --max-price', { timeout: 10_000 }, async () => {
+  const { server, url } = await startServer((req, res) => {
+    res.writeHead(402, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({
+      x402Version: 1,
+      accepts: [{
+        scheme: 'exact',
+        network: 'base',
+        maxAmountRequired: '10000', // $0.01
+        asset: '0x833589fcd6edb6e08f4c7c32d4f71b54bda02913',
+        payTo: '0x1234567890123456789012345678901234567890',
+        maxTimeoutSeconds: 60,
+      }],
+    }));
+  });
+
+  try {
+    const { code } = await run('check-price.mjs', [url, '--max-price', '0.01']);
+    assert.equal(code, 0);
   } finally {
     server.close();
   }
