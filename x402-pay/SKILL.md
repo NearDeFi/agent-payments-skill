@@ -125,6 +125,8 @@ Check your wallet's USDC balance on Base — see `references/wallet-flows.md` fo
 
 Show the user the price you previewed in Step 3 (if significant time has passed, re-run `check-price.mjs` in case it changed). **Always get their confirmation before paying — for any amount.** Then pay the endpoint using your wallet — see `references/wallet-flows.md` for the method for your wallet (if not already known). Always pass the confirmed price, unpadded, as the payment command's hard cap — `--max-price <usdc>` for `pay.mjs`, `--max-amount <atomic>` for awal, `MAX_PRICE` in the managed-signer template — so a quote raised at payment time fails closed instead of overcharging.
 
+This rule applies to **every** payment method, including wallets not covered in `references/wallet-flows.md`: if the wallet's tooling has a spend-cap option, pass the confirmed price there; otherwise plug its EIP-712 signer into the managed-signer template (it is wallet-agnostic — any wallet that can sign typed data works) so `MAX_PRICE` is enforced. Never pay through a mechanism that cannot enforce the confirmed price as a hard cap at payment time.
+
 ---
 
 ## Step 6: Confirm
@@ -137,6 +139,7 @@ Report the response body and any transaction hash to the user.
 
 - **Always ask the user before executing any command.** Show the exact command you intend to run and wait for explicit approval before running it — this applies to wallet, payment, and funding commands.
 - Abide by configured safeguards such as wallet spend limits and allowlists.
+- Never pay through a mechanism that cannot enforce the user-confirmed price as a hard cap at payment time — for wallets without one, route signing through the managed-signer template in `references/wallet-flows.md`.
 - When funding, always confirm the refund destination (address, chain, and origin-chain vs. NEAR Intents balance) with the user before any deposit.
 - Never pay silently — always show the decoded price first
 - Confirm with user before any payment

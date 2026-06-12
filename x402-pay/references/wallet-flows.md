@@ -93,6 +93,8 @@ console.log(await res.text());   // the paid response body
 
 Set `MAX_PRICE` to the price the user confirmed — never pad it for headroom. If the script fails with `Payment rejected`, the server is now quoting more than the user agreed to: re-run `check-price.mjs`, show the user the new price, and only retry with an updated `MAX_PRICE` after they re-confirm.
 
+**Any other wallet:** the template is not limited to CDP/Privy/Turnkey — any wallet that can produce an EIP-712 typed-data signature plugs in as the `signTypedData` body. If the user pays with a wallet not covered in this file, use this template (rather than an ad-hoc payment flow) so the `MAX_PRICE` guard still applies; never pay through a mechanism that cannot enforce the confirmed price.
+
 ### CDP SDK (`@coinbase/cdp-sdk`)
 
 Requires packages not included in this skill — install separately:
