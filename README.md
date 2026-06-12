@@ -10,20 +10,39 @@ This skill moves real money. Configure your agent/harness so it **asks for appro
 
 ## Install
 
+Skills install:
+
 ```bash
 npx skills add NearDeFi/agent-payments-skill
 ```
 
-Then install the runtime dependency inside the skill directory:
+OpenClaw install:
 
 ```bash
-cd <skills-dir>/x402-pay
-npm install
+openclaw skills install x402-pay
 ```
 
-Where `<skills-dir>` is `.agents/skills` (universal) or `.claude/skills` (Claude Code), relative to your project root or home directory depending on whether you installed globally.
+## Usage
 
-The skill is available at https://clawhub.ai/pivortex/x402-pay on ClawHub.
+```
+Fetch the crypto news using x402
+```
+
+```
+Search for x402 services that do web search
+```
+
+```
+Fund my x402 wallet from my Tron wallet
+```
+
+```
+Fund my x402 wallet via Cash App
+```
+
+```
+Look up the DNS records for example.com using x402
+```
 
 ## Wallet configuration
 

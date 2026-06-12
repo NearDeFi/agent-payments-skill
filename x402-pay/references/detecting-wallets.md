@@ -20,7 +20,7 @@ Check environment variables and config for each setup below. The example env var
 | **CDP SDK** | `CDP_API_KEY_ID`, `CDP_API_KEY_SECRET`, `CDP_WALLET_SECRET` (optionally `CDP_WALLET_ADDRESS`) |
 | **Privy** | `PRIVY_APP_ID`, `PRIVY_APP_SECRET`, `PRIVY_WALLET_ID`, `PRIVY_WALLET_ADDRESS` |
 | **Turnkey** | `TURNKEY_API_PUBLIC_KEY`, `TURNKEY_API_PRIVATE_KEY`, `TURNKEY_ORGANIZATION_ID`, `TURNKEY_SIGN_WITH` |
-| **Raw private key** | `X402_PRIVATE_KEY` (canonical), or `PRIVATE_KEY` / `WALLET_PRIVATE_KEY` / `ETH_PRIVATE_KEY` / `AGENT_PRIVATE_KEY`; a `.env` in the project root or skill dir; or a keystore in `~/.foundry/keystores/` |
+| **Raw private key** | `X402_PRIVATE_KEY` (canonical), or `PRIVATE_KEY` / `WALLET_PRIVATE_KEY` / `ETH_PRIVATE_KEY` / `AGENT_PRIVATE_KEY`; a `.env` in the project root or skill dir |
 
 **Private-key caution:** `PRIVATE_KEY` / `WALLET_PRIVATE_KEY` / `ETH_PRIVATE_KEY` / `AGENT_PRIVATE_KEY` usually belong to other tools (Foundry, Hardhat, deployment scripts) and may control funds you shouldn't spend. If you find one of these (rather than the namespaced `X402_PRIVATE_KEY`), **confirm with the user** before using it for live payments.
 

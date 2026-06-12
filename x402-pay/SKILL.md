@@ -1,12 +1,12 @@
 ---
 name: x402-pay
 description: >
-  Use this skill when an HTTP request returns 402 Payment Required, when the user wants to call a paid API or x402-protected resource, when they want to discover x402 services, or when they need to fund a wallet across chains. Triggers: a 402 response, "x402", "HTTP 402", "pay for API", "paid endpoint", "find x402 services", "bazaar", "fund my wallet", "top up".
+  Use this skill when an HTTP request returns 402 Payment Required, when the user wants to call a paid API or x402-protected resource, when they want to discover x402 services, or when they need to fund a wallet across chains. Triggers: a 402 response, "x402", "HTTP 402", "pay for API", "paid endpoint", "find x402 services", "bazaar", "fund my x402 wallet", "top up my x402 wallet".
 compatibility: >
-  Requires internet access and `npm install` in x402-pay/. No API keys required. Wallet support: Coinbase Agentic Wallet
-  (awal, default), raw private key, CDP SDK, Privy server wallets, Turnkey.
+  No API keys required. Works out of the box with the default Coinbase Agentic Wallet (awal) — just an email address to log in.
+  Also supports raw private key, CDP SDK, Privy, and Turnkey if already configured. Requires internet access.
 metadata:
-  version: "1.0.0"
+  version: "1.0.2"
   openclaw:
     homepage: https://github.com/NearDeFi/agent-payments-skill
     emoji: "💸"
@@ -57,7 +57,7 @@ cd <skills-dir>/x402-pay
 npm install
 ```
 
-No API keys required.
+**No API keys required.** The default wallet (awal) works with just an email address. CDP, Privy, and Turnkey wallets are also supported if already configured.
 
 ---
 
@@ -123,7 +123,9 @@ Check your wallet's USDC balance on Base — see `references/wallet-flows.md` fo
 
 **Always show the price before paying. Confirm with user before paying.**
 
-Show the user the price you previewed in Step 3 (if significant time has passed, re-run `check-price.mjs` in case it changed). **Always get their confirmation before paying — for any amount.** Then pay the endpoint using your wallet — see `references/wallet-flows.md` for the method for your wallet (if not already known).
+Show the user the price you previewed in Step 3 (if significant time has passed, re-run `check-price.mjs` in case it changed). **Always get their confirmation before paying — for any amount.** Then pay the endpoint using your wallet — see `references/wallet-flows.md` for the method for your wallet (if not already known). Always pass the confirmed price, unpadded, as the payment command's hard cap — `--max-price <usdc>` for `pay.mjs`, `--max-amount <atomic>` for awal, `MAX_PRICE` in the managed-signer template — so a quote raised at payment time fails closed instead of overcharging.
+
+This rule applies to **every** payment method, including wallets not covered in `references/wallet-flows.md`: if the wallet's tooling has a spend-cap option, pass the confirmed price there; otherwise plug its EIP-712 signer into the managed-signer template (it is wallet-agnostic — any wallet that can sign typed data works) so `MAX_PRICE` is enforced. Never pay through a mechanism that cannot enforce the confirmed price as a hard cap at payment time.
 
 ---
 
@@ -137,6 +139,8 @@ Report the response body and any transaction hash to the user.
 
 - **Always ask the user before executing any command.** Show the exact command you intend to run and wait for explicit approval before running it — this applies to wallet, payment, and funding commands.
 - Abide by configured safeguards such as wallet spend limits and allowlists.
+- Never pay through a mechanism that cannot enforce the user-confirmed price as a hard cap at payment time — for wallets without one, route signing through the managed-signer template in `references/wallet-flows.md`.
+- If a wallet's authentication is missing or expired (e.g. awal is signed out), **stop immediately and report it**, telling the user what login action to take. Never attempt to recover access yourself: do not search the user's files, email, message history, or browser/app storage for keys, session tokens, or OTP codes, and do not retry authentication repeatedly.
 - When funding, always confirm the refund destination (address, chain, and origin-chain vs. NEAR Intents balance) with the user before any deposit.
 - Never pay silently — always show the decoded price first
 - Confirm with user before any payment

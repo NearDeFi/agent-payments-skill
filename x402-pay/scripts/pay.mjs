@@ -3,24 +3,42 @@
 // Supports v1 (body) and v2 (payment-required header) 402 responses using the exact-evm scheme.
 //
 // Usage:
-//   node scripts/pay.mjs --url <url> [--method GET|POST] [--body <json>] [--key <hex>]
+//   node scripts/pay.mjs --url <url> --max-price <usdc> [--method GET|POST] [--body <json>] [--key <hex>]
 //
 // Requires: npm install
 
 import { loadEnv } from './load-env.mjs';
 import { makeGetArg } from './cli-args.mjs';
+import {
+  formatUsdc, parseUsdcToAtomic, optionAmount,
+  isVerifiableBaseUsdcOption, baseUsdcOptions,
+} from './x402-options.mjs';
 loadEnv();
 
 const args = process.argv.slice(2);
 const getArg = makeGetArg(args);
 
-const urlArg  = getArg('--url');
-const method  = (getArg('--method') || 'GET').toUpperCase();
-const bodyArg = getArg('--body');
-const keyArg  = getArg('--key') || process.env.X402_PRIVATE_KEY || process.env.PRIVATE_KEY || process.env.WALLET_PRIVATE_KEY || process.env.ETH_PRIVATE_KEY || process.env.AGENT_PRIVATE_KEY;
+const urlArg      = getArg('--url');
+const method      = (getArg('--method') || 'GET').toUpperCase();
+const bodyArg     = getArg('--body');
+const keyArg      = getArg('--key') || process.env.X402_PRIVATE_KEY || process.env.PRIVATE_KEY || process.env.WALLET_PRIVATE_KEY || process.env.ETH_PRIVATE_KEY || process.env.AGENT_PRIVATE_KEY;
+const maxPriceArg = getArg('--max-price');
 
 if (!urlArg) {
-  console.error('Usage: node scripts/pay.mjs --url <url> [--method GET|POST] [--body <json>] [--key <hex>]');
+  console.error('Usage: node scripts/pay.mjs --url <url> --max-price <usdc> [--method GET|POST] [--body <json>] [--key <hex>]');
+  process.exit(1);
+}
+if (args.includes('--max-price') && maxPriceArg === null) {
+  console.error('--max-price requires a value (e.g. --max-price 0.0100).');
+  process.exit(1);
+}
+if (maxPriceArg === null) {
+  console.error('--max-price <usdc> is required. Preview the price with check-price.mjs, confirm with the user, then pass the confirmed price here.');
+  process.exit(1);
+}
+const maxAtomic = parseUsdcToAtomic(maxPriceArg);
+if (maxAtomic === null) {
+  console.error(`Invalid --max-price value: ${maxPriceArg}. Expected a USDC amount like 0.0100 (up to 6 decimals).`);
   process.exit(1);
 }
 if (!keyArg) {
@@ -29,23 +47,6 @@ if (!keyArg) {
 }
 
 // Initial probe to detect 402 and display price before paying
-const BASE_MAINNET_CHAIN_ID = 8453; // only Base mainnet is supported (no testnets / other chains)
-const CHAIN_IDS = { 'base': BASE_MAINNET_CHAIN_ID };
-// Normalize an x402 network field to its numeric EVM chain ID. Handles both the
-// CAIP-2 form ("eip155:8453") and the short-name form ("base"); returns null for
-// anything unrecognized.
-function evmChainId(network) {
-  if (network?.startsWith('eip155:')) return parseInt(network.split(':')[1], 10);
-  return CHAIN_IDS[network] ?? null;
-}
-
-// Format an atomic USDC amount (6 decimals) as a decimal string, using BigInt so
-// large values don't lose precision.
-function formatUsdc(atomic) {
-  const v = BigInt(atomic);
-  return `${v / 1_000_000n}.${(v % 1_000_000n).toString().padStart(6, '0')}`;
-}
-
 const reqHeaders = bodyArg ? { 'Content-Type': 'application/json' } : {};
 let probe;
 try {
@@ -70,19 +71,48 @@ if (!requirements?.accepts) {
   if (hdr) try { requirements = JSON.parse(Buffer.from(hdr, 'base64').toString('utf8')); } catch {}
 }
 
-if (requirements?.accepts) {
-  const evmOptions = requirements.accepts
-    .filter(a => a.scheme === 'exact' && evmChainId(a.network) === BASE_MAINNET_CHAIN_ID)
-    .sort((a, b) => {
-      const av = BigInt(a.maxAmountRequired || a.amount || 0);
-      const bv = BigInt(b.maxAmountRequired || b.amount || 0);
-      return av < bv ? -1 : av > bv ? 1 : 0;   // cheapest first
-    });
-  const accepted = evmOptions[0];
-  if (accepted) {
-    const amount = accepted.maxAmountRequired || accepted.amount;
-    console.log(`Payment required: ${formatUsdc(amount)} USDC on network ${accepted.network}`);
+// Pre-flight price check on the verifiable Base USDC options. The payment itself is
+// pinned to the cheapest such option by the selector below, so the cheapest one is
+// the price that will actually be paid.
+let priceVerified = false;
+{
+  const options = baseUsdcOptions(requirements?.accepts);
+  if (options[0]) {
+    const amount = optionAmount(options[0]);
+    console.log(`Payment required: ${formatUsdc(amount)} USDC on network ${options[0].network}`);
+    if (BigInt(amount) > maxAtomic) {
+      console.error(`Payment rejected: price ${formatUsdc(amount)} USDC exceeds --max-price ${maxPriceArg} USDC.`);
+      process.exit(1);
+    }
+    priceVerified = true;
   }
+}
+
+// Fail closed — if we couldn't decode the price requirements we cannot verify --max-price
+if (!priceVerified) {
+  console.error('Payment rejected: unable to verify the 402 price against --max-price (no Base USDC exact option, or undecodable requirements). Aborting to fail closed.');
+  process.exit(1);
+}
+
+// Wrap fetch so the library's own 402 re-probe is also checked against --max-price.
+// Clones each 402 response to decode requirements without consuming the body the library needs.
+async function guardedFetch(url, options) {
+  const response = await fetch(url, options);
+  if (response.status === 402) {
+    const clone = response.clone();
+    let reqs = null;
+    try { reqs = JSON.parse(await clone.text()); } catch {}
+    if (!reqs?.accepts) {
+      const hdr = response.headers.get('payment-required');
+      if (hdr) try { reqs = JSON.parse(Buffer.from(hdr, 'base64').toString('utf8')); } catch {}
+    }
+    if (!reqs?.accepts) throw new Error('Payment rejected: unable to verify 402 price (undecodable requirements). Aborting to fail closed.');
+    const opts = baseUsdcOptions(reqs.accepts);
+    if (!opts[0]) throw new Error('Payment rejected: unable to verify 402 price (no Base USDC exact option). Aborting to fail closed.');
+    const amount = optionAmount(opts[0]);
+    if (BigInt(amount) > maxAtomic) throw new Error(`Payment rejected: price ${formatUsdc(amount)} USDC exceeds --max-price ${maxPriceArg} USDC.`);
+  }
+  return response;
 }
 
 // Set up x402 client — handles all payment schemes and extensions automatically
@@ -94,9 +124,28 @@ try {
   const hexKey = keyArg.startsWith('0x') ? keyArg : `0x${keyArg}`;
   const signer = privateKeyToAccount(hexKey);
 
-  const client = new x402Client();
-  registerExactEvmScheme(client, { signer });
-  const fetchWithPayment = wrapFetchWithPayment(fetch, client);
+  // Pin exactly which option the library pays. Its default selector takes the FIRST
+  // supported option in *server order* — and the exact-evm scheme supports many EVM
+  // networks — so a malicious server could list an expensive non-Base or non-USDC
+  // option first to dodge a guard that only inspects Base USDC entries. This selector
+  // only ever returns a verified Base USDC option within --max-price (the cheapest),
+  // and throws (fail closed) when none qualifies.
+  const selectVerifiedOption = (_version, accepts) => {
+    const ok = baseUsdcOptions(accepts).filter(o => BigInt(optionAmount(o)) <= maxAtomic);
+    if (!ok[0]) throw new Error(`Payment rejected: no Base USDC option within --max-price ${maxPriceArg} USDC.`);
+    return ok[0];
+  };
+
+  const client = new x402Client(selectVerifiedOption);
+  // Scope the v2 scheme registration to Base mainnet (default is the eip155:* wildcard).
+  registerExactEvmScheme(client, { signer, networks: ['eip155:8453'] });
+  // Last line of defence: re-verify whatever was actually selected right before signing.
+  client.onBeforePaymentCreation(({ selectedRequirements: sel }) => {
+    if (!isVerifiableBaseUsdcOption(sel) || BigInt(optionAmount(sel)) > maxAtomic) {
+      return { abort: true, reason: `selected option is not Base USDC within --max-price ${maxPriceArg} USDC` };
+    }
+  });
+  const fetchWithPayment = wrapFetchWithPayment(guardedFetch, client);
 
   // Library handles 402 → sign → retry transparently, including all extensions
   const result = await fetchWithPayment(urlArg, { method, headers: reqHeaders, body: bodyArg || undefined });
