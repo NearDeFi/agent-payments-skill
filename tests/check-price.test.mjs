@@ -11,6 +11,7 @@
 //   7. Exits 1 with rejection message when price exceeds --max-price
 //   8. Exits 0 when price is within --max-price
 //   9. Exits 1 with a clear error on invalid --max-price format
+//  10. Exits 1 with a clear error when --max-price flag is present but has no value
 
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
@@ -192,6 +193,13 @@ test('check-price: errors on invalid --max-price format', { timeout: 10_000 }, a
   } finally {
     server.close();
   }
+});
+
+test('check-price: errors when --max-price flag has no value', async () => {
+  // --max-price is followed by another flag, so makeGetArg returns null — must be caught explicitly
+  const { code, stderr } = await run('check-price.mjs', ['http://localhost:1', '--max-price', '--method', 'GET']);
+  assert.equal(code, 1);
+  assert.match(stderr, /--max-price requires a value/i);
 });
 
 test('check-price: sorts cheapest-first with BigInt precision', { timeout: 10_000 }, async () => {

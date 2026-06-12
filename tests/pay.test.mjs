@@ -13,6 +13,7 @@
 //   9. Exits 1 with rejection message when price exceeds --max-price
 //  10. Proceeds normally when price is within --max-price
 //  11. Fails closed when 402 requirements cannot be decoded
+//  12. Enforces --max-price against the library's re-probe (price raised after initial probe)
 
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
@@ -226,7 +227,37 @@ test('pay: fails closed when 402 requirements cannot be decoded', { timeout: 10_
   try {
     const { code, stderr } = await run('pay.mjs', ['--url', url, '--max-price', '0.01', '--key', TEST_KEY]);
     assert.equal(code, 1);
-    assert.match(stderr, /fail closed/i);
+    assert.match(stderr, /unable to verify.*fail closed/i);
+  } finally {
+    server.close();
+  }
+});
+
+test('pay: enforces --max-price against library re-probe when price rises', { timeout: 10_000 }, async () => {
+  let requestCount = 0;
+  const { server, url } = await startServer((req, res) => {
+    requestCount++;
+    // Our probe sees $0.01; library's re-probe sees $0.02 — above the confirmed max
+    const price = requestCount === 1 ? '10000' : '20000';
+    res.writeHead(402, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({
+      x402Version: 1,
+      accepts: [{
+        scheme: 'exact',
+        network: 'base',
+        maxAmountRequired: price,
+        asset: '0x833589fcd6edb6e08f4c7c32d4f71b54bda02913',
+        payTo: '0x1234567890123456789012345678901234567890',
+        maxTimeoutSeconds: 60,
+        extra: { name: 'USD Coin', version: '2' },
+      }],
+    }));
+  });
+
+  try {
+    const { code, stderr } = await run('pay.mjs', ['--url', url, '--max-price', '0.01', '--key', TEST_KEY]);
+    assert.equal(code, 1);
+    assert.match(stderr, /exceeds --max-price/i);
   } finally {
     server.close();
   }

@@ -19,7 +19,11 @@ const body        = getArg('--body');
 const maxPriceArg = getArg('--max-price');
 
 if (!url) {
-  console.error('Usage: node scripts/check-price.mjs <url> [--method GET|POST] [--body <json>]');
+  console.error('Usage: node scripts/check-price.mjs <url> [--method GET|POST] [--body <json>] [--max-price <usdc>]');
+  process.exit(1);
+}
+if (args.includes('--max-price') && maxPriceArg === null) {
+  console.error('--max-price requires a value (e.g. --max-price 0.0100).');
   process.exit(1);
 }
 

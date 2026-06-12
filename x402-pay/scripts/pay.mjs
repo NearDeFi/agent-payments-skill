@@ -104,8 +104,31 @@ if (requirements?.accepts) {
 
 // Fail closed — if we couldn't decode the price requirements we cannot verify --max-price
 if (!priceVerified) {
-  console.error('Payment rejected: could not decode 402 price to verify --max-price. Aborting to fail closed.');
+  console.error('Payment rejected: unable to verify the 402 price against --max-price (unsupported scheme/network or undecodable requirements). Aborting to fail closed.');
   process.exit(1);
+}
+
+// Wrap fetch so the library's own 402 re-probe is also checked against --max-price.
+// Clones each 402 response to decode requirements without consuming the body the library needs.
+async function guardedFetch(url, options) {
+  const response = await fetch(url, options);
+  if (response.status === 402) {
+    const clone = response.clone();
+    let reqs = null;
+    try { reqs = JSON.parse(await clone.text()); } catch {}
+    if (!reqs?.accepts) {
+      const hdr = response.headers.get('payment-required');
+      if (hdr) try { reqs = JSON.parse(Buffer.from(hdr, 'base64').toString('utf8')); } catch {}
+    }
+    if (!reqs?.accepts) throw new Error('Payment rejected: unable to verify 402 price (undecodable requirements). Aborting to fail closed.');
+    const opts = reqs.accepts
+      .filter(a => a.scheme === 'exact' && evmChainId(a.network) === BASE_MAINNET_CHAIN_ID)
+      .sort((a, b) => { const av = BigInt(a.maxAmountRequired || a.amount || 0), bv = BigInt(b.maxAmountRequired || b.amount || 0); return av < bv ? -1 : av > bv ? 1 : 0; });
+    if (!opts[0]) throw new Error('Payment rejected: unable to verify 402 price (no supported Base option). Aborting to fail closed.');
+    const amount = opts[0].maxAmountRequired || opts[0].amount;
+    if (BigInt(amount) > maxAtomic) throw new Error(`Payment rejected: price ${formatUsdc(amount)} USDC exceeds --max-price ${maxPriceArg} USDC.`);
+  }
+  return response;
 }
 
 // Set up x402 client — handles all payment schemes and extensions automatically
@@ -119,7 +142,7 @@ try {
 
   const client = new x402Client();
   registerExactEvmScheme(client, { signer });
-  const fetchWithPayment = wrapFetchWithPayment(fetch, client);
+  const fetchWithPayment = wrapFetchWithPayment(guardedFetch, client);
 
   // Library handles 402 → sign → retry transparently, including all extensions
   const result = await fetchWithPayment(urlArg, { method, headers: reqHeaders, body: bodyArg || undefined });
