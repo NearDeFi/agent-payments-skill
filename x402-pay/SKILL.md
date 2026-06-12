@@ -6,7 +6,7 @@ compatibility: >
   No API keys required. Works out of the box with the default Coinbase Agentic Wallet (awal) — just an email address to log in.
   Also supports raw private key, CDP SDK, Privy, and Turnkey if already configured. Requires internet access.
 metadata:
-  version: "1.0.0"
+  version: "1.0.2"
   openclaw:
     homepage: https://github.com/NearDeFi/agent-payments-skill
     emoji: "💸"
