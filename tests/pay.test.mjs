@@ -4,16 +4,18 @@
 // Tests:
 //   1. Exits 0 and prints the status when the server returns 200 immediately (no payment needed)
 //   2. Exits 1 and prints usage when --url is not provided
-//   3. Exits 1 when --max-price is not provided; exits 1 with "requires a value" when flag has no value
-//   4. Exits 1 with a clear error on invalid --max-price format
-//   5. Exits 1 with "No private key" when no key is available in env or args
-//   6. Handles the full v1 402 flow (requirements in JSON body, X-PAYMENT header)
-//   7. POST with --body sends the body to the server and handles 402 → retry
-//   8. Handles the full v2 402 flow (requirements in payment-required header, PAYMENT-SIGNATURE header)
+//   3. Exits 1 when --max-price is not provided
+//   4. Exits 1 with "requires a value" when --max-price flag has no value
+//   5. Exits 1 with a clear error on invalid --max-price format
+//   6. Exits 1 with "No private key" when no key is available in env or args
+//   7. Handles the full v1 402 flow (requirements in JSON body, X-PAYMENT header)
+//   8. POST with --body sends the body to the server and handles 402 → retry
 //   9. Exits 1 with rejection message when price exceeds --max-price
 //  10. Proceeds normally when price is within --max-price
 //  11. Fails closed when 402 requirements cannot be decoded
 //  12. Enforces --max-price against the library's re-probe (price raised after initial probe)
+//  13. Handles the full v2 402 flow (requirements in payment-required header, PAYMENT-SIGNATURE header)
+//  14. Rejects when cheapest Base option passes but most expensive exceeds --max-price
 
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
@@ -262,6 +264,45 @@ test('pay: enforces --max-price against library re-probe when price rises', { ti
 
   try {
     const { code, stderr } = await run('pay.mjs', ['--url', url, '--max-price', '0.01', '--key', TEST_KEY]);
+    assert.equal(code, 1);
+    assert.match(stderr, /exceeds --max-price/i);
+  } finally {
+    server.close();
+  }
+});
+
+test('pay: rejects when most expensive Base option exceeds --max-price', { timeout: 10_000 }, async () => {
+  // Server returns two Base options: $0.005 (under limit) and $0.02 (over limit).
+  // Checking only opts[0] would pass; a correct guard must check the most expensive.
+  const { server, url } = await startServer((req, res) => {
+    res.writeHead(402, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({
+      x402Version: 1,
+      accepts: [
+        {
+          scheme: 'exact',
+          network: 'base',
+          maxAmountRequired: '5000', // $0.005 — under the $0.01 limit
+          asset: '0x833589fcd6edb6e08f4c7c32d4f71b54bda02913',
+          payTo: '0x1234567890123456789012345678901234567890',
+          maxTimeoutSeconds: 60,
+          extra: { name: 'USD Coin', version: '2' },
+        },
+        {
+          scheme: 'exact',
+          network: 'base',
+          maxAmountRequired: '20000', // $0.02 — over the $0.01 limit
+          asset: '0x833589fcd6edb6e08f4c7c32d4f71b54bda02913',
+          payTo: '0x1234567890123456789012345678901234567890',
+          maxTimeoutSeconds: 60,
+          extra: { name: 'USD Coin', version: '2' },
+        },
+      ],
+    }));
+  });
+
+  try {
+    const { code, stderr } = await run('pay.mjs', ['--url', url, '--key', TEST_KEY, '--max-price', '0.01']);
     assert.equal(code, 1);
     assert.match(stderr, /exceeds --max-price/i);
   } finally {

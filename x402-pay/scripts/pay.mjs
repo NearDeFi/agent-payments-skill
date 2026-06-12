@@ -94,12 +94,13 @@ if (requirements?.accepts) {
       const bv = BigInt(b.maxAmountRequired || b.amount || 0);
       return av < bv ? -1 : av > bv ? 1 : 0;   // cheapest first
     });
-  const accepted = evmOptions[0];
-  if (accepted) {
-    const amount = accepted.maxAmountRequired || accepted.amount;
-    console.log(`Payment required: ${formatUsdc(amount)} USDC on network ${accepted.network}`);
-    if (BigInt(amount) > maxAtomic) {
-      console.error(`Payment rejected: price ${formatUsdc(amount)} USDC exceeds --max-price ${maxPriceArg} USDC.`);
+  if (evmOptions[0]) {
+    const displayAmount = evmOptions[0].maxAmountRequired || evmOptions[0].amount;
+    const maxOpt = evmOptions[evmOptions.length - 1];
+    const guardAmount = maxOpt.maxAmountRequired || maxOpt.amount;
+    console.log(`Payment required: ${formatUsdc(displayAmount)} USDC on network ${evmOptions[0].network}`);
+    if (BigInt(guardAmount) > maxAtomic) {
+      console.error(`Payment rejected: price ${formatUsdc(guardAmount)} USDC exceeds --max-price ${maxPriceArg} USDC.`);
       process.exit(1);
     }
     priceVerified = true;
@@ -129,8 +130,9 @@ async function guardedFetch(url, options) {
       .filter(a => a.scheme === 'exact' && evmChainId(a.network) === BASE_MAINNET_CHAIN_ID)
       .sort((a, b) => { const av = BigInt(a.maxAmountRequired || a.amount || 0), bv = BigInt(b.maxAmountRequired || b.amount || 0); return av < bv ? -1 : av > bv ? 1 : 0; });
     if (!opts[0]) throw new Error('Payment rejected: unable to verify 402 price (no supported Base option). Aborting to fail closed.');
-    const amount = opts[0].maxAmountRequired || opts[0].amount;
-    if (BigInt(amount) > maxAtomic) throw new Error(`Payment rejected: price ${formatUsdc(amount)} USDC exceeds --max-price ${maxPriceArg} USDC.`);
+    const maxOpt = opts[opts.length - 1];
+    const maxAmount = maxOpt.maxAmountRequired || maxOpt.amount;
+    if (BigInt(maxAmount) > maxAtomic) throw new Error(`Payment rejected: price ${formatUsdc(maxAmount)} USDC exceeds --max-price ${maxPriceArg} USDC.`);
   }
   return response;
 }
