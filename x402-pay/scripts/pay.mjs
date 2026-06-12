@@ -24,7 +24,11 @@ if (!urlArg) {
   console.error('Usage: node scripts/pay.mjs --url <url> --max-price <usdc> [--method GET|POST] [--body <json>] [--key <hex>]');
   process.exit(1);
 }
-if (!maxPriceArg) {
+if (args.includes('--max-price') && maxPriceArg === null) {
+  console.error('--max-price requires a value (e.g. --max-price 0.0100).');
+  process.exit(1);
+}
+if (maxPriceArg === null) {
   console.error('--max-price <usdc> is required. Preview the price with check-price.mjs, confirm with the user, then pass the confirmed price here.');
   process.exit(1);
 }

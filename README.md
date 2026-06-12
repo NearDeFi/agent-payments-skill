@@ -16,7 +16,7 @@ Skills install:
 npx skills add NearDeFi/agent-payments-skill
 ```
 
-Openclaw install:
+OpenClaw install:
 
 ```bash
 openclaw skills install x402-pay

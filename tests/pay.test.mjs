@@ -4,7 +4,7 @@
 // Tests:
 //   1. Exits 0 and prints the status when the server returns 200 immediately (no payment needed)
 //   2. Exits 1 and prints usage when --url is not provided
-//   3. Exits 1 when --max-price is not provided
+//   3. Exits 1 when --max-price is not provided; exits 1 with "requires a value" when flag has no value
 //   4. Exits 1 with a clear error on invalid --max-price format
 //   5. Exits 1 with "No private key" when no key is available in env or args
 //   6. Handles the full v1 402 flow (requirements in JSON body, X-PAYMENT header)
@@ -56,6 +56,12 @@ test('pay: errors with no --max-price', async () => {
   const { code, stderr } = await run('pay.mjs', ['--url', 'http://localhost:1', '--key', TEST_KEY]);
   assert.equal(code, 1);
   assert.match(stderr, /--max-price.*required/i);
+});
+
+test('pay: errors when --max-price flag has no value', async () => {
+  const { code, stderr } = await run('pay.mjs', ['--url', 'http://localhost:1', '--max-price', '--key', TEST_KEY]);
+  assert.equal(code, 1);
+  assert.match(stderr, /--max-price requires a value/i);
 });
 
 test('pay: errors on invalid --max-price format', async () => {
