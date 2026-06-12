@@ -8,9 +8,11 @@ const CHAIN_IDS = { 'base': BASE_MAINNET_CHAIN_ID };
 
 // Normalize an x402 network field to its numeric EVM chain ID. Handles both the
 // CAIP-2 form ("eip155:8453") and the short-name form ("base"); returns null for
-// anything unrecognized.
+// anything unrecognized or malformed (parseInt would accept "eip155:8453garbage").
 export function evmChainId(network) {
-  if (network?.startsWith?.('eip155:')) return parseInt(network.split(':')[1], 10);
+  if (typeof network !== 'string') return null;
+  const caip2 = network.match(/^eip155:(\d+)$/);
+  if (caip2) return Number(caip2[1]);
   return CHAIN_IDS[network] ?? null;
 }
 

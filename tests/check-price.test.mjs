@@ -6,7 +6,7 @@
 //   2. Decodes a v1 402 (requirements in JSON body) and prints the USDC price
 //   3. Decodes a v2 402 (requirements in payment-required header) and prints the price
 //   4. Reports "No payment required" (exit 0) when the server returns 200
-//   5. Includes only Base mainnet — excludes testnets and other EVM chains
+//   5. Includes only Base mainnet — excludes testnets, other EVM chains, and malformed network ids
 //   6. Exits 1 with rejection message when price exceeds --max-price
 //   7. Exits 0 when price is within --max-price
 //   8. Exits 1 with a clear error on invalid --max-price format
@@ -114,6 +114,7 @@ test('check-price: includes only Base mainnet, excludes other EVM networks', { t
       accepts: [
         { scheme: 'exact', network: 'eip155:137',   maxAmountRequired: '20000', asset: USDC_BASE, payTo: '0x1', maxTimeoutSeconds: 60 }, // Polygon
         { scheme: 'exact', network: 'eip155:84532', maxAmountRequired: '5000',  asset: USDC_BASE, payTo: '0x1', maxTimeoutSeconds: 60 }, // Base Sepolia
+        { scheme: 'exact', network: 'eip155:8453garbage', maxAmountRequired: '5000', asset: USDC_BASE, payTo: '0x1', maxTimeoutSeconds: 60 }, // malformed CAIP-2 — parseInt would read 8453
         { scheme: 'exact', network: 'base',         maxAmountRequired: '10000', asset: USDC_BASE, payTo: '0x1', maxTimeoutSeconds: 60 }, // Base mainnet
       ],
     }));
