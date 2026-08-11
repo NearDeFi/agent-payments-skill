@@ -19,6 +19,8 @@
 //      is treated as missing, exits 1 with usage output
 //  11. --refund-type is no longer supported: passing it exits 1 with an explanatory error
 //      instead of silently falling back to an origin-chain refund
+//  12. same for the inline --refund-type=intents form, which an unmatched flag check
+//      would otherwise ignore
 
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
@@ -101,11 +103,15 @@ test('near-intents: errors when --refund value is missing (next token is a flag)
   assert.match(stderr, /Usage/i);
 });
 
-test('near-intents: rejects --refund-type instead of silently ignoring it', async () => {
-  const { code, stderr } = await run('near-intents.mjs', [
-    'quote', '--usdc', '1.00', '--from', 'eth:ETH',
-    '--wallet', TEST_ADDRESS, '--refund', TEST_ADDRESS, '--refund-type', 'intents',
-  ]);
-  assert.equal(code, 1);
-  assert.match(stderr, /--refund-type is no longer supported/i);
-});
+// Both spellings must be rejected: unknown args are otherwise ignored, so an unmatched
+// `--refund-type=intents` would silently fall back to an origin-chain refund.
+for (const form of [['--refund-type', 'intents'], ['--refund-type=intents']]) {
+  test(`near-intents: rejects ${form[0]} instead of silently ignoring it`, async () => {
+    const { code, stderr } = await run('near-intents.mjs', [
+      'quote', '--usdc', '1.00', '--from', 'eth:ETH',
+      '--wallet', TEST_ADDRESS, '--refund', TEST_ADDRESS, ...form,
+    ]);
+    assert.equal(code, 1);
+    assert.match(stderr, /--refund-type is no longer supported/i);
+  });
+}

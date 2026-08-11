@@ -112,8 +112,10 @@ if (cmd === 'tokens') {
 
   // --refund-type was removed: refunds are always returned on the origin chain. Reject it
   // rather than ignore it, so a caller asking for an intents refund can't silently get an
-  // origin-chain refund to an address that only exists on Base.
-  if (args.includes('--refund-type')) {
+  // origin-chain refund to an address that only exists on Base. Match the inline
+  // `--refund-type=intents` form too — unknown args are otherwise ignored, so checking only
+  // the two-token form would leave exactly that silent fallback in place.
+  if (args.some(a => a === '--refund-type' || a.startsWith('--refund-type='))) {
     console.error('--refund-type is no longer supported — refunds are always returned on the origin chain.');
     console.error('Pass --refund <address on the origin chain you send from> and drop --refund-type.');
     process.exit(1);
