@@ -2,12 +2,20 @@
 // The doc snippet is the source of truth — these tests stub the inner status command
 // and run the loop verbatim (the only deviation is `sleep 0` instead of `sleep 5`).
 //
-// The contract is:
-//   1. The loop exits 0 (so wrappers that retry-via-exit-1 don't pollute tooling logs).
-//   2. Non-terminal statuses (PENDING_DEPOSIT, KNOWN_DEPOSIT_TX, PROCESSING) are iterated past.
-//   3. Each terminal status (SUCCESS, REFUNDED, FAILED, INCOMPLETE_DEPOSIT) breaks the loop.
-//   4. A FATAL line (permanent API failure, e.g. an unknown deposit address) breaks the loop,
-//      while a RETRYING line (transient failure) is iterated past like a non-terminal status.
+// The loop must always exit 0, so wrappers that retry-via-exit-1 don't pollute tooling logs.
+//
+// Tests:
+//   1. iterates past PENDING_DEPOSIT, KNOWN_DEPOSIT_TX and PROCESSING, then breaks on SUCCESS
+//   2. breaks on SUCCESS
+//   3. breaks on REFUNDED
+//   4. breaks on FAILED
+//   5. breaks on INCOMPLETE_DEPOSIT
+//   6. breaks on a FATAL line (permanent API failure, e.g. an unknown deposit address)
+//   7. iterates past a RETRYING line (transient failure), like a non-terminal status
+//   8. does not break when an error message merely contains a status word
+//      (`RETRYING: FAILED to query upstream`) — the pattern is anchored to the
+//      `Status: ` / `FATAL:` prefixes so message text cannot masquerade as terminal
+//   9. does not break when every status is non-terminal (bounded by a timeout)
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { execFile } from 'node:child_process';
@@ -25,7 +33,7 @@ function buildLoop(stubCmd) {
     while :; do
       out=$(${stubCmd})
       echo "$out"
-      echo "$out" | grep -qE "SUCCESS|REFUNDED|FAILED|INCOMPLETE_DEPOSIT|FATAL" && break
+      echo "$out" | grep -qE '^(Status: (SUCCESS|REFUNDED|FAILED|INCOMPLETE_DEPOSIT)([[:space:]]|$)|FATAL:)' && break
       sleep 0
     done
   `;
@@ -100,6 +108,16 @@ test('poll loop: iterates past a RETRYING line', async () => {
   ]);
   assert.match(stdout, /RETRYING[\s\S]*PROCESSING[\s\S]*SUCCESS/);
   assert.equal(iterations, 3, 'expected a transient error to be polled past, not break');
+});
+
+test('poll loop: a status word inside an error message does not break the loop', async () => {
+  const { stdout, iterations } = await runLoop([
+    'RETRYING: FAILED to query upstream',
+    'PROCESSING',
+    'SUCCESS',
+  ]);
+  assert.match(stdout, /RETRYING: FAILED[\s\S]*PROCESSING[\s\S]*SUCCESS/);
+  assert.equal(iterations, 3, 'expected the anchored pattern to ignore "FAILED" inside a message');
 });
 
 test('poll loop: does not break on non-terminal statuses alone', async () => {

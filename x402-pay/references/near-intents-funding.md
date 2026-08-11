@@ -67,7 +67,7 @@ Each line is `chain:SYMBOL`. Pick the entry that matches the asset you're sendin
 **You cannot skip this step.** The quote is the only source of:
 - The **Deposit to:** address — where to send funds (unique per quote, not reusable)
 - The **Send (units):** value — the exact raw amount for the on-chain transfer
-- The **Deposit by:** deadline — the 2-hour window within which the deposit must be confirmed
+- The **Deposit by:** deadline — the 2-hour window within which the whole swap must complete
 
 Do not calculate the amount yourself. Do not reuse a deposit address from a previous quote. Run a fresh quote every time:
 
@@ -87,9 +87,11 @@ Once the script prints the quote, the exact **`Send (units):`** amount must be s
 
 ### Always tell the user the quote's time limit
 
-The quote prints a **`Deposit by:`** line — a **2-hour** window, and the deposit must be **confirmed on the origin chain** by then, not merely sent. Miss it and the deposit is refunded to `--refund` instead of swapped. Whenever the **user** is the one sending the deposit (external-wallet funding), you **must** include this time limit in the instructions you give them — never hand over a deposit address without it. If the deadline passes before they send, do **not** let them use the old address: run a fresh quote and give them the new address, amount, and deadline.
+The quote prints a **`Deposit by:`** line — a **2-hour** window by which the **swap must complete**, not merely by which the deposit is sent: the deposit has to be confirmed on the origin chain, and the swap itself then takes a few more seconds. Miss it and the deposit is refunded to `--refund` instead of swapped. Whenever the **user** is the one sending the deposit (external-wallet funding), you **must** include this time limit in the instructions you give them — never hand over a deposit address without it. If the deadline passes before they send, do **not** let them use the old address: run a fresh quote and give them the new address, amount, and deadline.
 
 Slow chains eat into that window — a Bitcoin deposit can take about an hour to mine, so tell the user to send promptly rather than near the deadline.
+
+If the quote comes back with the deposit address expiring **before** that deadline, the script prints `DEADLINE MISMATCH` and withholds the address entirely: a late deposit could then be lost rather than refunded. This is not overridable — re-run the quote, and if it repeats, fund from a different source chain.
 
 ### Show the deposit address as a QR (optional)
 
@@ -138,14 +140,14 @@ Poll until a terminal status is reached. Use a single shell loop that exits 0 on
 while :; do
   out=$(node scripts/near-intents.mjs status <depositAddress>)
   echo "$out"
-  echo "$out" | grep -qE "SUCCESS|REFUNDED|FAILED|INCOMPLETE_DEPOSIT|FATAL" && break
+  echo "$out" | grep -qE '^(Status: (SUCCESS|REFUNDED|FAILED|INCOMPLETE_DEPOSIT)([[:space:]]|$)|FATAL:)' && break
   sleep 5
 done
 ```
 
 If the original quote printed a `MEMO REQUIRED` value, append `--memo <value>` to the inner status command.
 
-A `FATAL:` line means the deposit address itself was rejected (usually mistyped, or from a different quote) — the loop breaks; re-check the address rather than re-polling. A `RETRYING:` line is a transient API error and the loop keeps polling.
+A `FATAL:` line means the deposit address itself was rejected (usually mistyped, or from a different quote) — the loop breaks; re-check the address rather than re-polling. A `RETRYING:` line is a transient API error (timeout, rate limit, server error) and the loop keeps polling. The pattern is anchored to those two prefixes so an error *message* that happens to contain a status word can't masquerade as a terminal state.
 
 > **zsh gotcha:** if you write the loop in zsh (the default macOS shell), do **not** name a local variable `status` — `$status` is read-only in zsh and assigning to it will crash the loop. Use `out`, `st`, or any other name.
 
