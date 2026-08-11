@@ -2,10 +2,20 @@
 // The doc snippet is the source of truth — these tests stub the inner status command
 // and run the loop verbatim (the only deviation is `sleep 0` instead of `sleep 5`).
 //
-// The contract is:
-//   1. The loop exits 0 (so wrappers that retry-via-exit-1 don't pollute tooling logs).
-//   2. Non-terminal statuses (PENDING_DEPOSIT, KNOWN_DEPOSIT_TX, PROCESSING) are iterated past.
-//   3. Each terminal status (SUCCESS, REFUNDED, FAILED, INCOMPLETE_DEPOSIT) breaks the loop.
+// The loop must always exit 0, so wrappers that retry-via-exit-1 don't pollute tooling logs.
+//
+// Tests:
+//   1. iterates past PENDING_DEPOSIT, KNOWN_DEPOSIT_TX and PROCESSING, then breaks on SUCCESS
+//   2. breaks on SUCCESS
+//   3. breaks on REFUNDED
+//   4. breaks on FAILED
+//   5. breaks on INCOMPLETE_DEPOSIT
+//   6. breaks on a FATAL line (permanent API failure, e.g. an unknown deposit address)
+//   7. iterates past a RETRYING line (transient failure), like a non-terminal status
+//   8. does not break when an error message merely contains a status word
+//      (`RETRYING: FAILED to query upstream`) — the pattern is anchored to the
+//      `Status: ` / `FATAL:` prefixes so message text cannot masquerade as terminal
+//   9. does not break when every status is non-terminal (bounded by a timeout)
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { execFile } from 'node:child_process';
@@ -23,7 +33,7 @@ function buildLoop(stubCmd) {
     while :; do
       out=$(${stubCmd})
       echo "$out"
-      echo "$out" | grep -qE "SUCCESS|REFUNDED|FAILED|INCOMPLETE_DEPOSIT" && break
+      echo "$out" | grep -qE '^(Status: (SUCCESS|REFUNDED|FAILED|INCOMPLETE_DEPOSIT)([[:space:]]|$)|FATAL:)' && break
       sleep 0
     done
   `;
@@ -31,17 +41,19 @@ function buildLoop(stubCmd) {
 
 // Writes a stub shell script that, on each invocation, prints the next status
 // from `sequence` and increments a counter on disk. After the sequence is
-// exhausted it keeps returning the last entry.
+// exhausted it keeps returning the last entry. An entry containing a colon is
+// emitted verbatim (for `FATAL:` / `RETRYING:` lines); a bare status is prefixed.
 function writeStub(dir, sequence) {
   const counter = path.join(dir, 'counter');
   const stub = path.join(dir, 'stub.sh');
-  const cases = sequence.map((s, i) => `${i}) echo "Status: ${s}" ;;`).join('\n  ');
-  const fallback = sequence[sequence.length - 1];
+  const line = (s) => (s.includes(':') ? s : `Status: ${s}`);
+  const cases = sequence.map((s, i) => `${i}) echo "${line(s)}" ;;`).join('\n  ');
+  const fallback = line(sequence[sequence.length - 1]);
   fs.writeFileSync(stub, `#!/bin/bash
 i=$(cat ${counter} 2>/dev/null || echo 0)
 case $i in
   ${cases}
-  *) echo "Status: ${fallback}" ;;
+  *) echo "${fallback}" ;;
 esac
 echo $((i+1)) > ${counter}
 `, { mode: 0o755 });
@@ -78,6 +90,35 @@ for (const terminal of ['SUCCESS', 'REFUNDED', 'FAILED', 'INCOMPLETE_DEPOSIT']) 
     assert.equal(iterations, 3, `expected 3 iterations to reach ${terminal}`);
   });
 }
+
+test('poll loop: breaks on a FATAL line', async () => {
+  const { stdout, iterations } = await runLoop([
+    'PENDING_DEPOSIT',
+    'FATAL: Deposit address 0x0000000000000000000000000000000000000001 not found',
+  ]);
+  assert.match(stdout, /PENDING_DEPOSIT[\s\S]*FATAL/);
+  assert.equal(iterations, 2, 'expected the FATAL line to break the loop');
+});
+
+test('poll loop: iterates past a RETRYING line', async () => {
+  const { stdout, iterations } = await runLoop([
+    'RETRYING: upstream error from the status API',
+    'PROCESSING',
+    'SUCCESS',
+  ]);
+  assert.match(stdout, /RETRYING[\s\S]*PROCESSING[\s\S]*SUCCESS/);
+  assert.equal(iterations, 3, 'expected a transient error to be polled past, not break');
+});
+
+test('poll loop: a status word inside an error message does not break the loop', async () => {
+  const { stdout, iterations } = await runLoop([
+    'RETRYING: FAILED to query upstream',
+    'PROCESSING',
+    'SUCCESS',
+  ]);
+  assert.match(stdout, /RETRYING: FAILED[\s\S]*PROCESSING[\s\S]*SUCCESS/);
+  assert.equal(iterations, 3, 'expected the anchored pattern to ignore "FAILED" inside a message');
+});
 
 test('poll loop: does not break on non-terminal statuses alone', async () => {
   // If every status is non-terminal, the stub falls back to PROCESSING forever.

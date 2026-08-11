@@ -6,15 +6,16 @@
 //   2. tokens --chain near: filters by chain, output contains near: entries
 //   3. tokens --chain fake: exits 1 with "No tokens found" error
 //   4. quote: gets a committed quote for 1 USDC from ETH, asserts the Send:, Receive:,
-//      Send (units):, Deposit to:, Valid until: (with minutes remaining), and the
-//      origin-chain Refund to: output lines
+//      Send (units):, Deposit to:, Deposit by: (a ~2h window, with minutes remaining),
+//      and the origin-chain Refund to: output lines
 //   5. missing --refund: runs the quote command without --refund, asserts exit 1 and usage output
 //   6. unknown token: uses a non-existent chain:SYMBOL (fake:FAKE), asserts exit 1
 //      and a "Token not found" error message
 //   7. missing --usdc: runs the quote command without --usdc, asserts exit 1 and usage output
 //   8. missing --from: runs the quote command without --from, asserts exit 1 and usage output
-//   9. status: calls the status subcommand with a dummy deposit address,
-//      asserts the output contains a "Status:" line
+//   9. status: an unknown deposit address is a permanent (4xx) failure — asserts the
+//      output is a FATAL line carrying the API's message and the exit code is 1, so the
+//      documented monitor loop breaks instead of polling "Status: undefined" forever
 //  10. flag-as-value: --refund immediately followed by another flag (no real value)
 //      is treated as missing, exits 1 with usage output
 //  11. --refund-type is no longer supported: passing it exits 1 with an explanatory error
@@ -44,7 +45,7 @@ test('near-intents: tokens --chain fake exits 1', { timeout: 20_000 }, async () 
   assert.match(stderr, /No tokens found/i);
 });
 
-test('near-intents: quote shows Send, Receive, Send (units), Deposit to, Valid until', { timeout: 20_000 }, async () => {
+test('near-intents: quote shows Send, Receive, Send (units), Deposit to, Deposit by', { timeout: 20_000 }, async () => {
   const { code, stdout } = await run('near-intents.mjs', [
     'quote', '--usdc', '1.00', '--from', 'eth:ETH',
     '--wallet', TEST_ADDRESS, '--refund', TEST_ADDRESS,
@@ -55,7 +56,11 @@ test('near-intents: quote shows Send, Receive, Send (units), Deposit to, Valid u
   assert.match(stdout, /Send \(units\):/);
   assert.match(stdout, /Deposit to:/);
   // ISO deadline plus a human-readable minutes-remaining hint
-  assert.match(stdout, /Valid until: \d{4}-\d{2}-\d{2}T.*\(~\d+ minutes from now\)/);
+  const deadlineLine = stdout.match(/Deposit by: \d{4}-\d{2}-\d{2}T\S+ \(~(\d+) minutes from now\)/);
+  assert.ok(deadlineLine, `expected a "Deposit by:" line, got:\n${stdout}`);
+  // The requested window is 2h; allow slack for the round trip.
+  const minutesLeft = Number(deadlineLine[1]);
+  assert.ok(minutesLeft > 110 && minutesLeft <= 120, `expected a ~120 minute window, got ${minutesLeft}`);
   assert.match(stdout, /Refund to:.*origin chain/);
 });
 
@@ -87,12 +92,15 @@ test('near-intents: errors with missing --from', async () => {
   assert.match(stderr, /Usage/i);
 });
 
-test('near-intents: status returns a status line', { timeout: 20_000 }, async () => {
+test('near-intents: status fails fatally on an unknown deposit address', { timeout: 20_000 }, async () => {
   const { code, stdout } = await run('near-intents.mjs', [
     'status', '0x0000000000000000000000000000000000000001',
   ]);
-  assert.equal(code, 0);
-  assert.match(stdout, /Status:/);
+  // A 4xx is permanent: print FATAL (which the documented monitor loop breaks on) and exit
+  // non-zero, rather than printing `Status: undefined` and letting the loop poll forever.
+  assert.equal(code, 1);
+  assert.match(stdout, /^FATAL: .*not found/im);
+  assert.doesNotMatch(stdout, /Status: undefined/);
 });
 
 test('near-intents: errors when --refund value is missing (next token is a flag)', async () => {

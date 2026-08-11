@@ -19,6 +19,12 @@ import { makeGetArg } from './cli-args.mjs';
 const API        = 'https://1click.chaindefuser.com';
 const DEST_ASSET = 'nep141:base-0x833589fcd6edb6e08f4c7c32d4f71b54bda02913.omft.near';
 
+// How long we ask 1Click to hold the deposit open. This is the point at which a refund
+// begins if the swap hasn't completed, so it must exceed the time for the deposit to be
+// *mined* on the origin chain — the API docs cite ~1 hour for Bitcoin. A longer window
+// costs nothing (quoted amounts are identical at 10 minutes and 24 hours).
+const DEPOSIT_WINDOW_MINUTES = 120;
+
 const args = process.argv.slice(2);
 const cmd  = args[0];
 
@@ -88,6 +94,17 @@ if (cmd === 'tokens') {
   if (memoArg) params.set('depositMemo', memoArg);
   const result = await apiRequest('GET', `/v0/status?${params}`);
 
+  // Error bodies carry no `status` field (an unknown deposit address 404s), so without this
+  // the monitor loop would print `Status: undefined` and poll forever. Most 4xx are
+  // permanent — print FATAL so the loop breaks. 408/429 are retryable, as is anything else
+  // (5xx): print RETRYING and stay pollable so a blip can't abandon an in-flight swap.
+  const RETRYABLE_4XX = [408, 429];
+  if (!result.status) {
+    const fatal = result.statusCode >= 400 && result.statusCode < 500 && !RETRYABLE_4XX.includes(result.statusCode);
+    console.log(`${fatal ? 'FATAL' : 'RETRYING'}: ${result.message || 'unexpected response from the status API'}`);
+    process.exit(fatal ? 1 : 0);
+  }
+
   const labels = {
     PENDING_DEPOSIT:    'Waiting for deposit to be detected',
     KNOWN_DEPOSIT_TX:   'Deposit detected, awaiting confirmation',
@@ -156,7 +173,7 @@ if (cmd === 'tokens') {
   }
 
   const amount   = Math.round(parseFloat(usdcArg) * 1_000_000).toString();
-  const deadline = new Date(Date.now() + 10 * 60 * 1000).toISOString();
+  const deadline = new Date(Date.now() + DEPOSIT_WINDOW_MINUTES * 60 * 1000).toISOString();
   const refundTo = refundArg;
 
   const quoteBody = {
@@ -194,8 +211,9 @@ if (cmd === 'tokens') {
   } catch (e) {
     console.error(`COST LIMIT EXCEEDED (unverifiable quote) — ${e.message}`);
     console.error('The funding cost could not be measured, so the deposit address is withheld. This is NOT');
-    console.error('bypassable with --override-cost-cap. Report to the user and fund from a different source');
-    console.error('asset (run the "tokens" command for options).');
+    console.error('bypassable with --override-cost-cap. Tell the user the funding source they picked could');
+    console.error('not produce a usable quote, ask where else they hold assets, and go back to "Determine');
+    console.error('source of funds" to start again from their new choice.');
     process.exit(1);
   }
   const override = args.includes('--override-cost-cap');
@@ -216,13 +234,34 @@ if (cmd === 'tokens') {
     console.warn(`WARNING: overhead $${cost.overheadUsd.toFixed(4)} (${cost.overheadPct.toFixed(2)}%) exceeds the ${MAX_OVERHEAD_PCT}% / $${MAX_OVERHEAD_USD} limit — proceeding (user-approved via --override-cost-cap).\n`);
   }
 
+  // ── Deadline guard ────────────────────────────────────────────────────────
+  // Two clocks come back with different consequences: the deadline we requested (after
+  // which a refund begins if the swap hasn't completed) and `q.deadline` (after which the
+  // deposit address goes inactive and funds may be LOST). Refunding assumes the address is
+  // still live, so the request deadline must land first. If the response ever inverts that
+  // — or omits its deadline — the safe consequence can't be promised, so withhold the quote
+  // rather than print a deposit address under the wrong explanation.
+  const requestedMs      = Date.parse(deadline);
+  const addressExpiresMs = Date.parse(q.deadline);
+  if (!Number.isFinite(addressExpiresMs) || addressExpiresMs < requestedMs) {
+    console.error('DEADLINE MISMATCH — funding quote withheld (no deposit address shown).');
+    console.error(`  Deposit window requested: ${deadline} (${DEPOSIT_WINDOW_MINUTES} minutes)`);
+    console.error(`  Deposit address expires:  ${q.deadline ?? '(absent from the quote response)'}`);
+    console.error('The address would go inactive before the deposit deadline, so a late deposit could be');
+    console.error('LOST instead of refunded. This is NOT overridable. Tell the user the funding source they');
+    console.error('picked could not produce a usable quote, ask where else they hold assets, and go back to');
+    console.error('"Determine source of funds" to start again from their new choice.');
+    process.exit(1);
+  }
+
   console.log(`Send:    ${q.amountInFormatted} ${fromSymbol} on ${fromChain}`);
   console.log(`Receive: ${q.amountOutFormatted} USDC on Base`);
   console.log(`Send (units): ${q.amountIn}`);
   console.log(`\nDeposit to: ${q.depositAddress}`);
   if (token.contractAddress) console.log(`Asset:      ${token.contractAddress}`);
-  const minutesLeft = Math.max(0, Math.floor((new Date(q.deadline) - Date.now()) / 60_000));
-  console.log(`Valid until: ${q.deadline} (~${minutesLeft} minutes from now) — the deposit must arrive by then; after that the quote expires and you must run a fresh quote.`);
+  // Always the deadline we submitted — the one whose consequence (refund) is described here.
+  const minutesLeft = Math.max(0, Math.floor((requestedMs - Date.now()) / 60_000));
+  console.log(`Deposit by: ${deadline} (~${minutesLeft} minutes from now) — the swap must COMPLETE by then: the deposit has to be confirmed on ${fromChain}, plus ~${q.timeEstimate}s to execute. Miss it and the deposit is refunded to the refund address instead of swapped, so send promptly rather than near the deadline. After that, run a fresh quote.`);
 
   // Refund destination — confirm this with the user BEFORE they send to the deposit address.
   console.log(`Refund to:  ${refundTo} on ${fromChain} — origin chain (returned on-chain if the swap fails)`);
