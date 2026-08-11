@@ -91,7 +91,7 @@ The quote prints a **`Deposit by:`** line — a **2-hour** window by which the *
 
 Slow chains eat into that window — a Bitcoin deposit can take about an hour to mine, so tell the user to send promptly rather than near the deadline.
 
-If the quote comes back with the deposit address expiring **before** that deadline, the script prints `DEADLINE MISMATCH` and withholds the address entirely: a late deposit could then be lost rather than refunded. This is not overridable — re-run the quote, and if it repeats, fund from a different source chain.
+If the quote comes back with the deposit address expiring **before** that deadline, the script prints `DEADLINE MISMATCH` and withholds the address entirely: a late deposit could then be lost rather than refunded. This is not overridable — tell the user that funding source could not produce a usable quote, ask where else they hold assets, and go back to "Determine source of funds" to start again from their new choice.
 
 ### Show the deposit address as a QR (optional)
 

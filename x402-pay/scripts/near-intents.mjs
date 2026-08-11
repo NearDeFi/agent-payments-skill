@@ -211,8 +211,9 @@ if (cmd === 'tokens') {
   } catch (e) {
     console.error(`COST LIMIT EXCEEDED (unverifiable quote) — ${e.message}`);
     console.error('The funding cost could not be measured, so the deposit address is withheld. This is NOT');
-    console.error('bypassable with --override-cost-cap. Report to the user and fund from a different source');
-    console.error('asset (run the "tokens" command for options).');
+    console.error('bypassable with --override-cost-cap. Tell the user the funding source they picked could');
+    console.error('not produce a usable quote, ask where else they hold assets, and go back to "Determine');
+    console.error('source of funds" to start again from their new choice.');
     process.exit(1);
   }
   const override = args.includes('--override-cost-cap');
@@ -247,8 +248,9 @@ if (cmd === 'tokens') {
     console.error(`  Deposit window requested: ${deadline} (${DEPOSIT_WINDOW_MINUTES} minutes)`);
     console.error(`  Deposit address expires:  ${q.deadline ?? '(absent from the quote response)'}`);
     console.error('The address would go inactive before the deposit deadline, so a late deposit could be');
-    console.error('LOST instead of refunded. This is NOT overridable. Re-run the quote; if it persists,');
-    console.error('fund from a different source chain and report it.');
+    console.error('LOST instead of refunded. This is NOT overridable. Tell the user the funding source they');
+    console.error('picked could not produce a usable quote, ask where else they hold assets, and go back to');
+    console.error('"Determine source of funds" to start again from their new choice.');
     process.exit(1);
   }
 
