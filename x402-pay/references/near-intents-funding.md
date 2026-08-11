@@ -76,16 +76,12 @@ node scripts/near-intents.mjs quote \
   --usdc <amount> \
   --from <chain:SYMBOL> \
   --wallet <baseWalletAddress> \
-  [--refund <sendingWalletAddress>] \
-  [--refund-type origin|intents]
+  --refund <sendingWalletAddress>
 ```
 
-Choose `--refund-type` before running — it sets where a **failed/partial** swap is refunded (refunds are always in the *origin* asset you sent, not Base USDC):
+`--refund` is **required**: it's where a **failed/partial** swap is returned, on the **origin chain** and in the **origin asset** you sent (not Base USDC). When funding **from a wallet** you always have the sending wallet's address — pass it. There is no other refund mode.
 
-- **`origin`** (default) → refunds on-chain to `--refund`. Automatic, no manual recovery. When funding **from a wallet** you always have the sending wallet's address — pass it as `--refund` and use `origin`. This is the normal case.
-- **`intents`** → credits the refund to a **NEAR Intents balance** keyed to `--refund` (defaults to the `--wallet` Base address; EVM addresses are auto-lowercased to the intents account format). Reclaiming is **manual** — the user must connect that wallet at app.near-intents.org and sign. Only use this as a last resort, for a **self-custody EVM wallet** funding from a source with no origin-chain address you can refund to. **Do not** use `intents` for managed wallets (awal/CDP/Privy/Turnkey) — they can't connect to claim, and the refund would be stranded.
-
-If you do not have an address to refund the deposit to and they are using a managed wallet, ask the user for a refund address on the chain they deposited from and do not proceed without one.
+If you do not have an address on the origin chain to refund the deposit to, ask the user for one and do not proceed without it.
 
 Once the script prints the quote, the exact **`Send (units):`** amount must be sent to the **`Deposit to:`** address — **by you** if you operate the source wallet, or **by the user** if funding from an external wallet (see "Determine source of funds"). Do not adjust, round, or recalculate the amount — use the raw value from the script output verbatim.
 
@@ -105,7 +101,7 @@ Put the exact `Deposit to:` address in the `data` parameter. **Always tell the u
 
 ### Confirm the refund destination before any deposit
 
-The quote prints a **`Refund to:`** line — where funds go if the swap fails. **Before** you send (or tell the user to send) anything to the `Deposit to:` address, **confirm this with the user**: the refund **address**, its **chain**, and **whether it's returned on the origin chain or held as a NEAR Intents balance**. Only proceed once they acknowledge. Never send to a deposit address without the user having seen where a failed swap refunds to.
+The quote prints a **`Refund to:`** line — where funds go if the swap fails. **Before** you send (or tell the user to send) anything to the `Deposit to:` address, **confirm this with the user**: the refund **address** and its **chain** — the origin chain you're sending from. Only proceed once they acknowledge. Never send to a deposit address without the user having seen where a failed swap refunds to.
 
 ### If the quote is rejected: `COST LIMIT EXCEEDED`
 

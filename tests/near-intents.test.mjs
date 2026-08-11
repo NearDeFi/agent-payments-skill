@@ -6,8 +6,8 @@
 //   2. tokens --chain near: filters by chain, output contains near: entries
 //   3. tokens --chain fake: exits 1 with "No tokens found" error
 //   4. quote: gets a committed quote for 1 USDC from ETH, asserts the Send:, Receive:,
-//      Send (units):, Deposit to:, Valid until: (with minutes remaining), and
-//      (origin-chain variant) Refund to: output lines
+//      Send (units):, Deposit to:, Valid until: (with minutes remaining), and the
+//      origin-chain Refund to: output lines
 //   5. missing --refund: runs the quote command without --refund, asserts exit 1 and usage output
 //   6. unknown token: uses a non-existent chain:SYMBOL (fake:FAKE), asserts exit 1
 //      and a "Token not found" error message
@@ -17,9 +17,8 @@
 //      asserts the output contains a "Status:" line
 //  10. flag-as-value: --refund immediately followed by another flag (no real value)
 //      is treated as missing, exits 1 with usage output
-//  11. --refund-type intents without --refund: quote succeeds, refund defaults to --wallet
-//      and the output shows a "NEAR Intents balance" Refund to: line
-//  12. invalid --refund-type: exits 1 with an error
+//  11. --refund-type is no longer supported: passing it exits 1 with an explanatory error
+//      instead of silently falling back to an origin-chain refund
 
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
@@ -102,22 +101,11 @@ test('near-intents: errors when --refund value is missing (next token is a flag)
   assert.match(stderr, /Usage/i);
 });
 
-test('near-intents: --refund-type intents defaults refund to --wallet', { timeout: 20_000 }, async () => {
-  const { code, stdout } = await run('near-intents.mjs', [
-    'quote', '--usdc', '1.00', '--from', 'eth:ETH',
-    '--wallet', TEST_ADDRESS, '--refund-type', 'intents',
-  ]);
-  assert.equal(code, 0);
-  assert.match(stdout, /Deposit to:/);
-  // Refund defaults to the --wallet address (lowercased — the intents account id format)
-  // and is held as a NEAR Intents balance.
-  assert.match(stdout, new RegExp(`Refund to:\\s+${TEST_ADDRESS.toLowerCase()}.*NEAR Intents balance`));
-});
-
-test('near-intents: errors on invalid --refund-type', async () => {
+test('near-intents: rejects --refund-type instead of silently ignoring it', async () => {
   const { code, stderr } = await run('near-intents.mjs', [
-    'quote', '--usdc', '1.00', '--from', 'eth:ETH', '--wallet', TEST_ADDRESS, '--refund-type', 'bogus',
+    'quote', '--usdc', '1.00', '--from', 'eth:ETH',
+    '--wallet', TEST_ADDRESS, '--refund', TEST_ADDRESS, '--refund-type', 'intents',
   ]);
   assert.equal(code, 1);
-  assert.match(stderr, /--refund-type must be/i);
+  assert.match(stderr, /--refund-type is no longer supported/i);
 });
