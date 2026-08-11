@@ -6,7 +6,7 @@ compatibility: >
   No API keys required. Works out of the box with the default Coinbase Agentic Wallet (awal) — just an email address to log in.
   Also supports raw private key, CDP SDK, Privy, and Turnkey if already configured. Requires internet access.
 metadata:
-  version: "1.0.2"
+  version: "2.0.0"
   openclaw:
     homepage: https://github.com/NearDeFi/agent-payments-skill
     emoji: "💸"
@@ -113,7 +113,7 @@ https://x402.ottoai.services/crypto-news
 Check your wallet's USDC balance on Base — see `references/wallet-flows.md` for the method for your wallet (if you don't already know it) — and compare it against the price you previewed in Step 3.
 
 - **Balance ≥ service price** → proceed to Step 5
-- **Balance < service price** → fund it: Read `references/near-intents-funding.md` for the cross-chain funding flow. Always use NEAR intents to fund the wallet if the balance is low. If the user has no crypto to swap from, the **onramp** path (`references/onramp-funding.md`) funds the wallet from Cash App / Robinhood / Revolut.
+- **Balance < service price** → fund it: Read `references/near-intents-funding.md` for the cross-chain funding flow. Always use NEAR intents to fund the wallet if the balance is low.
 
 **Gas:** No ETH needed — you sign off-chain only. The x402 facilitator submits the on-chain transaction and covers gas. This applies to all wallet types.
 
@@ -141,7 +141,7 @@ Report the response body and any transaction hash to the user.
 - Abide by configured safeguards such as wallet spend limits and allowlists.
 - Never pay through a mechanism that cannot enforce the user-confirmed price as a hard cap at payment time — for wallets without one, route signing through the managed-signer template in `references/wallet-flows.md`.
 - If a wallet's authentication is missing or expired (e.g. awal is signed out), **stop immediately and report it**, telling the user what login action to take. Never attempt to recover access yourself: do not search the user's files, email, message history, or browser/app storage for keys, session tokens, or OTP codes, and do not retry authentication repeatedly.
-- When funding, always confirm the refund destination (address, chain, and origin-chain vs. NEAR Intents balance) with the user before any deposit.
+- When funding, always confirm the refund destination (the address and its origin chain) with the user before any deposit.
 - Never pay silently — always show the decoded price first
 - Confirm with user before any payment
 - Always report the tx hash after a successful payment

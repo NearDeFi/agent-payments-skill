@@ -1,6 +1,6 @@
 # x402 Pay
 
-A skill for making HTTP 402 (x402) micropayments in USDC on Base. It can be funded cross-chain via NEAR Intents or from onramps like Cash App, Revolut, and Robinhood. Designed to work across most agent frameworks (Claude Code, OpenClaw, etc.) and to be compatible with multiple agent wallet setups.
+A skill for making HTTP 402 (x402) micropayments in USDC on Base. It can be funded cross-chain via NEAR Intents. Designed to work across most agent frameworks (Claude Code, OpenClaw, etc.) and to be compatible with multiple agent wallet setups.
 
 Before using this skill, please review the [DISCLOSURES.txt](./DISCLOSURES.txt) and [NOTICE.txt](./NOTICE.txt) files.
 
@@ -34,10 +34,6 @@ Search for x402 services that do web search
 
 ```
 Fund my x402 wallet from my Tron wallet
-```
-
-```
-Fund my x402 wallet via Cash App
 ```
 
 ```

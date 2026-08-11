@@ -5,10 +5,9 @@
 //   node scripts/near-intents.mjs tokens [--chain <chain>]
 //
 // Get a committed quote (deposit address + exact send amount):
-//   node scripts/near-intents.mjs quote --usdc <amount> --from <chain:SYMBOL> --wallet <baseAddress> [--refund <sendingAddress>] [--refund-type origin|intents] [--override-cost-cap]
+//   node scripts/near-intents.mjs quote --usdc <amount> --from <chain:SYMBOL> --wallet <baseAddress> --refund <sendingAddress> [--override-cost-cap]
 //   Rejects quotes whose USD overhead exceeds both 2.5% and $0.005; --override-cost-cap proceeds anyway (user-approved).
-//   --refund-type origin (default): refund to --refund on the origin chain. intents: refund to a NEAR Intents
-//   balance keyed to --refund (defaults to --wallet) — claimable by connecting that wallet at app.near-intents.org.
+//   A failed/partial swap always refunds the origin asset on the origin chain to --refund.
 //
 // Check swap status:
 //   node scripts/near-intents.mjs status <depositAddress> [--memo <memo>]
@@ -110,19 +109,22 @@ if (cmd === 'tokens') {
   const fromArg   = getArg('--from');
   const refundArg = getArg('--refund');
   const walletArg = getArg('--wallet');
-  const refundTypeArg = (getArg('--refund-type') || 'origin').toLowerCase();
 
-  if (refundTypeArg !== 'origin' && refundTypeArg !== 'intents') {
-    console.error('--refund-type must be "origin" or "intents"');
+  // --refund-type was removed: refunds are always returned on the origin chain. Reject it
+  // rather than ignore it, so a caller asking for an intents refund can't silently get an
+  // origin-chain refund to an address that only exists on Base. Match the inline
+  // `--refund-type=intents` form too — unknown args are otherwise ignored, so checking only
+  // the two-token form would leave exactly that silent fallback in place.
+  if (args.some(a => a === '--refund-type' || a.startsWith('--refund-type='))) {
+    console.error('--refund-type is no longer supported — refunds are always returned on the origin chain.');
+    console.error('Pass --refund <address on the origin chain you send from> and drop --refund-type.');
     process.exit(1);
   }
-  const refundToIntents = refundTypeArg === 'intents';
 
-  // --refund is required for an origin-chain refund; for intents it defaults to --wallet.
-  if (!usdcArg || !fromArg || (!refundArg && !refundToIntents)) {
+  if (!usdcArg || !fromArg || !refundArg) {
     console.error('Usage:');
-    console.error('  node scripts/near-intents.mjs quote --usdc <amount> --from <chain:SYMBOL> --wallet <address> [--refund <address>] [--refund-type origin|intents]');
-    console.error('  --refund is required unless --refund-type intents (then it defaults to --wallet)');
+    console.error('  node scripts/near-intents.mjs quote --usdc <amount> --from <chain:SYMBOL> --wallet <address> --refund <address>');
+    console.error('  --refund is required — the origin-chain address a failed swap is returned to');
     console.error('  Use "tokens" subcommand to list valid --from values');
     process.exit(1);
   }
@@ -155,11 +157,7 @@ if (cmd === 'tokens') {
 
   const amount   = Math.round(parseFloat(usdcArg) * 1_000_000).toString();
   const deadline = new Date(Date.now() + 10 * 60 * 1000).toISOString();
-  const refundType = refundToIntents ? 'INTENTS' : 'ORIGIN_CHAIN';
-  let   refundTo   = refundArg || walletAddress;  // intents mode defaults the refund to the Base wallet
-  // A NEAR Intents account id for an EVM address must be lowercase — the API rejects the
-  // checksummed (mixed-case) form. Only normalise EVM-shaped addresses; leave other ids as-is.
-  if (refundToIntents && /^0x[0-9a-fA-F]{40}$/.test(refundTo)) refundTo = refundTo.toLowerCase();
+  const refundTo = refundArg;
 
   const quoteBody = {
     dry:              false,
@@ -171,7 +169,7 @@ if (cmd === 'tokens') {
     refundTo,
     depositType:      'ORIGIN_CHAIN',
     recipientType:    'DESTINATION_CHAIN',
-    refundType,
+    refundType:       'ORIGIN_CHAIN',
     deadline,
     slippageTolerance: 100,
   };
@@ -227,11 +225,7 @@ if (cmd === 'tokens') {
   console.log(`Valid until: ${q.deadline} (~${minutesLeft} minutes from now) — the deposit must arrive by then; after that the quote expires and you must run a fresh quote.`);
 
   // Refund destination — confirm this with the user BEFORE they send to the deposit address.
-  if (refundToIntents) {
-    console.log(`Refund to:  ${refundTo} — NEAR Intents balance (if the swap fails, claim it by connecting this wallet at app.near-intents.org)`);
-  } else {
-    console.log(`Refund to:  ${refundTo} on ${fromChain} — origin chain (returned on-chain if the swap fails)`);
-  }
+  console.log(`Refund to:  ${refundTo} on ${fromChain} — origin chain (returned on-chain if the swap fails)`);
 
   if (q.depositMemo) {
     console.log(`\nMEMO REQUIRED: ${q.depositMemo}`);
@@ -242,7 +236,7 @@ if (cmd === 'tokens') {
   console.error(`Unknown command: ${cmd ?? '(none)'}`);
   console.error('Usage:');
   console.error('  node scripts/near-intents.mjs tokens [--chain <chain>]');
-  console.error('  node scripts/near-intents.mjs quote --usdc <amount> --from <chain:SYMBOL> --wallet <address> [--refund <address>] [--refund-type origin|intents]');
+  console.error('  node scripts/near-intents.mjs quote --usdc <amount> --from <chain:SYMBOL> --wallet <address> --refund <address>');
   console.error('  node scripts/near-intents.mjs status <depositAddress> [--memo <memo>]');
   process.exit(1);
 }
