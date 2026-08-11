@@ -19,6 +19,12 @@ import { makeGetArg } from './cli-args.mjs';
 const API        = 'https://1click.chaindefuser.com';
 const DEST_ASSET = 'nep141:base-0x833589fcd6edb6e08f4c7c32d4f71b54bda02913.omft.near';
 
+// How long we ask 1Click to hold the deposit open. This is the point at which a refund
+// begins if the swap hasn't completed, so it must exceed the time for the deposit to be
+// *mined* on the origin chain — the API docs cite ~1 hour for Bitcoin. A longer window
+// costs nothing (quoted amounts are identical at 10 minutes and 24 hours).
+const DEPOSIT_WINDOW_MINUTES = 120;
+
 const args = process.argv.slice(2);
 const cmd  = args[0];
 
@@ -88,6 +94,15 @@ if (cmd === 'tokens') {
   if (memoArg) params.set('depositMemo', memoArg);
   const result = await apiRequest('GET', `/v0/status?${params}`);
 
+  // Error bodies carry no `status` field (an unknown deposit address 404s), so without this
+  // the monitor loop would print `Status: undefined` and poll forever. A 4xx is permanent —
+  // print FATAL so the loop breaks. Anything else is transient: stay pollable.
+  if (!result.status) {
+    const fatal = result.statusCode >= 400 && result.statusCode < 500;
+    console.log(`${fatal ? 'FATAL' : 'RETRYING'}: ${result.message || 'unexpected response from the status API'}`);
+    process.exit(fatal ? 1 : 0);
+  }
+
   const labels = {
     PENDING_DEPOSIT:    'Waiting for deposit to be detected',
     KNOWN_DEPOSIT_TX:   'Deposit detected, awaiting confirmation',
@@ -156,7 +171,7 @@ if (cmd === 'tokens') {
   }
 
   const amount   = Math.round(parseFloat(usdcArg) * 1_000_000).toString();
-  const deadline = new Date(Date.now() + 10 * 60 * 1000).toISOString();
+  const deadline = new Date(Date.now() + DEPOSIT_WINDOW_MINUTES * 60 * 1000).toISOString();
   const refundTo = refundArg;
 
   const quoteBody = {
@@ -221,8 +236,13 @@ if (cmd === 'tokens') {
   console.log(`Send (units): ${q.amountIn}`);
   console.log(`\nDeposit to: ${q.depositAddress}`);
   if (token.contractAddress) console.log(`Asset:      ${token.contractAddress}`);
-  const minutesLeft = Math.max(0, Math.floor((new Date(q.deadline) - Date.now()) / 60_000));
-  console.log(`Valid until: ${q.deadline} (~${minutesLeft} minutes from now) — the deposit must arrive by then; after that the quote expires and you must run a fresh quote.`);
+  // Two different clocks come back: the deadline we requested above (when a refund begins
+  // if the swap hasn't completed) and `q.deadline` (when the deposit address goes inactive
+  // and funds may be lost). Show the earlier one — that's the deposit deadline that binds.
+  const quoteDeadlineMs = Date.parse(q.deadline);
+  const effectiveMs     = Number.isFinite(quoteDeadlineMs) ? Math.min(Date.parse(deadline), quoteDeadlineMs) : Date.parse(deadline);
+  const minutesLeft     = Math.max(0, Math.floor((effectiveMs - Date.now()) / 60_000));
+  console.log(`Deposit by: ${new Date(effectiveMs).toISOString()} (~${minutesLeft} minutes from now) — the deposit must be confirmed on ${fromChain} by then, or it is refunded instead of swapped. After that, run a fresh quote.`);
 
   // Refund destination — confirm this with the user BEFORE they send to the deposit address.
   console.log(`Refund to:  ${refundTo} on ${fromChain} — origin chain (returned on-chain if the swap fails)`);
