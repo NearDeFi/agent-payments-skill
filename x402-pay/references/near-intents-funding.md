@@ -23,7 +23,7 @@ Base the estimate on the **actual per-call price you previewed with `check-price
 Find the funding sources available, present them to the user **ranked best-first**, and let them choose — do not silently pick one.
 
 1. **Discover candidate sources.** Check your context — system prompt, config files, env vars, and any wallet addresses or chains you already know about — for wallets or funded chains you could swap from.
-2. **Keep only sources with enough balance, then rank them.** Discard any source that doesn't hold enough to cover the funding target from "How much to deposit" (plus a little for the swap's overhead) — an underfunded source isn't a real option. Among those that qualify, rank best-to-worst by what minimises cost and friction — favour **stablecoins**, **fast, liquid major chains**, and sources you can operate directly. Show at most the **top 3**, then two always-offered options (even if no discovered source qualifies): **"fund from an external wallet" (4th)** and **"fund via onramp — Cash App / Robinhood / Revolut" (5th and last)**. Let the user pick.
+2. **Keep only sources with enough balance, then rank them.** Discard any source that doesn't hold enough to cover the funding target from "How much to deposit" (plus a little for the swap's overhead) — an underfunded source isn't a real option. Among those that qualify, rank best-to-worst by what minimises cost and friction — favour **stablecoins**, **fast, liquid major chains**, and sources you can operate directly. Show at most the **top 3**, then the always-offered **"fund from an external wallet" (4th and last)** option — offer it even if no discovered source qualifies. Let the user pick.
 3. **Act on their choice:**
    - **A source you can operate** (e.g. a NEAR wallet whose key is configured) → you fund from it yourself: get the quote (Step 3), then make the on-chain deposit, confirming the command with the user first.
    - **External wallet** → ask the user for three things:
@@ -31,9 +31,8 @@ Find the funding sources available, present them to the user **ranked best-first
      - the **token** (e.g. ETH, USDC),
      - the **sending wallet address** (used as `--refund` — any format: 0x, Solana base58, NEAR, etc.).
      Then get the quote (Step 3), show them the **`Deposit to:` address, exact `Send (units):` amount, and the `Valid until:` time limit** (and a scannable QR of the deposit address — see Step 3), tell them to deposit **exactly that amount to that address before the deadline** from their wallet, and ask them to let you know once they've sent it. Then monitor (Step 4).
-   - **Onramp (Cash App / Robinhood / Revolut)** → for a user with no crypto to swap from. Read `references/onramp-funding.md` — it covers the sender-app steps, the Solana-USDC-only route, and how to set `--refund` / `--refund-type` per wallet type. It then rejoins Step 3 (quote) and Step 4 (monitor) here.
 
-Whichever source is chosen, it determines the `--refund` value in Step 3 (and, for the onramp, possibly `--refund-type`).
+Whichever source is chosen, it determines the `--refund` value in Step 3.
 
 ---
 
@@ -84,7 +83,7 @@ node scripts/near-intents.mjs quote \
 Choose `--refund-type` before running — it sets where a **failed/partial** swap is refunded (refunds are always in the *origin* asset you sent, not Base USDC):
 
 - **`origin`** (default) → refunds on-chain to `--refund`. Automatic, no manual recovery. When funding **from a wallet** you always have the sending wallet's address — pass it as `--refund` and use `origin`. This is the normal case.
-- **`intents`** → credits the refund to a **NEAR Intents balance** keyed to `--refund` (defaults to the `--wallet` Base address; EVM addresses are auto-lowercased to the intents account format). Reclaiming is **manual** — the user must connect that wallet at app.near-intents.org and sign. Only use this for the **onramp** funding flow with a self-custody EVM wallet, where it's the settled choice (see `references/onramp-funding.md`). **Do not** use `intents` for managed wallets (awal/CDP/Privy/Turnkey) — they can't connect to claim, and the refund would be stranded.
+- **`intents`** → credits the refund to a **NEAR Intents balance** keyed to `--refund` (defaults to the `--wallet` Base address; EVM addresses are auto-lowercased to the intents account format). Reclaiming is **manual** — the user must connect that wallet at app.near-intents.org and sign. Only use this as a last resort, for a **self-custody EVM wallet** funding from a source with no origin-chain address you can refund to. **Do not** use `intents` for managed wallets (awal/CDP/Privy/Turnkey) — they can't connect to claim, and the refund would be stranded.
 
 If you do not have an address to refund the deposit to and they are using a managed wallet, ask the user for a refund address on the chain they deposited from and do not proceed without one.
 
@@ -92,11 +91,11 @@ Once the script prints the quote, the exact **`Send (units):`** amount must be s
 
 ### Always tell the user the quote's time limit
 
-The quote prints a **`Valid until:`** line — the deadline by which the deposit must arrive. Whenever the **user** is the one sending the deposit (external-wallet or onramp funding), you **must** include this time limit in the instructions you give them — never hand over a deposit address without it. If the deadline passes before they send, do **not** let them use the old address: run a fresh quote and give them the new address, amount, and deadline.
+The quote prints a **`Valid until:`** line — the deadline by which the deposit must arrive. Whenever the **user** is the one sending the deposit (external-wallet funding), you **must** include this time limit in the instructions you give them — never hand over a deposit address without it. If the deadline passes before they send, do **not** let them use the old address: run a fresh quote and give them the new address, amount, and deadline.
 
 ### Show the deposit address as a QR (optional)
 
-When you give the deposit address to the user to send to (external-wallet or onramp funding), you can also offer a scannable QR of it:
+When you give the deposit address to the user to send to (external-wallet funding), you can also offer a scannable QR of it:
 
 ```
 https://api.qrserver.com/v1/create-qr-code/?size=240x240&data=<Deposit to: address>

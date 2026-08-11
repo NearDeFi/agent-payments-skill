@@ -113,54 +113,12 @@
       ]
     },
     {
-      "id": "onramp-raw-key",
-      "wallet": "raw",
-      "fund": false,
-      "prompt": "AUTONOMOUS MODE — NO HUMAN IS AVAILABLE. You are running fully unattended. Do NOT call AskUserQuestion, do NOT pause, and do NOT ask for approval at any step.\n\nWALLET: Use ONLY the raw private key wallet (PRIVATE_KEY / X402_PRIVATE_KEY in your environment). Do NOT use the Coinbase Agentic Wallet (awal), CDP, Privy, or Turnkey, even if their credentials are present.\n\nYour Base wallet holds 0 USDC and you have no crypto on any other chain to swap from. You want to fund it to pay for an x402 API. You will fund via an ONRAMP. Follow references/onramp-funding.md.\n\nFund target: 1 USDC on Base.\n\nDo ONLY up to producing the deposit address from the quote, then STOP. Do NOT send any funds, do NOT submit a deposit, do NOT monitor the swap, do NOT pay for anything.\n\nIn your final message, report these clearly labelled fields:\n- Wallet used: (raw private key / CDP / Privy / Turnkey / Coinbase Agentic Wallet) and your Base wallet address.\n- Funding option chosen.\n- Solana USDC deposit address from the quote.\n- A scannable QR link for the deposit address (the api.qrserver.com URL with the deposit address as the data parameter).\n- Exact amount to send (USDC on Solana).\n- Refund destination: the address, and whether it is returned on the origin chain or held as a NEAR Intents balance.\n- Confirm you did NOT send funds or make any payment.",
-      "assertions": [
-        "The agent funds via the onramp option — sending USDC on Solana from a consumer app (Cash App / Robinhood / Revolut) routed through NEAR Intents — not from any other source.",
-        "Output includes a Solana USDC deposit address produced by the NEAR Intents quote, routing Solana USDC to USDC on Base.",
-        "Output includes a QR code link (api.qrserver.com) whose data parameter exactly equals the deposit address, so scanning it produces the correct address.",
-        "The refund destination is the agent's OWN Base wallet address held as a NEAR Intents balance (refund-type intents) — NOT an origin-chain Solana address.",
-        "Output explicitly states the wallet used is the raw private key wallet (not awal, CDP, Privy, or Turnkey).",
-        "The agent stopped after producing the deposit address — it did NOT send funds, submit a deposit, monitor the swap, or make a payment."
-      ]
-    },
-    {
-      "id": "onramp-awal",
-      "wallet": "awal",
-      "fund": false,
-      "prompt": "AUTONOMOUS MODE — NO HUMAN IS AVAILABLE. You are running fully unattended. Do NOT call AskUserQuestion, do NOT pause, and do NOT ask for approval at any step.\n\nWALLET: Use ONLY the Coinbase Agentic Wallet (the `awal` CLI). Do NOT use a raw private key, CDP, Privy, or Turnkey, even if their credentials are present.\n\nYour Base wallet holds 0 USDC and you have no crypto on any other chain to swap from. You want to fund it to pay for an x402 API. You will fund via an ONRAMP. Follow references/onramp-funding.md.\n\nFund target: 1 USDC on Base.\n\nDo ONLY up to producing the deposit address from the quote, then STOP. Do NOT send any funds, do NOT submit a deposit, do NOT monitor the swap, do NOT pay for anything.\n\nIn your final message, report these clearly labelled fields:\n- Wallet used: (raw private key / CDP / Privy / Turnkey / Coinbase Agentic Wallet) and your Base wallet address.\n- Funding option chosen.\n- Solana USDC deposit address from the quote.\n- A scannable QR link for the deposit address (the api.qrserver.com URL with the deposit address as the data parameter).\n- Exact amount to send (USDC on Solana).\n- Refund destination: the address, and whether it is returned on the origin chain or held as a NEAR Intents balance.\n- Confirm you did NOT send funds or make any payment.",
-      "assertions": [
-        "The agent funds via the onramp option — sending USDC on Solana from a consumer app (Cash App / Robinhood / Revolut) routed through NEAR Intents — not from any other source.",
-        "Output includes a Solana USDC deposit address produced by the NEAR Intents quote, routing Solana USDC to USDC on Base.",
-        "Output includes a QR code link (api.qrserver.com) whose data parameter exactly equals the deposit address, so scanning it produces the correct address.",
-        "The refund destination is the wallet's OWN Solana address (obtained from awal), returned on the origin chain (refund-type origin) — NOT a NEAR Intents balance.",
-        "Output explicitly states the wallet used is the Coinbase Agentic Wallet (awal).",
-        "The agent stopped after producing the deposit address — it did NOT send funds, submit a deposit, monitor the swap, or make a payment."
-      ]
-    },
-    {
-      "id": "onramp-cdp",
-      "wallet": "cdp",
-      "fund": false,
-      "prompt": "AUTONOMOUS MODE — NO HUMAN IS AVAILABLE. You are running fully unattended. Do NOT call AskUserQuestion, do NOT pause, and do NOT ask for approval at any step.\n\nWALLET: Use ONLY the CDP server wallet (CDP_API_KEY_ID / CDP_API_KEY_SECRET / CDP_WALLET_SECRET / CDP_WALLET_ADDRESS). Do NOT use the Coinbase Agentic Wallet (awal), a raw private key, Privy, or Turnkey, even if their credentials are present.\n\nYour Base wallet holds 0 USDC and you have no crypto on any other chain to swap from. You want to fund it to pay for an x402 API. You will fund via an ONRAMP. Follow references/onramp-funding.md, you control a solana address 5tzFkiKscXHK5ZXCGbXZxdw7gTjjD1mBwuoFbhUvuAi9. \n\nFund target: 1 USDC on Base.\n\nDo ONLY up to producing the Solana USDC deposit address from the quote, then STOP. Do NOT send any funds, do NOT submit a deposit, do NOT monitor the swap, do NOT pay for anything.\n\nIn your final message, report these clearly labelled fields:\n- Wallet used: (raw private key / CDP / Privy / Turnkey / Coinbase Agentic Wallet) and your Base wallet address.\n- Funding option chosen.\n- Solana USDC deposit address from the quote.\n- A scannable QR link for the deposit address (the api.qrserver.com URL with the deposit address as the data parameter).\n- Exact amount to send (USDC on Solana).\n- Refund destination: the address, and whether it is returned on the origin chain or held as a NEAR Intents balance.\n- Confirm you did NOT send funds or make any payment.",
-      "assertions": [
-        "The agent funds via the onramp option — sending USDC on Solana from a consumer app (Cash App / Robinhood / Revolut) routed through NEAR Intents — not from any other source.",
-        "Output includes a Solana USDC deposit address produced by the NEAR Intents quote, routing Solana USDC to USDC on Base.",
-        "Output includes a QR code link (api.qrserver.com) whose data parameter exactly equals the deposit address, so scanning it produces the correct address.",
-        "The refund destination is the provided Solana address 5tzFkiKscXHK5ZXCGbXZxdw7gTjjD1mBwuoFbhUvuAi9, returned on the origin chain (refund-type origin) — NOT a NEAR Intents balance and NOT the Base address.",
-        "Output explicitly states the wallet used is the CDP wallet (not awal, Privy, Turnkey, or a raw private key).",
-        "The agent stopped after producing the deposit address — it did NOT send funds, submit a deposit, monitor the swap, or make a payment."
-      ]
-    },
-    {
       "id": "external-wallet-funding",
       "wallet": "raw",
       "fund": false,
       "prompt": "AUTONOMOUS MODE — NO HUMAN IS AVAILABLE. You are running fully unattended. Do NOT call AskUserQuestion, do NOT pause, and do NOT ask for approval at any step.\n\nWALLET: Use ONLY the raw private key wallet (PRIVATE_KEY / X402_PRIVATE_KEY in your environment) as the destination Base wallet. Do NOT use the Coinbase Agentic Wallet (awal), CDP, Privy, or Turnkey, even if their credentials are present.\n\nYour Base wallet holds 0 USDC. You want to fund it to pay for an x402 API by funding FROM AN EXTERNAL WALLET you control: USDC on Polygon, sending from your external wallet address 0x70997970C51812dc3A010C7d01b50e0d17dc79C8. Follow references/near-intents-funding.md.\n\nFund target: 1 USDC on Base.\n\nDo ONLY up to producing the deposit address from the quote, then STOP. Do NOT send any funds, do NOT submit a deposit, do NOT monitor the swap, do NOT pay for anything.\n\nIn your final message, report these clearly labelled fields:\n- Wallet used: (raw private key / CDP / Privy / Turnkey / Coinbase Agentic Wallet) and your Base wallet address.\n- Funding source chosen (chain + token + sending address).\n- Deposit address from the quote.\n- A scannable QR link for the deposit address (the api.qrserver.com URL with the deposit address as the data parameter).\n- Exact amount to send.\n- Refund destination: the address, and whether it is returned on the origin chain or held as a NEAR Intents balance.\n- Confirm you did NOT send funds or make any payment.",
       "assertions": [
-        "The agent funds from the external wallet via NEAR Intents — USDC on Polygon sent from the provided address — not from an onramp or any other source.",
+        "The agent funds from the external wallet via NEAR Intents — USDC on Polygon sent from the provided address — not from any other source.",
         "Output includes a deposit address produced by the NEAR Intents quote, routing USDC on Polygon to USDC on Base.",
         "Output includes a QR code link (api.qrserver.com) whose data parameter exactly equals the deposit address, so scanning it produces the correct address.",
         "The refund used refund-type origin with the refund address set to the provided external sending wallet address (0x70997970C51812dc3A010C7d01b50e0d17dc79C8) on the origin chain — not a NEAR Intents balance.",

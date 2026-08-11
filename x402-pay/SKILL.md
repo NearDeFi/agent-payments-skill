@@ -113,7 +113,7 @@ https://x402.ottoai.services/crypto-news
 Check your wallet's USDC balance on Base — see `references/wallet-flows.md` for the method for your wallet (if you don't already know it) — and compare it against the price you previewed in Step 3.
 
 - **Balance ≥ service price** → proceed to Step 5
-- **Balance < service price** → fund it: Read `references/near-intents-funding.md` for the cross-chain funding flow. Always use NEAR intents to fund the wallet if the balance is low. If the user has no crypto to swap from, the **onramp** path (`references/onramp-funding.md`) funds the wallet from Cash App / Robinhood / Revolut.
+- **Balance < service price** → fund it: Read `references/near-intents-funding.md` for the cross-chain funding flow. Always use NEAR intents to fund the wallet if the balance is low.
 
 **Gas:** No ETH needed — you sign off-chain only. The x402 facilitator submits the on-chain transaction and covers gas. This applies to all wallet types.
 
